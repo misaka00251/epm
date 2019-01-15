@@ -62,6 +62,10 @@ fi)
 
 AC_ARG_ENABLE(gui, [  --enable-gui            turn on GUI utilities [[default=auto]]])
 
+AC_ARG_ENABLE(fltk, [  --enable-fltk          enable fltk [[default=auto]]])
+
+AC_ARG_ENABLE(aoo, [  --enable-aoo           enable AOO modifications [[default=no]]])
+
 AC_ARG_WITH(docdir, [  --with-docdir=/dir      set directory for documentation
                           [[default=${datadir}/doc/epm]]],
 	docdir="$withval",
@@ -129,7 +133,11 @@ else
 fi
 AC_SEARCH_LIBS(gethostname, socket)
 
-if test "x$enable_gui" != xno; then
+if test "x$enable_aoo" = xyes; then
+	CFLAGS="-D__FOR_AOO__ $CFLAGS"
+fi
+
+if test "x$enable_gui" != xno && test "x$enable_fltk" = xyes; then
 	AC_PATH_PROG(FLTKCONFIG,fltk-config)
 else
 	FLTKCONFIG=""

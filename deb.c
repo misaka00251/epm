@@ -26,6 +26,31 @@
  * Local functions...
  */
 
+#ifdef __FOR_AOO__
+/*
+ * 'add_size()' - Append Installed-Size tag to DEBIAN/control file
+ */
+
+static int                      /* O - 0 = success, 1 = fail */
+add_size(FILE       *fpControl, /* Control file stream */
+         const char *directory) /* Directory containing all files to package */
+{
+    FILE *fp;
+    char command[1024];
+
+    snprintf(command, sizeof(command), "du -k -s %s", directory);
+    fp = popen(command, "r");
+    if( NULL != fp )
+    {
+        char size[1024];
+        fscanf(fp, "%s .", size);
+        fprintf(fpControl, "Installed-Size: %s\n", size);
+        return pclose(fp);
+    }
+    return 1;
+}
+#endif /* __FOR_AOO__ */
+
 static int	make_subpackage(const char *prodname, const char *directory,
 		                const char *platname, dist_t *dist,
 		                struct utsname *platform,
@@ -48,10 +73,33 @@ make_deb(const char     *prodname,	/* I - Product short name */
   char		name[1024],		/* Full product name */
 		filename[1024];		/* File to archive */
 
+#ifdef __FOR_AOO__
+  /*
+   * Use debian default naming scheme
+   */
+
+  if (!strcmp(platname, "intel"))
+#ifdef __FreeBSD_kernel__
+    platname = "kfreebsd-i386";
+#else
+    platname = "i386";
+#endif
+  else if (!strcmp(platname, "x86_64"))
+#ifdef __FreeBSD_kernel__
+    platname = "kfreebsd-amd64";
+#else
+    platname = "amd64";
+#endif
+  else if (!strcmp(platname, "ppc"))
+    platname = "powerpc";
+
+#else /* __FOR_AOO__ */
 
  /* Debian packages use "amd64" instead of "x86_64" for the architecture... */
   if (!strcmp(platname, "x86_64"))
     platname = "amd64";
+
+#endif /* __FOR_AOO__ */
 
   if (make_subpackage(prodname, directory, platname, dist, platform, NULL))
     return (1);
@@ -72,14 +120,26 @@ make_deb(const char     *prodname,	/* I - Product short name */
     */
 
     if (dist->release[0])
+#ifdef __FOR_AOO__
+      snprintf(name, sizeof(name), "%s_%s-%s", prodname, dist->version,
+#else /* __FOR_AOO__ */
       snprintf(name, sizeof(name), "%s-%s-%s", prodname, dist->version,
+#endif /* __FOR_AOO__ */
                dist->release);
     else
+#ifdef __FOR_AOO__
+      snprintf(name, sizeof(name), "%s_%s", prodname, dist->version);
+#else /* __FOR_AOO__ */
       snprintf(name, sizeof(name), "%s-%s", prodname, dist->version);
+#endif /* __FOR_AOO__ */
 
     if (platname[0])
     {
+#ifdef __FOR_AOO__
+      strlcat(name, "_", sizeof(name));
+#else /* __FOR_AOO__ */
       strlcat(name, "-", sizeof(name));
+#endif /* __FOR_AOO__ */
       strlcat(name, platname, sizeof(name));
     }
 
@@ -183,7 +243,11 @@ make_subpackage(const char     *prodname,
   */
 
   if (subpackage)
+#ifdef __FOR_AOO__
+    snprintf(prodfull, sizeof(prodfull), "%s_%s", prodname, subpackage);
+#else /* __FOR_AOO__ */
     snprintf(prodfull, sizeof(prodfull), "%s-%s", prodname, subpackage);
+#endif /* __FOR_AOO__ */
   else
     strlcpy(prodfull, prodname, sizeof(prodfull));
 
@@ -192,14 +256,26 @@ make_subpackage(const char     *prodname,
   */
 
   if (dist->release[0])
+#ifdef __FOR_AOO__
+    snprintf(name, sizeof(name), "%s_%s-%s", prodfull, dist->version,
+#else /* __FOR_AOO__ */
     snprintf(name, sizeof(name), "%s-%s-%s", prodfull, dist->version,
+#endif /* __FOR_AOO__ */
              dist->release);
   else
+#ifdef __FOR_AOO__
+    snprintf(name, sizeof(name), "%s_%s", prodfull, dist->version);
+#else /* __FOR_AOO__ */
     snprintf(name, sizeof(name), "%s-%s", prodfull, dist->version);
+#endif /* __FOR_AOO__ */
 
   if (platname[0])
   {
+#ifdef __FOR_AOO__
+    strlcat(name, "_", sizeof(name));
+#else /* __FOR_AOO__ */
     strlcat(name, "-", sizeof(name));
+#endif /* __FOR_AOO__ */
     strlcat(name, platname, sizeof(name));
   }
 
@@ -239,6 +315,24 @@ make_subpackage(const char     *prodname,
   * (which we change in get_platform to a common name)
   */
 
+#ifdef __FOR_AOO__
+  if (!strcmp(platform->machine, "intel"))
+#ifdef __FreeBSD_kernel__
+    fputs("Architecture: kfreebsd-i386\n", fp);
+#else
+    fputs("Architecture: i386\n", fp);
+#endif
+  else if (!strcmp(platform->machine, "x86_64"))
+#ifdef __FreeBSD_kernel__
+    fputs("Architecture: kfreebsd-amd64\n", fp);
+#else
+    fputs("Architecture: amd64\n", fp);
+#endif
+  else if (!strcmp(platform->machine, "ppc"))
+    fputs("Architecture: powerpc\n", fp);
+  else
+    fprintf(fp, "Architecture: %s\n", platform->machine);
+#else /* __FOR_AOO__ */
   if (!strcmp(platform->machine, "intel"))
     fputs("Architecture: i386\n", fp);
   if (!strcmp(platform->machine, "x86_64"))
@@ -247,6 +341,7 @@ make_subpackage(const char     *prodname,
     fputs("Architecture: powerpc\n", fp);
   else
     fprintf(fp, "Architecture: %s\n", platform->machine);
+#endif
 
   fprintf(fp, "Description: %s\n", dist->product);
   fprintf(fp, " Copyright: %s\n", dist->copyright);
@@ -503,6 +598,27 @@ make_subpackage(const char     *prodname,
       fprintf(fp, "/etc/init.d/%s\n", file->dst);
 
   fclose(fp);
+
+#ifdef __FOR_AOO__
+  /*
+   * Calculate and append Installed-Size to DEBIAN/control
+   */
+
+  if (Verbosity)
+    puts("Calculating Installed-Size...");
+
+  snprintf(filename, sizeof(filename), "%s/%s/DEBIAN/control", directory, name);
+  if ((fp = fopen(filename, "a")) == NULL)
+  {
+    fprintf(stderr, "epm: Unable to Installed-Size to file \"%s\" - %s\n", filename,
+            strerror(errno));
+    return (1);
+  }
+
+  snprintf(filename, sizeof(filename), "%s/%s", directory, name);
+  add_size(fp, filename);
+  fclose(fp);
+#endif /* __FOR_AOO__ */
 
  /*
   * Copy the files over...

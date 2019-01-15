@@ -26,6 +26,18 @@
  * Local functions...
  */
 
+#ifdef __FOR_AOO__
+static void cr2semicolon(char *command)
+{
+  int		len, i;
+
+  len = strlen(command);
+  for (i = 0; i < len; i++)
+    if (*(command+i)=='\n')
+      *(command+i)=';';
+}
+#endif
+
 static int	make_subpackage(const char *prodname, const char *directory,
 		                const char *platname, dist_t *dist,
 			        const char *subpackage);
@@ -197,12 +209,24 @@ make_subpackage(
     if (d->subpackage != subpackage)
       continue;
 
+#ifdef __FOR_AOO__
+#ifdef __FreeBSD__
+    if (d->type == DEPEND_REQUIRES) {
+      if (dist->relnumber) {
+        fprintf(fp, "@pkgdep %s-%s-%d-%s", d->product, dist->version, dist->relnumber, platname);
+      } else {
+        fprintf(fp, "@pkgdep %s-%s-%s", d->product, dist->version, platname);
+      }
+    } else
+#endif /* __FreeBSD__ */
+#else
     if (d->type == DEPEND_REQUIRES)
 #ifdef __OpenBSD__
       fprintf(fp, "@depend %s", d->product);
 #else
       fprintf(fp, "@pkgdep %s", d->product);
 #endif /* __OpenBSD__ */
+#endif /* __FOR_AOO__ */
     else
 #ifdef __FreeBSD__
      /*
@@ -229,9 +253,15 @@ make_subpackage(
 	          "         by the BSD packager.\n", stderr);
             break;
 	case COMMAND_POST_INSTALL :
+#ifdef __FOR_AOO__
+	    cr2semicolon(c->command);
+#endif /* __FOR_AOO__ */
             fprintf(fp, "@exec %s\n", c->command);
 	    break;
 	case COMMAND_PRE_REMOVE :
+#ifdef __FOR_AOO__
+	    cr2semicolon(c->command);
+#endif /* __FOR_AOO__ */
             fprintf(fp, "@unexec %s\n", c->command);
 	    break;
 	case COMMAND_POST_REMOVE :
