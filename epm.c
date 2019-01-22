@@ -650,7 +650,8 @@ info(void)
   puts(EPM_VERSION);
   puts("Copyright 1999-2017 by Michael R Sweet.");
 #ifdef __FOR_AOO__
-  puts("Patched for Apache OpenOffice.org");
+  puts("Patched for Apache OpenOffice");
+  puts("  url: https://github.com/jimjag/epm/");
 #endif /* __FOR_AOO__ */
   puts("");
   puts("EPM is free software and comes with ABSOLUTELY NO WARRANTY; for details");
