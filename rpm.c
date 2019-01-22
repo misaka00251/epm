@@ -221,7 +221,6 @@ make_rpm(int            format,		/* I - Subformat */
     }
   }
 
-#ifndef __FOR_AOO__
  /*
   * Build the distribution from the spec file...
   */
@@ -479,7 +478,6 @@ make_rpm(int            format,		/* I - Subformat */
                        dist->subpackages[i]);
     }
   }
-#endif /* __FOR_AOO__ */
   return (0);
 }
 
