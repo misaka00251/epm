@@ -121,7 +121,7 @@ make_deb(const char     *prodname,	/* I - Product short name */
 
     if (dist->release[0])
 #ifdef __FOR_AOO__
-      snprintf(name, sizeof(name), "%s_%s-%s", prodname, dist->version,
+      snprintf(name, sizeof(name), "%s_%s_%s", prodname, dist->version,
 #else /* __FOR_AOO__ */
       snprintf(name, sizeof(name), "%s-%s-%s", prodname, dist->version,
 #endif /* __FOR_AOO__ */
@@ -257,7 +257,7 @@ make_subpackage(const char     *prodname,
 
   if (dist->release[0])
 #ifdef __FOR_AOO__
-    snprintf(name, sizeof(name), "%s_%s-%s", prodfull, dist->version,
+    snprintf(name, sizeof(name), "%s_%s_%s", prodfull, dist->version,
 #else /* __FOR_AOO__ */
     snprintf(name, sizeof(name), "%s-%s-%s", prodfull, dist->version,
 #endif /* __FOR_AOO__ */
