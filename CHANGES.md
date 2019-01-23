@@ -1,6 +1,11 @@
 Changes in EPM
 ==============
 
+Changes in EPM 4.4.2
+--------------------
+
+- Support Apache OpenOffice patches
+
 Changes in EPM 4.4.1
 --------------------
 
