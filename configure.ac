@@ -133,8 +133,12 @@ else
 fi
 AC_SEARCH_LIBS(gethostname, socket)
 
+AC_MSG_CHECKING(Checking if building for Apache OpenOffice)
 if test "x$enable_aoo" = xyes; then
 	CFLAGS="-D__FOR_AOO__ $CFLAGS"
+	AC_MSG_RESULT(yes)
+else
+	AC_MSG_RESULT(no)
 fi
 
 if test "x$enable_gui" != xno && test "x$enable_fltk" = xyes; then

@@ -4628,8 +4628,15 @@ if test "$ac_res" != no; then :
 fi
 
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking Checking if building for Apache OpenOffice" >&5
+$as_echo_n "checking Checking if building for Apache OpenOffice... " >&6; }
 if test "x$enable_aoo" = xyes; then
 	CFLAGS="-D__FOR_AOO__ $CFLAGS"
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
 fi
 
 if test "x$enable_gui" != xno && test "x$enable_fltk" = xyes; then
