@@ -1,5 +1,5 @@
-ESP Package Manager (EPM) 4.4
-=============================
+ESP Package Manager (EPM) 4.4.2
+===============================
 
 What is EPM?
 ------------
@@ -28,7 +28,12 @@ one package a snap.  The installers can be customized with product logos,
 EPM is provided as free software under version 2 of the GNU General Public
 license.
 
-> Note: This software is currently in maintenance mode.
+How is this releated to the official EPM?
+-----------------------------------------
+
+This version is a matched fork of that repo, but with Apache OpenOffice (and related)
+specific changes applied to the source code. These changes are only in effect if
+EPM is configured and built with the `--enable-aoo ` option.
 
 
 How Do I Compile EPM?

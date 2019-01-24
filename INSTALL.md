@@ -38,6 +38,12 @@ different location, use the `--prefix` option to the configure script:
     ./configure --prefix=/path/to/use ENTER
     make ENTER
 
+If using to build Apache OpenOffice, you will need to also include the `--enable-aoo`
+option, to activate those AOO specific changes:
+
+    ./configure --enable-aoo ENTER
+    make ENTER
+
 Once EPM is compiled you can type:
 
     sudo make install ENTER
