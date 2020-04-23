@@ -583,7 +583,7 @@ PACKAGE_TARNAME='epm'
 PACKAGE_VERSION='4.5.0-jj'
 PACKAGE_STRING='EPM 4.5.0-jj'
 PACKAGE_BUGREPORT='https://github.com/jimjag/epm/issues'
-PACKAGE_URL='https://www.msweet.org/epm'
+PACKAGE_URL='https://github.com/jimjag/epm'
 
 # Factoring default headers for most tests.
 ac_includes_default="\
@@ -1380,7 +1380,7 @@ Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
 
 Report bugs to <https://github.com/jimjag/epm/issues>.
-EPM home page: <https://www.msweet.org/epm>.
+EPM home page: <https://github.com/jimjag/epm>.
 _ACEOF
 ac_status=$?
 fi
@@ -5767,7 +5767,7 @@ Configuration headers:
 $config_headers
 
 Report bugs to <https://github.com/jimjag/epm/issues>.
-EPM home page: <https://www.msweet.org/epm>."
+EPM home page: <https://github.com/jimjag/epm>."
 
 _ACEOF
 cat >>$CONFIG_STATUS <<_ACEOF || ac_write_fail=1

@@ -15,7 +15,7 @@ dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 dnl GNU General Public License for more details.
 dnl
 
-AC_INIT([EPM],[4.5.0-jj],[https://github.com/jimjag/epm/issues],[epm],[https://www.msweet.org/epm])
+AC_INIT([EPM],[4.5.0-jj],[https://github.com/jimjag/epm/issues],[epm],[https://github.com/jimjag/epm])
 AC_CONFIG_HEADER(config.h)
 
 dnl Version number...
