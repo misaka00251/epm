@@ -15,6 +15,9 @@
 // GNU General Public License for more details.
 //
 
+#ifndef _GUI_COMMON_H_
+#  define _GUI_COMMON_H_
+
 //
 // Include necessary headers...
 //
@@ -99,3 +102,5 @@ gui_dist_t	*gui_find_dist(const char *name, int num_d, gui_dist_t *d);
 void		gui_get_installed(void);
 void		gui_load_file(Fl_Help_View *hv, const char *filename);
 int		gui_sort_dists(const gui_dist_t *d0, const gui_dist_t *d1);
+
+#endif // !_GUI_COMMON_H_

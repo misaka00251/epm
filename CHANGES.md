@@ -1,6 +1,21 @@
 Changes in EPM
 ==============
 
+Changes in EPM 4.5.jj
+------------------
+
+- "make install" failed due to the README filename changing (Issue #59)
+- The `mkepmlist` utility did not correctly handle filenames containing the
+  `$` character (Issue #62)
+- The configure script incorrectly substituted "NONE" for the installation
+  prefix (Issue #67)
+- Fixed some over-zealous permissions on temporary build directories (Issue #71)
+- Fixed the mantohtml helper program - was depending on private CUPS headers for
+  some reason (Issue #72)
+- Fixed some build system issues (Issue #75, Issue #76)
+- Documentation updates (Issue #74, Issue #77)
+- Cleaned up old sprintf and strcpy usage in many places.
+
 Changes in EPM 4.4.2
 --------------------
 
@@ -10,6 +25,11 @@ Changes in EPM 4.4.1
 --------------------
 
 - "make install" failed due to the README filename changing (Issue #59)
+- The `mkepmlist` utility did not correctly handle filenames containing the
+  `$` character (Issue #62)
+- The configure script incorrectly substituted "NONE" for the installation
+  prefix (Issue #67)
+- Cleaned up old sprintf and strcpy usage in many places.
 
 
 Changes in EPM 4.4

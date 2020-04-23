@@ -1,8 +1,8 @@
 dnl
 dnl Configuration script for the ESP Package Manager (EPM).
 dnl
-dnl Copyright 1999-2017 by Michael R Sweet
-dnl Copyright 1999-2007 by Easy Software Products, all rights reserved.
+dnl Copyright © 1999-2020 by Michael R Sweet
+dnl Copyright © 1999-2007 by Easy Software Products, all rights reserved.
 dnl
 dnl This program is free software; you can redistribute it and/or modify
 dnl it under the terms of the GNU General Public License as published by
@@ -15,21 +15,24 @@ dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 dnl GNU General Public License for more details.
 dnl
 
-AC_INIT([EPM],[4.4.2],[https://github.com/michaelrsweet/epm/issues],[epm],[https://michaelrsweet.github.io/epm])
+AC_INIT([EPM],[4.5.0-jj],[https://github.com/jimjag/epm/issues],[epm],[https://www.msweet.org/epm])
 AC_CONFIG_HEADER(config.h)
 
 dnl Version number...
 
 VERSION="AC_PACKAGE_VERSION"
-VERNUMBER=442
+VERNUMBER=450jj
 AC_SUBST(VERSION)
 AC_SUBST(VERNUMBER)
 AC_DEFINE_UNQUOTED(EPM_VERSION, "ESP Package Manager v$VERSION")
 
-dnl Get the operating system...
+dnl Get the build and host platforms and split the host_os value
+AC_CANONICAL_BUILD
+AC_CANONICAL_HOST
 
 uname=`uname`
 uversion=`uname -r | sed -e '1,$s/[[^0-9]]//g'`
+[host_os_name=`echo $host_os | sed -e '1,$s/[0-9.]*$//g'`]
 
 if test "$uname" = "IRIX64"; then
     uname="IRIX"
@@ -84,12 +87,13 @@ AC_PROG_CXX(clang++ c++ g++)
 AC_PROG_RANLIB
 AC_PATH_PROG(AR,ar)
 AC_PATH_PROG(CHMOD,chmod)
+AC_PATH_PROGS(CODE_SIGN, codesign true)
 AC_PATH_PROG(CP,cp)
 AC_PATH_PROG(GZIP,gzip)
 if test x$GZIP = x; then
-	AC_MSG_ERROR(GNU zip not found but required!)
+	AC_MSG_ERROR([GNU zip not found but required.])
 fi
-AC_PATH_PROG(HTMLDOC,htmldoc)
+AC_PATH_PROGS(HTMLDOC, htmldoc echo)
 AC_PATH_PROG(MKDIR,mkdir)
 AC_PATH_PROG(NROFF,nroff)
 if test x$NROFF = x; then
@@ -153,14 +157,14 @@ if test "x$FLTKCONFIG" = x; then
 	INSTALL_GUIS=""
 	INSTALL_OSX=""
 
-	AC_MSG_WARN([Sorry, setup GUI requires FLTK 1.1.x.])
+	AC_MSG_WARN([Sorry, setup GUI requires FLTK 1.1.x or later.])
 else
 	CXXFLAGS="`$FLTKCONFIG --cflags` ${CXXFLAGS}"
 	GUIS="setup uninst"
 	GUILIBS="`$FLTKCONFIG --use-images --ldstaticflags`"
 	INSTALL_GUIS="install-guis"
 
-	if test "$uname" = Darwin; then
+	if test "$host_os_name" = darwin; then
 		GUILIBS="$GUILIBS -framework Security"
 		INSTALL_OSX="install-macos"
 	else
@@ -174,8 +178,8 @@ AC_SUBST(GUIS)
 AC_SUBST(GUILIBS)
 
 dnl Set the default compression value...
-case "$uname" in
-	Darwin* | *BSD | Linux* | SunOS*)
+case "$host_os_name" in
+	darwin* | *bsd* | linux* | sunos*)
 		# macOS, *BSD, Linux, and Solaris come with gzip standard
 		AC_DEFINE(EPM_COMPRESS, 1)
 		;;
@@ -196,6 +200,17 @@ if test -n "$GCC"; then
 	# Add useful warning options...
 	CFLAGS="-Wall -Wformat -Wno-format-y2k -Wunused $CFLAGS"
 	CXXFLAGS="-Wall -Wformat -Wno-format-y2k -Wunused $CXXFLAGS"
+
+	# See if GCC supports -Wno-format-truncation...
+	AC_MSG_CHECKING(if GCC supports -Wno-format-truncation)
+	OLDCFLAGS="$CFLAGS"
+	CFLAGS="$CFLAGS -Werror -Wno-format-truncation"
+	AC_TRY_COMPILE(,,[
+		CFLAGS="$OLDCFLAGS -Wno-format-truncation"
+		CXXFLAGS="$CXXFLAGS -Wno-format-truncation"
+		AC_MSG_RESULT(yes)],[
+		AC_MSG_RESULT(no)
+		CFLAGS="$OLDCFLAGS"])
 
 	# See if GCC supports -fno-rtti...
 	AC_MSG_CHECKING(if GCC supports -fno-rtti)
@@ -275,8 +290,8 @@ else
 fi
 
 dnl Flags for "ar" command...
-case $uname in
-        Darwin* | *BSD*)
+case $host_os_name in
+        darwin* | *bsd*)
                 ARFLAGS="-rc"
                 ;;
         *)
@@ -286,10 +301,10 @@ esac
 
 AC_SUBST(ARFLAGS)
 
-#dnl Fix "prefix" variable if it hasn't been specified...
-#if test "$prefix" = "NONE"; then
-#	prefix="/usr"
-#fi
+dnl Fix "prefix" variable if it hasn't been specified...
+if test "$prefix" = "NONE"; then
+	prefix="/usr/local"
+fi
 
 dnl Fix "exec_prefix" variable if it hasn't been specified...
 if test "$exec_prefix" = "NONE"; then

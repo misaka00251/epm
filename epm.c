@@ -1,8 +1,8 @@
 /*
  * Main program source for the ESP Package Manager (EPM).
  *
- * Copyright 1999-2015 by Michael R Sweet
- * Copyright 1999-2008 by Easy Software Products.
+ * Copyright © 1999-2020 by Michael R Sweet
+ * Copyright © 1999-2008 by Easy Software Products.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -428,7 +428,7 @@ main(int  argc,				/* I - Number of command-line args */
     */
 
     if (custom_name)
-      sprintf(directory, "%s", custom_name);
+      strlcpy(directory, custom_name, sizeof(directory));
     else
       snprintf(directory, sizeof(directory), "%s-%s-%s", platform.sysname,
              platform.release, platform.machine);
@@ -530,7 +530,7 @@ main(int  argc,				/* I - Number of command-line args */
   * Make build directory...
   */
 
-  make_directory(directory, 0777, getuid(), getgid());
+  make_directory(directory, 0, getuid(), getgid());
 
  /*
   * Make the distribution in the correct format...
@@ -560,7 +560,7 @@ main(int  argc,				/* I - Number of command-line args */
     case PACKAGE_DEB :
         if (geteuid())
 	  fputs("epm: Warning - file permissions and ownership may not be correct\n"
-	        "     in Debian packages unless you run EPM as root!\n", stderr);
+	        "     in Debian packages unless you run EPM as root.\n", stderr);
 
         i = make_deb(prodname, directory, platname, dist, &platform);
 	break;
@@ -648,7 +648,7 @@ static void
 info(void)
 {
   puts(EPM_VERSION);
-  puts("Copyright 1999-2017 by Michael R Sweet.");
+  puts("Copyright (c) 1999-2020 by Michael R Sweet.");
 #ifdef __FOR_AOO__
   puts("Patched for Apache OpenOffice");
   puts("  url: https://github.com/jimjag/epm/");
@@ -677,7 +677,7 @@ usage(void)
   puts("    Use the named architecture instead of the local one.");
   puts("-g");
   puts("    Don't strip executables in distributions.");
-  puts("-f {aix,bsd,deb,depot,inst,macos,macos-signed,native,pkg,portable,rpm,setld,slackware,swinstall,tardist}");
+  puts("-f {aix,bsd,deb,depot,inst,macos,macos-signed,native,pkg,portable,rpm,rpm-signed,setld,slackware,swinstall,tardist}");
   puts("    Set distribution format.");
   puts("-k");
   puts("    Keep intermediate files (spec files, etc.)");

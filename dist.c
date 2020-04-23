@@ -1,7 +1,7 @@
 /*
  * Distribution functions for the ESP Package Manager (EPM).
  *
- * Copyright 1999-2017 by Michael R Sweet
+ * Copyright 1999-2019 by Michael R Sweet
  * Copyright 1999-2010 by Easy Software Products.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -544,7 +544,7 @@ get_platform(struct utsname *platform)	/* O - Platform info */
       if ((ptr = strstr(line, "<string>")) != NULL)
         sscanf(ptr + 8, "%d.%d", &major, &minor);
 
-      sprintf(platform->release, "%d.%d", major, minor);
+      snprintf(platform->release, sizeof(platform->release), "%d.%d", major, minor);
     }
     else
     {
@@ -566,11 +566,11 @@ get_platform(struct utsname *platform)	/* O - Platform info */
   */
 
 #ifdef __sgi
-  strcpy(platform->machine, "mips");
+  strlcpy(platform->machine, "mips", sizeof(platform->machine));
 #elif defined(__hpux)
-  strcpy(platform->machine, "hppa");
+  strlcpy(platform->machine, "hppa", sizeof(platform->machine));
 #elif defined(_AIX)
-  strcpy(platform->machine, "ppc");
+  strlcpy(platform->machine, "ppc", sizeof(platform->machine));
 #else
   update_architecture(platform->machine, sizeof(platform->machine));
 #endif /* __sgi */
@@ -581,8 +581,7 @@ get_platform(struct utsname *platform)	/* O - Platform info */
   * combine them...
   */
 
-  sprintf(platform->release, "%d.%d", atoi(platform->version),
-          atoi(platform->release));
+  snprintf(platform->release, sizeof(platform->release), "%d.%d", atoi(platform->version), atoi(platform->release));
 #else
  /*
   * Remove any extra junk from the release number - we just want the
@@ -1051,10 +1050,10 @@ read_dist(const char     *filename,	/* I - Main distribution list file */
 
 #ifdef __osf__ /* Remap group "sys" to "system" */
         if (!strcmp(group, "sys"))
-	  strcpy(group, "system");
+	  strlcpy(group, "system", sizeof(group));
 #elif defined(__linux) /* Remap group "sys" to "root" */
         if (!strcmp(group, "sys"))
-	  strcpy(group, "root");
+	  strlcpy(group, "root", sizeof(group));
 #endif /* __osf__ */
 
         if ((temp = strrchr(src, '/')) == NULL)
@@ -1237,7 +1236,7 @@ write_dist(const char *listname,	/* I - File to write to */
   FILE		*listfile;		/* Output file */
   file_t	*file;			/* Current file entry */
   time_t	curtime;		/* Current time */
-  struct tm	*curdate;		/* Current date */
+  struct tm	curdate;		/* Current date */
   char		curstring[256];		/* Current date/time string */
   const char	*subpkg;		/* Current subpackage */
   static const char *commands[] =	/* Command strings */
@@ -1280,11 +1279,11 @@ write_dist(const char *listname,	/* I - File to write to */
   * Write the list file...
   */
 
-  curtime = time(NULL);
-  curdate = localtime(&curtime);
+  time(&curtime);
+  localtime_r(&curtime, &curdate);
 
   strftime(curstring, sizeof(curstring), "# List file created on %c by "
-           EPM_VERSION "\n", curdate);
+           EPM_VERSION "\n", &curdate);
   fputs(curstring, listfile);
 
   if (dist->product[0])

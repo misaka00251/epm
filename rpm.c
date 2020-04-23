@@ -1,8 +1,8 @@
 /*
  * Red Hat package gateway for the ESP Package Manager (EPM).
  *
- * Copyright 1999-2017 by Michael R Sweet
- * Copyright 1999-2010 by Easy Software Products.
+ * Copyright © 1999-2020 by Michael R Sweet
+ * Copyright © 1999-2010 by Easy Software Products.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -116,7 +116,7 @@ make_rpm(int            format,		/* I - Subformat */
 
 #ifdef EPM_RPMTOPDIR
   fprintf(fp, "%%define _topdir %s\n", absdir);
-  strcpy(rpmdir, absdir);
+  strlcpy(rpmdir, absdir, sizeof(rpmdir));
 #else
   if (getenv("RPMDIR"))
     strlcpy(rpmdir, getenv("RPMDIR"), sizeof(rpmdir));
@@ -130,11 +130,11 @@ make_rpm(int            format,		/* I - Subformat */
 
   snprintf(filename, sizeof(filename), "%s/BUILD", directory);
 
-  make_directory(filename, 0777, getuid(), getgid());
+  make_directory(filename, 0, getuid(), getgid());
 
   snprintf(filename, sizeof(filename), "%s/RPMS", directory);
 
-  make_directory(filename, 0777, getuid(), getgid());
+  make_directory(filename, 0, getuid(), getgid());
 
   snprintf(filename, sizeof(filename), "%s/rpms", directory);
   symlink("RPMS", filename);
@@ -147,7 +147,7 @@ make_rpm(int            format,		/* I - Subformat */
     snprintf(filename, sizeof(filename), "%s/RPMS/%s", directory,
              platform->machine);
 
-  make_directory(filename, 0777, getuid(), getgid());
+  make_directory(filename, 0, getuid(), getgid());
 
  /*
   * Now list all of the subpackages...
@@ -748,6 +748,7 @@ write_spec(int        format,		/* I - Subformat */
       fputs("		echo Unable to determine location of startup scripts!\n", fp);
       fputs("	else\n", fp);
       for (; i > 0; i --, file ++)
+    {
 	if (tolower(file->type) == 'i' && file->subpackage == subpackage)
 	{
 	  fputs("		if test -d $rcdir/init.d; then\n", fp);
@@ -783,6 +784,7 @@ write_spec(int        format,		/* I - Subformat */
 
 	  qprintf(fp, "		%s/init.d/%s start\n", SoftwareDir, file->dst);
 	}
+    }
 
       fputs("	fi\n", fp);
     }
@@ -831,6 +833,7 @@ write_spec(int        format,		/* I - Subformat */
       fputs("		echo Unable to determine location of startup scripts!\n", fp);
       fputs("	else\n", fp);
       for (; i > 0; i --, file ++)
+    {
 	if (tolower(file->type) == 'i' && file->subpackage == subpackage)
 	{
 	  qprintf(fp, "		%s/init.d/%s stop\n", SoftwareDir, file->dst);
@@ -857,6 +860,7 @@ write_spec(int        format,		/* I - Subformat */
 		     *runlevels == '6') ? 'K' : 'S', number, file->dst);
 	  }
 	}
+    }
 
       fputs("	fi\n", fp);
     }

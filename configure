@@ -2189,8 +2189,13 @@ ac_config_headers="$ac_config_headers config.h"
 
 
 
+<<<<<<< HEAD
 VERSION="4.4.2"
 VERNUMBER=442
+=======
+VERSION="4.4.1"
+VERNUMBER=441
+>>>>>>> 55c75346892ee509689c8067a7074dd7560f9bc3
 
 
 cat >>confdefs.h <<_ACEOF
@@ -4690,8 +4695,8 @@ if test "x$FLTKCONFIG" = x; then
 	INSTALL_GUIS=""
 	INSTALL_OSX=""
 
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Sorry, setup GUI requires FLTK 1.1.x." >&5
-$as_echo "$as_me: WARNING: Sorry, setup GUI requires FLTK 1.1.x." >&2;}
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Sorry, setup GUI requires FLTK 1.1.x or later." >&5
+$as_echo "$as_me: WARNING: Sorry, setup GUI requires FLTK 1.1.x or later." >&2;}
 else
 	CXXFLAGS="`$FLTKCONFIG --cflags` ${CXXFLAGS}"
 	GUIS="setup uninst"
@@ -4734,6 +4739,36 @@ if test -n "$GCC"; then
 	# Add useful warning options...
 	CFLAGS="-Wall -Wformat -Wno-format-y2k -Wunused $CFLAGS"
 	CXXFLAGS="-Wall -Wformat -Wno-format-y2k -Wunused $CXXFLAGS"
+
+	# See if GCC supports -Wno-format-truncation...
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if GCC supports -Wno-format-truncation" >&5
+$as_echo_n "checking if GCC supports -Wno-format-truncation... " >&6; }
+	OLDCFLAGS="$CFLAGS"
+	CFLAGS="$CFLAGS -Werror -Wno-format-truncation"
+	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+
+		CFLAGS="$OLDCFLAGS -Wno-format-truncation"
+		CXXFLAGS="$CXXFLAGS -Wno-format-truncation"
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+		CFLAGS="$OLDCFLAGS"
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
 	# See if GCC supports -fno-rtti...
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if GCC supports -fno-rtti" >&5
@@ -4874,10 +4909,9 @@ esac
 
 
 
-#dnl Fix "prefix" variable if it hasn't been specified...
-#if test "$prefix" = "NONE"; then
-#	prefix="/usr"
-#fi
+if test "$prefix" = "NONE"; then
+	prefix="/usr/local"
+fi
 
 if test "$exec_prefix" = "NONE"; then
 	exec_prefix="$prefix"

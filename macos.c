@@ -1,8 +1,8 @@
 /*
  * macOS package gateway for the ESP Package Manager (EPM).
  *
- * Copyright 2002-2017 by Michael R Sweet
- * Copyright 2002-2010 by Easy Software Products.
+ * Copyright © 2002-2020 by Michael R Sweet
+ * Copyright © 2002-2010 by Easy Software Products.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -399,7 +399,7 @@ make_subpackage(int        format,	/* I - Format */
     puts("Copying temporary resource files...");
 
   snprintf(filename, sizeof(filename), "%s/%s/Resources", directory, prodfull);
-  make_directory(filename, 0777, 0, 0);
+  make_directory(filename, 0755, 0, 0);
 
   if (!have_pkgbuild)
   {
@@ -665,7 +665,7 @@ make_subpackage(int        format,	/* I - Format */
           snprintf(filename, sizeof(filename),
 	           "%s/%s/Package/Library/StartupItems/%s/Resources/English.lproj",
 	           directory, prodfull, file->dst);
-          make_directory(filename, 0777, 0, 0);
+          make_directory(filename, 0755, 0, 0);
 
           snprintf(filename, sizeof(filename),
 	           "%s/%s/Package/Library/StartupItems/%s/Resources/English.lproj/Localizable.strings",
@@ -699,8 +699,7 @@ make_subpackage(int        format,	/* I - Format */
 	  if (Verbosity > 1)
 	    printf("Directory %s...\n", filename);
 
-          make_directory(filename, file->mode, pwd ? pwd->pw_uid : 0,
-			 grp ? grp->gr_gid : 0);
+          make_directory(filename, file->mode, pwd ? pwd->pw_uid : 0, grp ? grp->gr_gid : 0);
           break;
       case 'l' :
           if (!strncmp(file->dst, "/etc/", 5) || !strncmp(file->dst, "/var/", 5))
@@ -759,39 +758,16 @@ make_subpackage(int        format,	/* I - Format */
       const char *identity = getenv("EPM_SIGNING_IDENTITY");
       if (!identity)
       {
-        fputs("epm: Using default signing identity; set EPM_SIGNING_IDENTITY environment variable to override.\n", stderr);
-	identity = "-";
+      fputs("epm: Using default 'Developer ID Installer' signing identity.\n"
+            "     Set the EPM_SIGNING_IDENTITY environment variable to override.\n", stderr);
+      identity = "Developer ID Installer";
       }
 
-      run_command(NULL, "/usr/bin/pkgbuild "
-			"--identifier %s "
-			"--version %s "
-			"--ownership preserve "
-			"--scripts %s/%s/Resources "
-			"--root %s/%s/Package "
-			"--sign '%s' "
-			"%s",
-		  prodfull,
-		  dist->version,
-		  directory, prodfull,
-		  directory, prodfull,
-		  identity,
-		  pkgname);
+      run_command(NULL, "/usr/bin/pkgbuild --identifier %s --version %s --ownership preserve --scripts %s/%s/Resources --root %s/%s/Package --sign '%s' %s", prodfull, dist->version, directory, prodfull, directory, prodfull, identity, pkgname);
     }
     else
     {
-      run_command(NULL, "/usr/bin/pkgbuild "
-			"--identifier %s "
-			"--version %s "
-			"--ownership preserve "
-			"--scripts %s/%s/Resources "
-			"--root %s/%s/Package "
-			"%s",
-		  prodfull,
-		  dist->version,
-		  directory, prodfull,
-		  directory, prodfull,
-		  pkgname);
+      run_command(NULL, "/usr/bin/pkgbuild --identifier %s --version %s --ownership preserve --scripts %s/%s/Resources --root %s/%s/Package %s", prodfull, dist->version, directory, prodfull, directory, prodfull, pkgname);
     }
   }
   else

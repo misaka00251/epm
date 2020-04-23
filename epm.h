@@ -1,8 +1,8 @@
 /*
  * Definitions for the ESP Package Manager (EPM).
  *
- * Copyright 1999-2017 by Michael R Sweet
- * Copyright 1999-2010 by Easy Software Products.
+ * Copyright © 1999-2020 by Michael R Sweet
+ * Copyright © 1999-2010 by Easy Software Products.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

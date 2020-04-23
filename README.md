@@ -1,5 +1,5 @@
-ESP Package Manager (EPM) 4.4.2
-===============================
+ESP Package Manager (EPM)
+=========================
 
 What is EPM?
 ------------
@@ -68,7 +68,7 @@ See the file `CHANGES.md` for change information.
 Resources
 ---------
 
-The official home page for EPM is <https://michaelrsweet.github.io/epm>.
+The official home page for EPM is <https://www.msweet.org/epm>.
 
 Report all problems and submit all patches/pull requests using the Github issue
 tracking pages at <https://github.com/michaelrsweet/epm/issues>.
@@ -77,7 +77,7 @@ tracking pages at <https://github.com/michaelrsweet/epm/issues>.
 Legal Stuff
 -----------
 
-EPM is copyright 1999-2017 by Michael R Sweet. All rights reserved.
+EPM is Copyright © 1999-2020 by Michael R Sweet. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
