@@ -33,7 +33,8 @@ How is this releated to the official EPM?
 
 This version is a matched fork of that repo, but with Apache OpenOffice (and related)
 specific changes applied to the source code. These changes are only in effect if
-EPM is configured and built with the `--enable-aoo ` option.
+EPM is configured and built with the `--enable-aoo ` option. This version also
+continues to support platforms deprecated by the offical EPM.
 
 
 How Do I Compile EPM?
@@ -70,8 +71,8 @@ Resources
 
 The official home page for EPM is <https://www.msweet.org/epm>.
 
-Report all problems and submit all patches/pull requests using the Github issue
-tracking pages at <https://github.com/michaelrsweet/epm/issues>.
+Report all problems and submit all patches/pull requests for this version using the Github issue
+tracking pages at <https://github.com/jimjag/epm/issues>.
 
 
 Legal Stuff
