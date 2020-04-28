@@ -85,6 +85,7 @@ dnl Checks for programs...
 AC_PROG_CC(clang cc gcc)
 AC_PROG_CXX(clang++ c++ g++)
 AC_PROG_RANLIB
+AC_PROG_INSTALL
 AC_PATH_PROG(AR,ar)
 AC_PATH_PROG(CHMOD,chmod)
 AC_PATH_PROGS(CODE_SIGN, codesign true)
