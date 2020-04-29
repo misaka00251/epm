@@ -155,7 +155,7 @@ install: all @INSTALL_GUIS@ @INSTALL_OSX@
 	for file in epm epminstall mkepmlist; do \
 		$(INSTALL) -c -m 755 $$file $(BUILDROOT)$(bindir); \
 	done
-	(cd doc; $(MAKE) $(MFLAGS) install)
+	#(cd doc; $(MAKE) $(MFLAGS) install)
 
 install-guis:	setup uninst
 	echo Installing EPM setup/uninst in $(BUILDROOT)$(libdir)/epm
