@@ -1,7 +1,15 @@
 Changes in EPM
 ==============
 
-Changes in EPM 4.5.jj
+Changes in EPM 4.5.1
+--------------------
+
+- Fixed a typo in the epm.list file (Issue #78)
+- Fixed macro usage in the setup.types man page (Issue #81)
+- Fixed @INSTALL@ macro in makefile (Issue #84)
+
+
+Changes in EPM 4.5
 ------------------
 
 - "make install" failed due to the README filename changing (Issue #59)
