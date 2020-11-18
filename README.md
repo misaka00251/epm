@@ -69,9 +69,9 @@ See the file `CHANGES.md` for change information.
 Resources
 ---------
 
-The official home page for EPM is <https://www.msweet.org/epm>.
+The official home page for EPM is <https://jimjag.github.io/epm/>.
 
-Report all problems and submit all patches/pull requests for this version using the Github issue
+Report all problems and submit all patches/pull requests using the Github issue
 tracking pages at <https://github.com/jimjag/epm/issues>.
 
 

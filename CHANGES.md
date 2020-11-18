@@ -4,9 +4,11 @@ Changes in EPM
 Changes in EPM 4.5.1
 --------------------
 
+- Fixed Debian dependencies for min/max version (Issue #64)
 - Fixed a typo in the epm.list file (Issue #78)
 - Fixed macro usage in the setup.types man page (Issue #81)
 - Fixed @INSTALL@ macro in makefile (Issue #84)
+- Fixed Debian init script support (Issue #85)
 
 
 Changes in EPM 4.5

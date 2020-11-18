@@ -190,11 +190,9 @@ make_rpm(int            format,		/* I - Subformat */
           break;
       case 'i' :
           if (format == PACKAGE_LSB || format == PACKAGE_LSB_SIGNED)
-	    snprintf(filename, sizeof(filename), "%s/buildroot/etc/init.d/%s",
-		     directory, file->dst);
+	    snprintf(filename, sizeof(filename), "%s/buildroot/etc/init.d/%s", directory, file->dst);
           else
-	    snprintf(filename, sizeof(filename), "%s/buildroot%s/init.d/%s",
-		     directory, SoftwareDir, file->dst);
+	    snprintf(filename, sizeof(filename), "%s/buildroot%s/init.d/%s", directory, SoftwareDir, file->dst);
 
 	  if (Verbosity > 1)
 	    printf("%s -> %s...\n", file->src, filename);

@@ -15,13 +15,13 @@ dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 dnl GNU General Public License for more details.
 dnl
 
-AC_INIT([EPM],[4.5.0-jj],[https://github.com/jimjag/epm/issues],[epm],[https://github.com/jimjag/epm])
+AC_INIT([EPM],[4.5.1],[https://github.com/jimjag/epm/issues],[epm],[https://github.com/jimjag/epm])
 AC_CONFIG_HEADER(config.h)
 
 dnl Version number...
 
 VERSION="AC_PACKAGE_VERSION"
-VERNUMBER=450jj
+VERNUMBER=451
 AC_SUBST(VERSION)
 AC_SUBST(VERNUMBER)
 AC_DEFINE_UNQUOTED(EPM_VERSION, "ESP Package Manager v$VERSION")
@@ -51,17 +51,19 @@ AC_ARG_WITH(archflags, [  --with-archflags=flags  specify architecture flags [[d
 	ARCHFLAGS="${ARCHFLAGS:=}")
 AC_SUBST(ARCHFLAGS)
 
-AC_ARG_WITH(optim, [  --with-optim=flags      specify optimization flags [[default=auto]]],
-	OPTIM="$withval",
-	OPTIM="${OPTIM:=}")
-AC_SUBST(OPTIM)
+AC_ARG_ENABLE(debug, [  --enable-debug          turn on debugging, default=no])
+AC_ARG_ENABLE(sanitizer, [  --enable-sanitizer      build with AddressSanitizer, default=no])
 
-AC_ARG_ENABLE(debug, [  --enable-debug          turn on debugging [[default=no]]],
-if eval "test x$enable_debug = xyes"; then
- 	OPTIM="-g $OPTIM"
+if test "x$enable_debug" = xyes; then
+ 	OPTIM="-g"
+ 	CSFLAGS=""
 else
-	LDFLAGS="$LDFLAGS -s"
-fi)
+	OPTIM="-Os -g"
+	CSFLAGS="-o runtime"
+fi
+
+AC_SUBST(CSFLAGS)
+AC_SUBST(OPTIM)
 
 AC_ARG_ENABLE(gui, [  --enable-gui            turn on GUI utilities [[default=auto]]])
 
@@ -198,9 +200,14 @@ esac
 
 dnl Update compiler options...
 if test -n "$GCC"; then
-	# Add standard optimization options...
-	if test -z "$OPTIM"; then
-        	OPTIM="-Os"
+	if test x$enable_sanitizer = xyes; then
+		# Use -fsanitize=address with debugging...
+		OPTIM="-g -fsanitize=address"
+	else
+		# Otherwise use the Fortify enhancements to catch any unbounded
+		# string operations...
+		CFLAGS="$CFLAGS -D_FORTIFY_SOURCE=2"
+		CXXFLAGS="$CXXFLAGS -D_FORTIFY_SOURCE=2"
 	fi
 
 	# Add useful warning options...

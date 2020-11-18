@@ -373,7 +373,7 @@ make_subpackage(const char     *prodname,
 	  else
 	  {
 	    if (d->vernumber[1] < INT_MAX)
-	      fprintf(fp, " (>= %s, <= %s)", d->version[0], d->version[1]);
+	      fprintf(fp, " (>= %s), %s (<= %s)", d->version[0], d->product, d->version[1]);
 	    else
 	      fprintf(fp, " (>= %s)", d->version[0]);
 	  }
@@ -469,19 +469,12 @@ make_subpackage(const char     *prodname,
     for (i = dist->num_files, file = dist->files; i > 0; i --, file ++)
       if (tolower(file->type) == 'i' && file->subpackage == subpackage)
       {
-        runlevels = get_runlevels(file, "02345");
+       /*
+        * Debian's update-rc.d has changed over the years; current practice is
+        * to let update-rc.d choose the runlevels and ordering...
+        */
 
-        fprintf(fp, "update-rc.d %s start %02d", file->dst,
-	        get_start(file, 99));
-
-        for (rlptr = runlevels; isdigit(*rlptr & 255); rlptr ++)
-	  if (*rlptr != '0')
-	    fprintf(fp, " %c", *rlptr);
-
-	if (strchr(runlevels, '0') != NULL)
-          fprintf(fp, " . stop %02d 0", get_stop(file, 0));
-
-        fputs(" . >/dev/null\n", fp);
+        fprintf(fp, "update-rc.d %s defaults\n", file->dst);
         fprintf(fp, "/etc/init.d/%s start\n", file->dst);
       }
 
@@ -569,7 +562,7 @@ make_subpackage(const char     *prodname,
       if (tolower(file->type) == 'i' && file->subpackage == subpackage)
       {
         fputs("if [ purge = \"$1\" ]; then\n", fp);
-        fprintf(fp, "	update-rc.d %s remove >/dev/null\n", file->dst);
+        fprintf(fp, "	update-rc.d %s remove\n", file->dst);
         fputs("fi\n", fp);
       }
 

@@ -649,6 +649,7 @@ info(void)
 {
   puts(EPM_VERSION);
   puts("Copyright (c) 1999-2020 by Michael R Sweet.");
+  puts("Copyright (c) 2020 by Jim Jagielski.");
 #ifdef __FOR_AOO__
   puts("Patched for Apache OpenOffice");
   puts("  url: https://github.com/jimjag/epm/");
@@ -657,7 +658,7 @@ info(void)
   puts("EPM is free software and comes with ABSOLUTELY NO WARRANTY; for details");
   puts("see the GNU General Public License in the file COPYING or at");
   puts("\"http://www.fsf.org/gpl.html\".  Report all problems to");
-  puts("\"https://github.com/michaelrsweet/epm/issues\".");
+  puts("\"https://github.com/jimjag/epm/issues\".");
   puts("");
 }
 
