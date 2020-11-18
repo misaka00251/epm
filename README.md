@@ -31,10 +31,7 @@ license.
 How is this releated to the official EPM?
 -----------------------------------------
 
-This version is a matched fork of that repo, but with Apache OpenOffice (and related)
-specific changes applied to the source code. These changes are only in effect if
-EPM is configured and built with the `--enable-aoo ` option. This version also
-continues to support platforms deprecated by the offical EPM.
+Starting with version 4.5.2, this is, in fact, the official EPM distribution.
 
 
 How Do I Compile EPM?
@@ -79,6 +76,7 @@ Legal Stuff
 -----------
 
 EPM is Copyright © 1999-2020 by Michael R Sweet. All rights reserved.
+EPM is Copyright © 2020 by Jim Jagielski. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software

@@ -1,6 +1,11 @@
 Changes in EPM
 ==============
 
+Changes in EPM 4.5.2
+--------------------
+
+- Support `rpmbuild` for RHEL7 and similar platforms
+
 Changes in EPM 4.5.1
 --------------------
 
@@ -29,7 +34,7 @@ Changes in EPM 4.5
 Changes in EPM 4.4.2
 --------------------
 
-- Support Apache OpenOffice patches
+- Support Apache OpenOffice patches (at configure time)
 
 Changes in EPM 4.4.1
 --------------------

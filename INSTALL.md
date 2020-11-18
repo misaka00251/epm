@@ -16,7 +16,7 @@ The graphical setup program needs a C++ compiler and the FLTK library, version
 
 EPM can generate so-called "portable" distributions that are based on shell
 scripts and tar files.  For these types of distributions your customers/users
-will need a POXIX shell (Bourne, Korn, Bash, etc.), a tar program, and gzip.
+will need a POSIX shell (Bourne, Korn, Bash, etc.), a tar program, and gzip.
 The first two are standard items, and gzip is being shipped by most vendors as
 well.
 
