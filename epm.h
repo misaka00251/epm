@@ -1,6 +1,7 @@
 /*
  * Definitions for the ESP Package Manager (EPM).
  *
+ * Copyright © 2020 by Jim Jagielski
  * Copyright © 1999-2020 by Michael R Sweet
  * Copyright © 1999-2010 by Easy Software Products.
  *

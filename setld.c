@@ -1,6 +1,7 @@
 /*
  * Tru64 package gateway for the ESP Package Manager (EPM)
  *
+ * Copyright © 2020 by Jim Jagielski
  * Copyright 2001-2017 by Michael R Sweet
  * Copyright 2001-2010 by Easy Software Products
  * Copyright 2001 by Aneesh Kumar (aneesh.kumar@digital.com) at Digital India.

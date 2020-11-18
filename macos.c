@@ -1,6 +1,7 @@
 /*
  * macOS package gateway for the ESP Package Manager (EPM).
  *
+ * Copyright © 2020 by Jim Jagielski
  * Copyright © 2002-2020 by Michael R Sweet
  * Copyright © 2002-2010 by Easy Software Products.
  *

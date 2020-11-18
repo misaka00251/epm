@@ -1,6 +1,7 @@
 dnl
 dnl Configuration script for the ESP Package Manager (EPM).
 dnl
+dnl Copyright © 2020 by Jim Jagielski
 dnl Copyright © 1999-2020 by Michael R Sweet
 dnl Copyright © 1999-2007 by Easy Software Products, all rights reserved.
 dnl
@@ -19,7 +20,6 @@ AC_INIT([EPM],[4.5.1],[https://github.com/jimjag/epm/issues],[epm],[https://gith
 AC_CONFIG_HEADER(config.h)
 
 dnl Version number...
-
 VERSION="AC_PACKAGE_VERSION"
 VERNUMBER=451
 AC_SUBST(VERSION)
@@ -65,7 +65,7 @@ fi
 AC_SUBST(CSFLAGS)
 AC_SUBST(OPTIM)
 
-AC_ARG_ENABLE(gui, [  --enable-gui            turn on GUI utilities [[default=auto]]])
+AC_ARG_ENABLE(gui, [  --enable-gui            turn on GUI utilities, default=auto])
 
 AC_ARG_ENABLE(fltk, [  --enable-fltk          enable fltk [[default=auto]]])
 

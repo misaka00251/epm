@@ -1,6 +1,7 @@
 /*
  * Slackware package gateway for the ESP Package Manager (EPM).
  *
+ * Copyright © 2020 by Jim Jagielski
  * Copyright 2003-2017 by Michael R Sweet
  * Copyright 2003-2010 by Easy Software Products.
  *
