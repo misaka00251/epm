@@ -1,6 +1,10 @@
 # Don't need the OS's leftovers.
 **/.DS_Store
 
+#IDE
+/.project
+/.cproject
+
 # Targets build by the configure phase
 /Makefile
 /autom4te.cache
