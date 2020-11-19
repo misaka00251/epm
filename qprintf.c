@@ -29,183 +29,171 @@
  * 'qprintf()' - Do formatted output to a file.
  */
 
-int				/* O - Number of bytes formatted */
-qprintf(FILE       *fp,		/* I - File to write to */
-        const char *format,	/* I - printf-style format string */
-	...)			/* I - Additional args as needed... */
+int                             /* O - Number of bytes formatted */
+qprintf(FILE *fp,               /* I - File to write to */
+        const char *format,     /* I - printf-style format string */
+        ...)                    /* I - Additional args as needed... */
 {
-  va_list	ap;		/* Pointer to additional arguments */
-  int		bytes;		/* Bytes written */
-  char		sign,		/* Sign of format width */
-		size,		/* Size character (h, l, L) */
-		type;		/* Format type character */
-  const char	*bufformat;	/* Start of format */
-  int		width,		/* Width of field */
-		prec;		/* Number of characters of precision */
-  char		tformat[100];	/* Temporary format string for fprintf() */
-  char		*s;		/* Pointer to string */
-  int		slen;		/* Length of string */
-  int		i;		/* Looping var */
-  char      *pattern = "`~#$%^&*()[{]}\\|;\'\"<>? ";
+    va_list ap;                 /* Pointer to additional arguments */
+    int bytes;                  /* Bytes written */
+    char sign,                  /* Sign of format width */
+         size,                  /* Size character (h, l, L) */
+         type;                  /* Format type character */
+    const char *bufformat;      /* Start of format */
+    int width,                  /* Width of field */
+        prec;                   /* Number of characters of precision */
+    char tformat[100];          /* Temporary format string for fprintf() */
+    char *s;                    /* Pointer to string */
+    int slen;                   /* Length of string */
+    int i;                      /* Looping var */
+    char *pattern = "`~#$%^&*()[{]}\\|;\'\"<>? ";
 
 #if defined(__FreeBSD__)
-  if (AooMode)
-      pattern = "`~!#%^&*()[{]}\\|;\'\"<>? ";
+    if (AooMode)
+        pattern = "`~!#%^&*()[{]}\\|;\'\"<>? ";
 #endif
- /*
-  * Loop through the format string, formatting as needed...
-  */
+    /*
+     * Loop through the format string, formatting as needed...
+     */
 
-  va_start(ap, format);
+    va_start(ap, format);
 
-  bytes = 0;
+    bytes = 0;
 
-  while (*format)
-  {
-    if (*format == '%')
-    {
-      bufformat = format;
-      format ++;
+    while (*format) {
+        if (*format == '%') {
+            bufformat = format;
+            format++;
 
-      if (*format == '%')
-      {
-        putc(*format++, fp);
-	bytes ++;
-	continue;
-      }
-      else if (strchr(" -+#\'", *format))
-        sign = *format++;
-      else
-        sign = 0;
+            if (*format == '%') {
+                putc(*format++, fp);
+                bytes++;
+                continue;
+            }
+            else if (strchr(" -+#\'", *format))
+                sign = *format++;
+            else
+                sign = 0;
 
-      width = 0;
-      while (isdigit(*format & 255))
-        width = width * 10 + *format++ - '0';
+            width = 0;
+            while (isdigit(*format & 255))
+                width = width * 10 + *format++ - '0';
 
-      if (*format == '.')
-      {
-        format ++;
-	prec = 0;
+            if (*format == '.') {
+                format++;
+                prec = 0;
 
-	while (isdigit(*format & 255))
-          prec = prec * 10 + *format++ - '0';
-      }
-      else
-        prec = -1;
+                while (isdigit(*format & 255))
+                    prec = prec * 10 + *format++ - '0';
+            }
+            else
+                prec = -1;
 
-      if (*format == 'l')
-        size = *format++;
-      else
-        size = '\0';
+            if (*format == 'l')
+                size = *format++;
+            else
+                size = '\0';
 
-      if (!*format)
-        break;
+            if (!*format)
+                break;
 
-      type = *format++;
+            type = *format++;
 
-      switch (type)
-      {
-	case 'E' : /* Floating point formats */
-	case 'G' :
-	case 'e' :
-	case 'f' :
-	case 'g' :
-	    if ((format - bufformat + 1) > sizeof(tformat))
-	      break;
+            switch (type) {
+            case 'E':          /* Floating point formats */
+            case 'G':
+            case 'e':
+            case 'f':
+            case 'g':
+                if ((format - bufformat + 1) > sizeof(tformat))
+                    break;
 
-	    strlcpy(tformat, bufformat, (size_t)(format - bufformat + 1));
+                strlcpy(tformat, bufformat, (size_t) (format - bufformat + 1));
 
-	    bytes += fprintf(fp, tformat, va_arg(ap, double));
-	    break;
+                bytes += fprintf(fp, tformat, va_arg(ap, double));
+                break;
 
-        case 'B' : /* Integer formats */
-	case 'X' :
-	case 'b' :
-        case 'd' :
-	case 'i' :
-	case 'o' :
-	case 'u' :
-	case 'x' :
-	    if ((format - bufformat + 1) > sizeof(tformat))
-	      break;
+            case 'B':          /* Integer formats */
+            case 'X':
+            case 'b':
+            case 'd':
+            case 'i':
+            case 'o':
+            case 'u':
+            case 'x':
+                if ((format - bufformat + 1) > sizeof(tformat))
+                    break;
 
-	    strlcpy(tformat, bufformat, (size_t)(format - bufformat + 1));
+                strlcpy(tformat, bufformat, (size_t) (format - bufformat + 1));
 
-            if (size == 'l')
-	      bytes += fprintf(fp, tformat, va_arg(ap, long));
-	    else
-	      bytes += fprintf(fp, tformat, va_arg(ap, int));
-	    break;
+                if (size == 'l')
+                    bytes += fprintf(fp, tformat, va_arg(ap, long));
+                else
+                    bytes += fprintf(fp, tformat, va_arg(ap, int));
+                break;
 
-	case 'p' : /* Pointer value */
-	    if ((format - bufformat + 1) > sizeof(tformat))
-	      break;
+            case 'p':          /* Pointer value */
+                if ((format - bufformat + 1) > sizeof(tformat))
+                    break;
 
-	    strlcpy(tformat, bufformat, (size_t)(format - bufformat + 1));
+                strlcpy(tformat, bufformat, (size_t) (format - bufformat + 1));
 
-	    bytes += fprintf(fp, tformat, va_arg(ap, void *));
-	    break;
+                bytes += fprintf(fp, tformat, va_arg(ap, void *));
+                break;
 
-        case 'c' : /* Character or character array */
-	    if (width <= 1)
-	    {
-	      bytes ++;
-	      putc(va_arg(ap, int), fp);
-	    }
-	    else
-	    {
-	      fwrite(va_arg(ap, char *), 1, (size_t)width, fp);
-	      bytes += width;
-	    }
-	    break;
+            case 'c':          /* Character or character array */
+                if (width <= 1) {
+                    bytes++;
+                    putc(va_arg(ap, int), fp);
+                }
+                else {
+                    fwrite(va_arg(ap, char *), 1, (size_t) width, fp);
+                    bytes += width;
+                }
+                break;
 
-	case 's' : /* String */
-	    if ((s = va_arg(ap, char *)) == NULL)
-	      s = "(null)";
+            case 's':          /* String */
+                if ((s = va_arg(ap, char *)) == NULL)
+                    s = "(null)";
 
-	    slen = (int)strlen(s);
-	    if (slen > width && prec != width)
-	      width = slen;
+                slen = (int) strlen(s);
+                if (slen > width && prec != width)
+                    width = slen;
 
-            if (slen > width)
-	      slen = width;
+                if (slen > width)
+                    slen = width;
 
-            if (sign != '-')
-	    {
-	      for (i = width - slen; i > 0; i --, bytes ++)
-	        putc(' ', fp);
-	    }
+                if (sign != '-') {
+                    for (i = width - slen; i > 0; i--, bytes++)
+                        putc(' ', fp);
+                }
 
-            for (i = slen; i > 0; i --, s ++, bytes ++)
-	    {
-	      if (strchr(pattern, *s))
-	      {
-	        putc('\\', fp);
-		bytes ++;
-	      }
-	      putc(*s, fp);
-	    }
+                for (i = slen; i > 0; i--, s++, bytes++) {
+                    if (strchr(pattern, *s)) {
+                        putc('\\', fp);
+                        bytes++;
+                    }
+                    putc(*s, fp);
+                }
 
-            if (sign == '-')
-	    {
-	      for (i = width - slen; i > 0; i --, bytes ++)
-	        putc(' ', fp);
-	    }
-	    break;
-      }
+                if (sign == '-') {
+                    for (i = width - slen; i > 0; i--, bytes++)
+                        putc(' ', fp);
+                }
+                break;
+            }
+        }
+        else {
+            putc(*format++, fp);
+            bytes++;
+        }
     }
-    else
-    {
-      putc(*format++, fp);
-      bytes ++;
-    }
-  }
 
-  va_end(ap);
+    va_end(ap);
 
- /*
-  * Return the number of characters written.
-  */
+    /*
+     * Return the number of characters written.
+     */
 
-  return (bytes);
+    return (bytes);
 }

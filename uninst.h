@@ -14,7 +14,7 @@ extern Fl_Wizard *Wizard;
 #include <FL/Fl_Help_View.H>
 extern Fl_Help_View *ReadmeFile;
 #include <FL/Fl_Check_Browser.H>
-extern void list_cb(Fl_Check_Browser*, void*);
+extern void list_cb(Fl_Check_Browser *, void *);
 extern Fl_Check_Browser *SoftwareList;
 extern Fl_Box *SoftwareSize;
 #include <FL/Fl_Button.H>
@@ -28,8 +28,8 @@ extern Fl_Progress *RemovePercent;
 extern Fl_Browser *RemoveLog;
 extern Fl_Box *WelcomeImage;
 extern Fl_Button *PrevButton;
-extern void next_cb(Fl_Button*, void*);
+extern void next_cb(Fl_Button *, void *);
 extern Fl_Button *NextButton;
 extern Fl_Button *CancelButton;
-Fl_Double_Window* make_window();
+Fl_Double_Window *make_window();
 #endif
