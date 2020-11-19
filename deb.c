@@ -228,8 +228,6 @@ make_subpackage(const char     *prodname,
   file_t		*file;		/* Current distribution file */
   struct passwd		*pwd;		/* Pointer to user record */
   struct group		*grp;		/* Pointer to group record */
-  const char		*runlevels,	/* Run levels */
-			*rlptr;		/* Pointer into runlevels */
   static const char	*depends[] =	/* Dependency names */
 			{
 			  "Depends:",
