@@ -530,7 +530,7 @@ main(int argc,                  /* I - Number of command-line args */
         break;
     case PACKAGE_MACOS:
     case PACKAGE_MACOS_SIGNED:
-        i = make_osx(format, prodname, directory, platname, dist, &platform, setup);
+        i = make_macos(format, prodname, directory, platname, dist, &platform, setup);
         break;
     case PACKAGE_PKG:
         i = make_pkg(prodname, directory, platname, dist, &platform);
@@ -607,7 +607,7 @@ static void info(void)
     puts(EPM_VERSION);
     puts("Copyright (c) 1999-2020 by Michael R Sweet.");
     puts("Copyright (c) 2020 by Jim Jagielski.");
-    puts("Apache OpenOffice enabled");
+    puts("Apache OpenOffice compatible");
     puts("  url: https://github.com/jimjag/epm/");
     puts("");
     puts("EPM is free software and comes with ABSOLUTELY NO WARRANTY; for details");

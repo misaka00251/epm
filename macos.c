@@ -32,17 +32,17 @@ static int make_package(int format, const char *prodname, const char *directory,
 
 
 /*
- * 'make_osx()' - Make a Red Hat software distribution package.
+ * 'make_macos()' - Make a Red Hat software distribution package.
  */
 
 int                             /* O - 0 = success, 1 = fail */
-make_osx(int format,            /* I - Format */
-         const char *prodname,  /* I - Product short name */
-         const char *directory, /* I - Directory for distribution files */
-         const char *platname,  /* I - Platform name */
-         dist_t * dist,         /* I - Distribution information */
-         struct utsname *platform,      /* I - Platform information */
-         const char *setup)     /* I - Setup GUI image */
+make_macos(int format,            /* I - Format */
+           const char *prodname,  /* I - Product short name */
+           const char *directory, /* I - Directory for distribution files */
+           const char *platname,  /* I - Platform name */
+           dist_t * dist,         /* I - Distribution information */
+           struct utsname *platform,      /* I - Platform information */
+           const char *setup)     /* I - Setup GUI image */
 {
     char filename[1024];        /* Destination filename */
 

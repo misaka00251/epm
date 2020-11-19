@@ -281,9 +281,9 @@ extern "C"
     extern int make_inst(const char *prodname, const char *directory,
                          const char *platname, dist_t * dist, struct utsname *platform);
     extern int make_link(const char *dst, const char *src);
-    extern int make_osx(int format, const char *prodname, const char *directory,
-                        const char *platname, dist_t * dist,
-                        struct utsname *platform, const char *setup);
+    extern int make_macos(int format, const char *prodname, const char *directory,
+                          const char *platname, dist_t * dist,
+                          struct utsname *platform, const char *setup);
     extern int make_pkg(const char *prodname, const char *directory,
                         const char *platname, dist_t * dist, struct utsname *platform);
     extern int make_portable(const char *prodname, const char *directory,
