@@ -559,9 +559,10 @@ main(int  argc,				/* I - Number of command-line args */
         i = make_slackware(prodname, directory, platname, dist, &platform);
 	break;
     case PACKAGE_DEB :
-        if (geteuid())
+        if (geteuid() && run_command(NULL, "fakeroot --version"))
 	  fputs("epm: Warning - file permissions and ownership may not be correct\n"
-	        "     in Debian packages unless you run EPM as root.\n", stderr);
+            "     in Debian packages unless you run EPM as root or the 'fakeroot'\n"
+            "     command is available!\n", stderr);
 
         i = make_deb(prodname, directory, platname, dist, &platform);
 	break;
