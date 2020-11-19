@@ -27,11 +27,10 @@
  * Local functions...
  */
 
-#ifdef __FOR_AOO__
 /*
  * 'add_size()' - Append Installed-Size tag to DEBIAN/control file
+ *                Used for AOO packages
  */
-
 static int                      /* O - 0 = success, 1 = fail */
 add_size(FILE       *fpControl, /* Control file stream */
          const char *directory) /* Directory containing all files to package */
@@ -50,7 +49,6 @@ add_size(FILE       *fpControl, /* Control file stream */
     }
     return 1;
 }
-#endif /* __FOR_AOO__ */
 
 static int	make_subpackage(const char *prodname, const char *directory,
 		                const char *platname, dist_t *dist,
@@ -73,34 +71,35 @@ make_deb(const char     *prodname,	/* I - Product short name */
   tarf_t	*tarfile;		/* Distribution tar file */
   char		name[1024],		/* Full product name */
 		filename[1024];		/* File to archive */
+  char      *sep;
 
-#ifdef __FOR_AOO__
+  sep = (AooMode ? "_" : "-");
+
+  if (AooMode) {
   /*
    * Use debian default naming scheme
    */
-
-  if (!strcmp(platname, "intel"))
+    if (!strcmp(platname, "intel"))
 #ifdef __FreeBSD_kernel__
-    platname = "kfreebsd-i386";
+      platname = "kfreebsd-i386";
 #else
-    platname = "i386";
+      platname = "i386";
 #endif
-  else if (!strcmp(platname, "x86_64"))
+    else if (!strcmp(platname, "x86_64"))
 #ifdef __FreeBSD_kernel__
-    platname = "kfreebsd-amd64";
+      platname = "kfreebsd-amd64";
 #else
-    platname = "amd64";
+      platname = "amd64";
 #endif
-  else if (!strcmp(platname, "ppc"))
-    platname = "powerpc";
+    else if (!strcmp(platname, "ppc"))
+      platname = "powerpc";
 
-#else /* __FOR_AOO__ */
-
+  } else {
  /* Debian packages use "amd64" instead of "x86_64" for the architecture... */
-  if (!strcmp(platname, "x86_64"))
-    platname = "amd64";
+    if (!strcmp(platname, "x86_64"))
+      platname = "amd64";
 
-#endif /* __FOR_AOO__ */
+  }
 
   if (make_subpackage(prodname, directory, platname, dist, platform, NULL))
     return (1);
@@ -119,28 +118,15 @@ make_deb(const char     *prodname,	/* I - Product short name */
    /*
     * Figure out the full name of the distribution...
     */
-
     if (dist->release[0])
-#ifdef __FOR_AOO__
-      snprintf(name, sizeof(name), "%s_%s_%s", prodname, dist->version,
-#else /* __FOR_AOO__ */
-      snprintf(name, sizeof(name), "%s-%s-%s", prodname, dist->version,
-#endif /* __FOR_AOO__ */
-               dist->release);
+      snprintf(name, sizeof(name), "%s%s%s%s%s", prodname, sep, dist->version,
+               sep, dist->release);
     else
-#ifdef __FOR_AOO__
-      snprintf(name, sizeof(name), "%s_%s", prodname, dist->version);
-#else /* __FOR_AOO__ */
-      snprintf(name, sizeof(name), "%s-%s", prodname, dist->version);
-#endif /* __FOR_AOO__ */
+      snprintf(name, sizeof(name), "%s%s%s", prodname, sep, dist->version);
 
     if (platname[0])
     {
-#ifdef __FOR_AOO__
-      strlcat(name, "_", sizeof(name));
-#else /* __FOR_AOO__ */
-      strlcat(name, "-", sizeof(name));
-#endif /* __FOR_AOO__ */
+      strlcat(name, sep, sizeof(name));
       strlcat(name, platname, sizeof(name));
     }
 
@@ -235,18 +221,15 @@ make_subpackage(const char     *prodname,
 			  "Replaces:",
 			  "Provides:"
 			};
+  char      *sep;
 
-
+  sep = (AooMode ? "_" : "-");
  /*
   * Figure out the full name of the distribution...
   */
 
   if (subpackage)
-#ifdef __FOR_AOO__
-    snprintf(prodfull, sizeof(prodfull), "%s_%s", prodname, subpackage);
-#else /* __FOR_AOO__ */
-    snprintf(prodfull, sizeof(prodfull), "%s-%s", prodname, subpackage);
-#endif /* __FOR_AOO__ */
+    snprintf(prodfull, sizeof(prodfull), "%s%s%s", prodname, sep, subpackage);
   else
     strlcpy(prodfull, prodname, sizeof(prodfull));
 
@@ -255,26 +238,14 @@ make_subpackage(const char     *prodname,
   */
 
   if (dist->release[0])
-#ifdef __FOR_AOO__
-    snprintf(name, sizeof(name), "%s_%s_%s", prodfull, dist->version,
-#else /* __FOR_AOO__ */
-    snprintf(name, sizeof(name), "%s-%s-%s", prodfull, dist->version,
-#endif /* __FOR_AOO__ */
-             dist->release);
+    snprintf(name, sizeof(name), "%s%s%s%s%s", prodfull, sep, dist->version,
+             sep, dist->release);
   else
-#ifdef __FOR_AOO__
-    snprintf(name, sizeof(name), "%s_%s", prodfull, dist->version);
-#else /* __FOR_AOO__ */
-    snprintf(name, sizeof(name), "%s-%s", prodfull, dist->version);
-#endif /* __FOR_AOO__ */
+    snprintf(name, sizeof(name), "%s%s%s", prodfull, sep, dist->version);
 
   if (platname[0])
   {
-#ifdef __FOR_AOO__
-    strlcat(name, "_", sizeof(name));
-#else /* __FOR_AOO__ */
-    strlcat(name, "-", sizeof(name));
-#endif /* __FOR_AOO__ */
+    strlcat(name, sep, sizeof(name));
     strlcat(name, platname, sizeof(name));
   }
 
@@ -314,7 +285,6 @@ make_subpackage(const char     *prodname,
   * (which we change in get_platform to a common name)
   */
 
-#ifdef __FOR_AOO__
   if (!strcmp(platform->machine, "intel"))
 #ifdef __FreeBSD_kernel__
     fputs("Architecture: kfreebsd-i386\n", fp);
@@ -331,16 +301,6 @@ make_subpackage(const char     *prodname,
     fputs("Architecture: powerpc\n", fp);
   else
     fprintf(fp, "Architecture: %s\n", platform->machine);
-#else /* __FOR_AOO__ */
-  if (!strcmp(platform->machine, "intel"))
-    fputs("Architecture: i386\n", fp);
-  if (!strcmp(platform->machine, "x86_64"))
-    fputs("Architecture: amd64\n", fp);
-  else if (!strcmp(platform->machine, "ppc"))
-    fputs("Architecture: powerpc\n", fp);
-  else
-    fprintf(fp, "Architecture: %s\n", platform->machine);
-#endif
 
   fprintf(fp, "Description: %s\n", dist->product);
   fprintf(fp, " Copyright: %s\n", dist->copyright);
@@ -591,26 +551,26 @@ make_subpackage(const char     *prodname,
 
   fclose(fp);
 
-#ifdef __FOR_AOO__
+  if (AooMode) {
   /*
    * Calculate and append Installed-Size to DEBIAN/control
    */
 
-  if (Verbosity)
-    puts("Calculating Installed-Size...");
+    if (Verbosity)
+      puts("Calculating Installed-Size...");
 
-  snprintf(filename, sizeof(filename), "%s/%s/DEBIAN/control", directory, name);
-  if ((fp = fopen(filename, "a")) == NULL)
-  {
-    fprintf(stderr, "epm: Unable to Installed-Size to file \"%s\" - %s\n", filename,
-            strerror(errno));
-    return (1);
+    snprintf(filename, sizeof(filename), "%s/%s/DEBIAN/control", directory, name);
+    if ((fp = fopen(filename, "a")) == NULL)
+    {
+      fprintf(stderr, "epm: Unable to Installed-Size to file \"%s\" - %s\n", filename,
+              strerror(errno));
+      return (1);
+    }
+
+    snprintf(filename, sizeof(filename), "%s/%s", directory, name);
+    add_size(fp, filename);
+    fclose(fp);
   }
-
-  snprintf(filename, sizeof(filename), "%s/%s", directory, name);
-  add_size(fp, filename);
-  fclose(fp);
-#endif /* __FOR_AOO__ */
 
  /*
   * Copy the files over...

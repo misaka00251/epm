@@ -46,8 +46,12 @@ qprintf(FILE       *fp,		/* I - File to write to */
   char		*s;		/* Pointer to string */
   int		slen;		/* Length of string */
   int		i;		/* Looping var */
+  char      *pattern = "`~#$%^&*()[{]}\\|;\'\"<>? ";
 
-
+#if defined(__FreeBSD__)
+  if (AooMode)
+      pattern = "`~!#%^&*()[{]}\\|;\'\"<>? ";
+#endif
  /*
   * Loop through the format string, formatting as needed...
   */
@@ -174,11 +178,7 @@ qprintf(FILE       *fp,		/* I - File to write to */
 
             for (i = slen; i > 0; i --, s ++, bytes ++)
 	    {
-#if defined(__FreeBSD__) && defined(__FOR_AOO__)
-	      if (strchr("`~!#%^&*()[{]}\\|;\'\"<>? ", *s))
-#else
-	      if (strchr("`~#$%^&*()[{]}\\|;\'\"<>? ", *s))
-#endif
+	      if (strchr(pattern, *s))
 	      {
 	        putc('\\', fp);
 		bytes ++;

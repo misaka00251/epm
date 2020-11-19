@@ -244,7 +244,8 @@ extern int		KeepFiles;	/* Keep intermediate files? */
 extern const char	*SetupProgram;	/* Setup program */
 extern const char	*SoftwareDir;	/* Software directory path */
 extern const char	*UninstProgram;	/* Uninstall program */
-extern int		Verbosity;	/* Be verbose? */
+extern int      Verbosity;  /* Be verbose? */
+extern int      AooMode;    /* Apply AOO features */
 
 
 /*

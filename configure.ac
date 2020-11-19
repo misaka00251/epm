@@ -16,12 +16,12 @@ dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 dnl GNU General Public License for more details.
 dnl
 
-AC_INIT([EPM],[4.5.2],[https://github.com/jimjag/epm/issues],[epm],[https://github.com/jimjag/epm])
+AC_INIT([EPM],[4.6.0],[https://github.com/jimjag/epm/issues],[epm],[https://github.com/jimjag/epm])
 AC_CONFIG_HEADER(config.h)
 
 dnl Version number...
 VERSION="AC_PACKAGE_VERSION"
-VERNUMBER=452
+VERNUMBER=460
 AC_SUBST(VERSION)
 AC_SUBST(VERNUMBER)
 AC_DEFINE_UNQUOTED(EPM_VERSION, "ESP Package Manager v$VERSION")
@@ -68,8 +68,6 @@ AC_SUBST(OPTIM)
 AC_ARG_ENABLE(gui, [  --enable-gui            turn on GUI utilities, default=auto])
 
 AC_ARG_ENABLE(fltk, [  --enable-fltk          enable fltk [[default=auto]]])
-
-AC_ARG_ENABLE(aoo, [  --enable-aoo           enable AOO modifications [[default=no]]])
 
 AC_ARG_WITH(docdir, [  --with-docdir=/dir      set directory for documentation
                           [[default=${datadir}/doc/epm]]],
@@ -143,14 +141,6 @@ else
 	AC_CHECK_FUNCS(snprintf vsnprintf)
 fi
 AC_SEARCH_LIBS(gethostname, socket)
-
-AC_MSG_CHECKING(Checking if building for Apache OpenOffice)
-if test "x$enable_aoo" = xyes; then
-	CFLAGS="-D__FOR_AOO__ $CFLAGS"
-	AC_MSG_RESULT(yes)
-else
-	AC_MSG_RESULT(no)
-fi
 
 if test "x$enable_gui" != xno && test "x$enable_fltk" = xyes; then
 	AC_PATH_PROG(FLTKCONFIG,fltk-config)

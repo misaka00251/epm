@@ -33,7 +33,8 @@ int		KeepFiles = 0;
 const char	*SetupProgram = EPM_LIBDIR "/setup";
 const char	*SoftwareDir = EPM_SOFTWARE;
 const char	*UninstProgram = EPM_LIBDIR "/uninst";
-int		Verbosity = 0;
+int     Verbosity = 0;
+int     AooMode = 0;
 
 
 /*
@@ -300,8 +301,10 @@ main(int  argc,				/* I - Number of command-line args */
 	    }
 	    else if (!strcmp(argv[i], "--depend"))
 	      show_depend = 1;
-	    else if (!strcmp(argv[i], "--keep-files"))
-	      KeepFiles = 1;
+        else if (!strcmp(argv[i], "--keep-files"))
+          KeepFiles = 1;
+        else if (!strcmp(argv[i], "--aoo-mode"))
+          AooMode = 1;
 	    else if (!strcmp(argv[i], "--output-dir"))
 	    {
 	      i ++;
@@ -652,10 +655,8 @@ info(void)
   puts(EPM_VERSION);
   puts("Copyright (c) 1999-2020 by Michael R Sweet.");
   puts("Copyright (c) 2020 by Jim Jagielski.");
-#ifdef __FOR_AOO__
-  puts("Patched for Apache OpenOffice");
+  puts("Apache OpenOffice enabled");
   puts("  url: https://github.com/jimjag/epm/");
-#endif /* __FOR_AOO__ */
   puts("");
   puts("EPM is free software and comes with ABSOLUTELY NO WARRANTY; for details");
   puts("see the GNU General Public License in the file COPYING or at");
@@ -712,6 +713,8 @@ usage(void)
   puts("    Show this usage message.");
   puts("--keep-files");
   puts("    Keep temporary distribution files in the output directory.");
+  puts("--aoo-mode");
+  puts("    Modify rpm, deb, et.al. package names and format for Apache OpenOffice use.");
   puts("--output-dir /foo/bar/directory");
   puts("    Enable the setup GUI and use \"setup.xpm\" for the setup image.");
   puts("--setup-image setup.xpm");

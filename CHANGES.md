@@ -1,6 +1,12 @@
 Changes in EPM
 ==============
 
+Changes in EPM 4.6.0
+--------------------
+
+- The Apache OpenOffice specific changes are no longer configure-time
+  (buildtime) enabled, but run time, via the --aoo-mode CLI option.
+
 Changes in EPM 4.5.2
 --------------------
 

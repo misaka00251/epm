@@ -466,7 +466,9 @@ make_pkg(const char     *prodname,	/* I - Product short name */
 
   fclose(fp);
 
-#ifndef __FOR_AOO__
+  if (AooMode)
+      return(0);
+
  /*
   * Build the distribution from the prototype file...
   */
@@ -550,7 +552,6 @@ make_pkg(const char     *prodname,	/* I - Product short name */
     snprintf(filename, sizeof(filename), "%s/%s", directory, prodname);
     unlink_directory(filename);
   }
-#endif /* __FOR_AOO__ */
   return (0);
 }
 

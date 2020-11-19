@@ -724,7 +724,6 @@ enable_debug
 enable_sanitizer
 enable_gui
 enable_fltk
-enable_aoo
 with_docdir
 with_softwaredir
 '
@@ -1357,7 +1356,6 @@ Optional Features:
   --enable-sanitizer      build with AddressSanitizer, default=no
   --enable-gui            turn on GUI utilities, default=auto
   --enable-fltk          enable fltk [default=auto]
-  --enable-aoo           enable AOO modifications [default=no]
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -2370,12 +2368,6 @@ fi
 # Check whether --enable-fltk was given.
 if test "${enable_fltk+set}" = set; then :
   enableval=$enable_fltk;
-fi
-
-
-# Check whether --enable-aoo was given.
-if test "${enable_aoo+set}" = set; then :
-  enableval=$enable_aoo;
 fi
 
 
@@ -4893,17 +4885,6 @@ if test "$ac_res" != no; then :
 
 fi
 
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking Checking if building for Apache OpenOffice" >&5
-$as_echo_n "checking Checking if building for Apache OpenOffice... " >&6; }
-if test "x$enable_aoo" = xyes; then
-	CFLAGS="-D__FOR_AOO__ $CFLAGS"
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-else
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
 
 if test "x$enable_gui" != xno && test "x$enable_fltk" = xyes; then
 	# Extract the first word of "fltk-config", so it can be a program name with args.

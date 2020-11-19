@@ -99,10 +99,9 @@ copy_file(const char *dst,		/* I - Destination file */
 
   if (mode)
     chmod(dst, mode);
-#ifndef __FOR_AOO__
-  if (owner != (uid_t)-1 && group != (gid_t)-1)
-    chown(dst, owner, group);
-#endif /* __FOR_AOO__ */
+  if (!AooMode)
+    if (owner != (uid_t)-1 && group != (gid_t)-1)
+      chown(dst, owner, group);
 
   return (0);
 }
@@ -133,10 +132,9 @@ make_directory(const char *directory,	/* I - Directory */
 	mkdir(buffer, 0755);
 	if (mode)
           chmod(buffer, mode | 0700);
-#ifndef __FOR_AOO__
-	if (owner != (uid_t)-1 && group != (gid_t)-1)
-	  chown(buffer, owner, group);
-#endif /* __FOR_AOO__ */
+	if (!AooMode)
+	  if (owner != (uid_t)-1 && group != (gid_t)-1)
+	    chown(buffer, owner, group);
       }
     }
 
@@ -150,10 +148,9 @@ make_directory(const char *directory,	/* I - Directory */
     mkdir(buffer, 0755);
     if (mode)
       chmod(buffer, mode | 0700);
-#ifndef __FOR_AOO__
-    if (owner != (uid_t)-1 && group != (gid_t)-1)
-      chown(buffer, owner, group);
-#endif /* __FOR_AOO__ */
+    if (!AooMode)
+      if (owner != (uid_t)-1 && group != (gid_t)-1)
+        chown(buffer, owner, group);
   }
 
   return (0);
