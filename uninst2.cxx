@@ -18,20 +18,20 @@
 
 #define _DEFINE_GLOBALS_
 #include "uninst.h"
-#include <FL/x.H>
-#include <FL/filename.H>
-#include <FL/fl_ask.H>
-#include <FL/Fl_XPM_Image.H>
+#include <FL/Fl_GIF_Image.H>
 #include <FL/Fl_JPEG_Image.H>
 #include <FL/Fl_PNG_Image.H>
-#include <FL/Fl_GIF_Image.H>
-#include <errno.h>
+#include <FL/Fl_XPM_Image.H>
+#include <FL/filename.H>
+#include <FL/fl_ask.H>
+#include <FL/x.H>
 #include <ctype.h>
-#include <unistd.h>
+#include <errno.h>
 #include <fcntl.h>
+#include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <sys/stat.h>
+#include <unistd.h>
 
 #ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
@@ -51,11 +51,10 @@
 
 #ifdef __osf__
 // No prototype for statfs under Tru64...
-extern "C"
-{
-    extern int statfs(const char *, struct statfs *);
+extern "C" {
+extern int statfs(const char *, struct statfs *);
 }
-#endif                          // __osf__
+#endif // __osf__
 
 #ifdef __APPLE__
 #include <CoreFoundation/CoreFoundation.h>
@@ -65,16 +64,14 @@ extern "C"
 AuthorizationRef SetupAuthorizationRef;
 #endif // __APPLE__
 
-
 //
 // Panes...
 //
 
-#define PANE_WELCOME	0
-#define PANE_SELECT	1
-#define PANE_CONFIRM	2
-#define PANE_REMOVE	3
-
+#define PANE_WELCOME 0
+#define PANE_SELECT 1
+#define PANE_CONFIRM 2
+#define PANE_REMOVE 3
 
 //
 // Local functions...
@@ -83,21 +80,19 @@ AuthorizationRef SetupAuthorizationRef;
 void load_image(void);
 void load_readme(void);
 void log_cb(int fd, int *fdptr);
-int remove_dist(const gui_dist_t * dist);
+int remove_dist(const gui_dist_t *dist);
 void show_installed(void);
 void update_sizes(void);
-
 
 //
 // 'main()' - Main entry for software wizard...
 //
 
-int                             // O - Exit status
-main(int argc,                  // I - Number of command-line arguments
-     char *argv[])              // I - Command-line arguments
+int                // O - Exit status
+main(int argc,     // I - Number of command-line arguments
+     char *argv[]) // I - Command-line arguments
 {
-    Fl_Window *w;               // Main window...
-
+    Fl_Window *w; // Main window...
 
     // Use GTK+ scheme for all operating systems...
     Fl::background(230, 230, 230);
@@ -112,8 +107,8 @@ main(int argc,                  // I - Number of command-line arguments
         CFURLRef mainURL = CFBundleCopyBundleURL(mainBundle);
         CFStringRef mainCFPath = CFURLCopyFileSystemPath(mainURL, kCFURLPOSIXPathStyle);
 
-        if (CFStringGetCString
-            (mainCFPath, mainPath, sizeof(mainPath), kCFStringEncodingUTF8)) {
+        if (CFStringGetCString(mainCFPath, mainPath, sizeof(mainPath),
+                               kCFStringEncodingUTF8)) {
             strlcat(mainPath, "/Contents/Resources", sizeof(mainPath));
             fprintf(stderr, "Using \"%s\" as the distribution directory.\n", mainPath);
             chdir(mainPath);
@@ -151,14 +146,14 @@ main(int argc,                  // I - Number of command-line arguments
         return (1);
     }
 
-    AuthorizationItem items = { kAuthorizationRightExecute, 0, NULL, 0 };
-    AuthorizationRights rights = { 1, &items };
+    AuthorizationItem items = {kAuthorizationRightExecute, 0, NULL, 0};
+    AuthorizationRights rights = {1, &items};
 
-    status = AuthorizationCopyRights(SetupAuthorizationRef, &rights, NULL,
-                                     kAuthorizationFlagDefaults |
-                                     kAuthorizationFlagInteractionAllowed |
-                                     kAuthorizationFlagPreAuthorize |
-                                     kAuthorizationFlagExtendRights, NULL);
+    status = AuthorizationCopyRights(
+        SetupAuthorizationRef, &rights, NULL,
+        kAuthorizationFlagDefaults | kAuthorizationFlagInteractionAllowed |
+            kAuthorizationFlagPreAuthorize | kAuthorizationFlagExtendRights,
+        NULL);
 
     if (status != errAuthorizationSuccess) {
         fl_alert("You must have administrative priviledges to remove this software!");
@@ -182,17 +177,14 @@ main(int argc,                  // I - Number of command-line arguments
     return (0);
 }
 
-
 //
 // 'list_cb()' - Handle selections in the software list.
 //
 
-void list_cb(Fl_Check_Browser *, void *)
-{
+void list_cb(Fl_Check_Browser *, void *) {
     int i, j, k;
     gui_dist_t *dist, *dist2;
     gui_depend_t *depend;
-
 
     if (SoftwareList->nchecked() == 0) {
         update_sizes();
@@ -222,13 +214,13 @@ void list_cb(Fl_Check_Browser *, void *)
                             SoftwareList->checked(i + 1, 0);
                             break;
                         }
-                    }
-                    else if ((dist2 = gui_find_dist(depend->product, NumInstalled,
-                                                    Installed)) == NULL) {
+                    } else if ((dist2 = gui_find_dist(depend->product, NumInstalled,
+                                                      Installed)) == NULL) {
                         // Required but not installed or available!
-                        fl_alert
-                            ("%s requires %s to be installed, but it is not available "
-                             "for installation.", dist->name, depend->product);
+                        fl_alert(
+                            "%s requires %s to be installed, but it is not available "
+                            "for installation.",
+                            dist->name, depend->product);
                         SoftwareList->checked(i + 1, 0);
                         break;
                     }
@@ -239,12 +231,12 @@ void list_cb(Fl_Check_Browser *, void *)
                                                Installed)) != NULL) {
                         // Already installed!
                         fl_alert("%s is incompatible with %s. Please remove it before "
-                                 "installing this software.", dist->name, dist2->name);
+                                 "installing this software.",
+                                 dist->name, dist2->name);
                         SoftwareList->checked(i + 1, 0);
                         break;
-                    }
-                    else if ((dist2 = gui_find_dist(depend->product, NumInstalled,
-                                                    Installed)) != NULL) {
+                    } else if ((dist2 = gui_find_dist(depend->product, NumInstalled,
+                                                      Installed)) != NULL) {
                         // Software is in the list, is it selected?
                         k = dist2 - Installed;
 
@@ -254,7 +246,8 @@ void list_cb(Fl_Check_Browser *, void *)
 
                         // Yes, tell the user...
                         fl_alert("%s is incompatible with %s. Please deselect it before "
-                                 "installing this software.", dist->name, dist2->name);
+                                 "installing this software.",
+                                 dist->name, dist2->name);
                         SoftwareList->checked(i + 1, 0);
                         break;
                     }
@@ -271,15 +264,12 @@ void list_cb(Fl_Check_Browser *, void *)
         NextButton->deactivate();
 }
 
-
 //
 // 'load_image()' - Load the setup image file (setup.gif/xpm)...
 //
 
-void load_image(void)
-{
-    Fl_Image *img;              // New image
-
+void load_image(void) {
+    Fl_Image *img; // New image
 
     if (!access("setup.xpm", 0))
         img = new Fl_XPM_Image("setup.xpm");
@@ -296,27 +286,25 @@ void load_image(void)
         WelcomeImage->image(img);
 }
 
-
 //
 // 'load_readme()' - Load the readme file...
 //
 
-void load_readme(void)
-{
+void load_readme(void) {
     ReadmeFile->textfont(FL_HELVETICA);
     ReadmeFile->textsize(14);
 
     if (access("uninst.readme", 0)) {
-        int i;                  // Looping var
-        gui_dist_t *dist;       // Current distribution
-        char *buffer,           // Text buffer
-            *ptr;               // Pointer into buffer
-
+        int i;            // Looping var
+        gui_dist_t *dist; // Current distribution
+        char *buffer,     // Text buffer
+            *ptr;         // Pointer into buffer
 
         buffer = new char[1024 + NumInstalled * 400];
 
         strcpy(buffer, "This program allows you to remove the following "
-               "software:</p>\n" "<ul>\n");
+                       "software:</p>\n"
+                       "<ul>\n");
         ptr = buffer + strlen(buffer);
 
         for (i = NumInstalled, dist = Installed; i > 0; i--, dist++) {
@@ -328,26 +316,22 @@ void load_readme(void)
 
         ReadmeFile->value(buffer);
 
-        delete[]buffer;
-    }
-    else
+        delete[] buffer;
+    } else
         gui_load_file(ReadmeFile, "uninst.readme");
-
 }
-
 
 //
 // 'log_cb()' - Add one or more lines of text to the removal log.
 //
 
-void log_cb(int fd,             // I - Pipe to read from
-            int *fdptr)         // O - Pipe to read from
+void log_cb(int fd,     // I - Pipe to read from
+            int *fdptr) // O - Pipe to read from
 {
-    int bytes;                  // Bytes read/to read
-    char *bufptr;               // Pointer into buffer
-    static int bufused = 0;     // Number of bytes used
-    static char buffer[8193];   // Buffer
-
+    int bytes;                // Bytes read/to read
+    char *bufptr;             // Pointer into buffer
+    static int bufused = 0;   // Number of bytes used
+    static char buffer[8193]; // Buffer
 
     bytes = 8192 - bufused;
     if ((bytes = read(fd, buffer + bufused, bytes)) <= 0) {
@@ -364,8 +348,7 @@ void log_cb(int fd,             // I - Pipe to read from
             RemoveLog->add(buffer);
             bufused = 0;
         }
-    }
-    else {
+    } else {
         // Add bytes to the buffer, then add lines as needed...
         bufused += bytes;
         buffer[bufused] = '\0';
@@ -381,19 +364,16 @@ void log_cb(int fd,             // I - Pipe to read from
     RemoveLog->bottomline(RemoveLog->size());
 }
 
-
 //
 // 'next_cb()' - Show software selections or remove software.
 //
 
-void next_cb(Fl_Button *, void *)
-{
-    int i;                      // Looping var
-    int progress;               // Progress so far...
-    int error;                  // Errors?
-    static char message[1024];  // Progress message...
-    static int removing = 0;    // Removing software?
-
+void next_cb(Fl_Button *, void *) {
+    int i;                     // Looping var
+    int progress;              // Progress so far...
+    int error;                 // Errors?
+    static char message[1024]; // Progress message...
+    static int removing = 0;   // Removing software?
 
     Wizard->next();
 
@@ -444,25 +424,23 @@ void next_cb(Fl_Button *, void *)
         fl_beep();
 
         removing = 0;
-    }
-    else if (Wizard->value() == Pane[PANE_SELECT] && SoftwareList->nchecked() == 0)
+    } else if (Wizard->value() == Pane[PANE_SELECT] && SoftwareList->nchecked() == 0)
         NextButton->deactivate();
 }
-
 
 //
 // 'remove_dist()' - Remove a distribution...
 //
 
-int                             // O - Remove status
-remove_dist(const gui_dist_t * dist)    // I - Distribution to remove
+int                                 // O - Remove status
+remove_dist(const gui_dist_t *dist) // I - Distribution to remove
 {
-    char command[1024];         // Command string
-    int fds[2];                 // Pipe FDs
-    int status = 0;             // Exit status
+    char command[1024]; // Command string
+    int fds[2];         // Pipe FDs
+    int status = 0;     // Exit status
 #ifndef __APPLE__
-    int pid;                    // Process ID
-#endif // !__APPLE__
+    int pid; // Process ID
+#endif       // !__APPLE__
 
     snprintf(command, sizeof(command), "**** %s ****", dist->name);
     RemoveLog->add(command);
@@ -473,13 +451,11 @@ remove_dist(const gui_dist_t * dist)    // I - Distribution to remove
 #ifdef __APPLE__
     // Run the remove script using Apple's authorization API...
     FILE *fp = NULL;
-    char *args[2] = { (char *) "now", NULL };
+    char *args[2] = {(char *)"now", NULL};
     OSStatus astatus;
 
-
-    astatus =
-        AuthorizationExecuteWithPrivileges(SetupAuthorizationRef, command,
-                                           kAuthorizationFlagDefaults, args, &fp);
+    astatus = AuthorizationExecuteWithPrivileges(SetupAuthorizationRef, command,
+                                                 kAuthorizationFlagDefaults, args, &fp);
 
     if (astatus != errAuthorizationSuccess) {
         RemoveLog->add("Failed to execute remove script!");
@@ -504,13 +480,12 @@ remove_dist(const gui_dist_t * dist)    // I - Distribution to remove
 
         // Execute the command; if an error occurs, return it...
         if (dist->type == PACKAGE_PORTABLE)
-            execl(command, command, "now", (char *) 0);
+            execl(command, command, "now", (char *)0);
         else
-            execlp("rpm", "rpm", "-e", "--nodeps", dist->product, (char *) 0);
+            execlp("rpm", "rpm", "-e", "--nodeps", dist->product, (char *)0);
 
         exit(errno);
-    }
-    else if (pid < 0) {
+    } else if (pid < 0) {
         // Unable to fork!
         sprintf(command, "Unable to remove %s:", dist->name);
         RemoveLog->add(command);
@@ -529,13 +504,13 @@ remove_dist(const gui_dist_t * dist)    // I - Distribution to remove
 #endif // __APPLE__
 
     // Listen for data on the input pipe...
-    Fl::add_fd(fds[0], (void (*)(int, void *)) log_cb, fds);
+    Fl::add_fd(fds[0], (void (*)(int, void *))log_cb, fds);
 
     // Show the user that we're busy...
     UninstallWindow->cursor(FL_CURSOR_WAIT);
 
     // Loop until the child is done...
-    while (fds[0])              // log_cb() will close and zero fds[0]...
+    while (fds[0]) // log_cb() will close and zero fds[0]...
     {
         // Wait for events...
         Fl::wait();
@@ -555,8 +530,7 @@ remove_dist(const gui_dist_t * dist)    // I - Distribution to remove
         // Close the pipe - have all the data from the child...
         Fl::remove_fd(fds[0]);
         close(fds[0]);
-    }
-    else {
+    } else {
         // Get the child's exit status...
         wait(&status);
     }
@@ -568,17 +542,14 @@ remove_dist(const gui_dist_t * dist)    // I - Distribution to remove
     return (status);
 }
 
-
 //
 // 'show_installed()' - Show the installed software products.
 //
 
-void show_installed()
-{
-    int i;                      // Looping var
-    gui_dist_t *temp;           // Pointer to current distribution
-    char line[1024];            // Product name and version...
-
+void show_installed() {
+    int i;            // Looping var
+    gui_dist_t *temp; // Pointer to current distribution
+    char line[1024];  // Product name and version...
 
     if (NumInstalled == 0) {
         fl_alert("No software found to remove!");
@@ -594,40 +565,37 @@ void show_installed()
     update_sizes();
 }
 
-
 //
 // 'update_size()' - Update the total +/- sizes of the installations.
 //
 
-void update_sizes(void)
-{
-    int i;                      // Looping var
-    gui_dist_t *dist,           // Distribution
-              *installed;       // Installed distribution
-    int rootsize,               // Total root size difference in kbytes
-        usrsize;                // Total /usr size difference in kbytes
-    struct statfs rootpart,     // Available root partition
-           usrpart;             // Available /usr partition
-    int rootfree,               // Free space on root partition
-        usrfree;                // Free space on /usr partition
-    static char sizelabel[1024];        // Label for selected sizes...
-
+void update_sizes(void) {
+    int i;                       // Looping var
+    gui_dist_t *dist,            // Distribution
+        *installed;              // Installed distribution
+    int rootsize,                // Total root size difference in kbytes
+        usrsize;                 // Total /usr size difference in kbytes
+    struct statfs rootpart,      // Available root partition
+        usrpart;                 // Available /usr partition
+    int rootfree,                // Free space on root partition
+        usrfree;                 // Free space on /usr partition
+    static char sizelabel[1024]; // Label for selected sizes...
 
     // Get the sizes for the selected products...
-    for (i = 0, dist = Installed, rootsize = 0, usrsize = 0;
-         i < NumInstalled; i++, dist++)
+    for (i = 0, dist = Installed, rootsize = 0, usrsize = 0; i < NumInstalled;
+         i++, dist++)
         if (SoftwareList->checked(i + 1)) {
             rootsize += dist->rootsize;
             usrsize += dist->usrsize;
 
-            if ((installed = gui_find_dist(dist->product, NumInstalled,
-                                           Installed)) != NULL) {
+            if ((installed = gui_find_dist(dist->product, NumInstalled, Installed)) !=
+                NULL) {
                 rootsize -= installed->rootsize;
                 usrsize -= installed->usrsize;
             }
         }
 
-    // Get the sizes of the root and /usr partition...
+        // Get the sizes of the root and /usr partition...
 #if defined(__sgi) || defined(__svr4__) || defined(__SVR4) || defined(M_XENIX)
     if (statfs("/", &rootpart, sizeof(rootpart), 0))
 #else
@@ -635,8 +603,9 @@ void update_sizes(void)
 #endif // __sgi || __svr4__ || __SVR4 || M_XENIX
         rootfree = 1024;
     else
-        rootfree = (int) ((double) rootpart.f_bfree * (double) rootpart.f_bsize /
-                          1024.0 / 1024.0 + 0.5);
+        rootfree =
+            (int)((double)rootpart.f_bfree * (double)rootpart.f_bsize / 1024.0 / 1024.0 +
+                  0.5);
 
 #if defined(__sgi) || defined(__svr4__) || defined(__SVR4) || defined(M_XENIX)
     if (statfs("/usr", &usrpart, sizeof(usrpart), 0))
@@ -645,21 +614,21 @@ void update_sizes(void)
 #endif // __sgi || __svr4__ || __SVR4 || M_XENIX
         usrfree = 1024;
     else
-        usrfree = (int) ((double) usrpart.f_bfree * (double) usrpart.f_bsize /
-                         1024.0 / 1024.0 + 0.5);
+        usrfree =
+            (int)((double)usrpart.f_bfree * (double)usrpart.f_bsize / 1024.0 / 1024.0 +
+                  0.5);
 
     // Display the results to the user...
     if (rootfree == usrfree) {
         rootsize += usrsize;
 
         if (rootsize >= 1024)
-            snprintf(sizelabel, sizeof(sizelabel),
-                     "%+.1fm required, %dm available.", rootsize / 1024.0, rootfree);
+            snprintf(sizelabel, sizeof(sizelabel), "%+.1fm required, %dm available.",
+                     rootsize / 1024.0, rootfree);
         else
-            snprintf(sizelabel, sizeof(sizelabel),
-                     "%+dk required, %dm available.", rootsize, rootfree);
-    }
-    else if (rootsize >= 1024 && usrsize >= 1024)
+            snprintf(sizelabel, sizeof(sizelabel), "%+dk required, %dm available.",
+                     rootsize, rootfree);
+    } else if (rootsize >= 1024 && usrsize >= 1024)
         snprintf(sizelabel, sizeof(sizelabel),
                  "%+.1fm required on /, %dm available,\n"
                  "%+.1fm required on /usr, %dm available.",

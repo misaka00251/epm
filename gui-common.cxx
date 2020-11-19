@@ -18,33 +18,31 @@
 
 #include "gui-common.h"
 #include <FL/filename.H>
-#include <errno.h>
 #include <ctype.h>
-#include <unistd.h>
+#include <errno.h>
 #include <fcntl.h>
+#include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <sys/stat.h>
-
+#include <unistd.h>
 
 //
 // 'gui_add_depend()' - Add a dependency to a distribution.
 //
 
-void gui_add_depend(gui_dist_t * d,     // I - Distribution
-                    int type,   // I - Dependency type
-                    const char *name,   // I - Name of product
-                    int lowver, // I - Lower version number
-                    int hiver)  // I - Highre version number
+void gui_add_depend(gui_dist_t *d,    // I - Distribution
+                    int type,         // I - Dependency type
+                    const char *name, // I - Name of product
+                    int lowver,       // I - Lower version number
+                    int hiver)        // I - Highre version number
 {
-    gui_depend_t *temp;         // Pointer to dependency
-
+    gui_depend_t *temp; // Pointer to dependency
 
     if (d->num_depends == 0)
-        temp = (gui_depend_t *) malloc(sizeof(gui_depend_t));
+        temp = (gui_depend_t *)malloc(sizeof(gui_depend_t));
     else
-        temp = (gui_depend_t *) realloc(d->depends,
-                                        sizeof(gui_depend_t) * (d->num_depends + 1));
+        temp = (gui_depend_t *)realloc(d->depends,
+                                       sizeof(gui_depend_t) * (d->num_depends + 1));
 
     if (temp == NULL) {
         perror("setup: Unable to allocate memory for dependency");
@@ -62,23 +60,21 @@ void gui_add_depend(gui_dist_t * d,     // I - Distribution
     temp->vernumber[1] = hiver;
 }
 
-
 //
 // 'gui_add_dist()' - Add a distribution.
 //
 
-gui_dist_t *                    // O - New distribution
-gui_add_dist(int *num_d,        // IO - Number of distributions
-             gui_dist_t ** d)   // IO - Distributions
+gui_dist_t *                 // O - New distribution
+gui_add_dist(int *num_d,     // IO - Number of distributions
+             gui_dist_t **d) // IO - Distributions
 {
-    gui_dist_t *temp;           // Pointer to current distribution
-
+    gui_dist_t *temp; // Pointer to current distribution
 
     // Add a new distribution entry...
     if (*num_d == 0)
-        temp = (gui_dist_t *) malloc(sizeof(gui_dist_t));
+        temp = (gui_dist_t *)malloc(sizeof(gui_dist_t));
     else
-        temp = (gui_dist_t *) realloc(*d, sizeof(gui_dist_t) * (*num_d + 1));
+        temp = (gui_dist_t *)realloc(*d, sizeof(gui_dist_t) * (*num_d + 1));
 
     if (temp == NULL) {
         perror("setup: Unable to allocate memory for distribution");
@@ -94,7 +90,6 @@ gui_add_dist(int *num_d,        // IO - Number of distributions
     return (temp);
 }
 
-
 //
 // 'gui_find_dist()' - Find a distribution.
 //
@@ -102,7 +97,7 @@ gui_add_dist(int *num_d,        // IO - Number of distributions
 gui_dist_t *                    // O - Pointer to distribution or NULL
 gui_find_dist(const char *name, // I - Distribution name
               int num_d,        // I - Number of distributions
-              gui_dist_t * d)   // I - Distributions
+              gui_dist_t *d)    // I - Distributions
 {
     while (num_d > 0) {
         if (!strcmp(name, d->product))
@@ -115,25 +110,22 @@ gui_find_dist(const char *name, // I - Distribution name
     return (NULL);
 }
 
-
 //
 // 'gui_get_installed()' - Get a list of installed software products.
 //
 
-void gui_get_installed(void)
-{
-    int i;                      // Looping var
-    int num_files;              // Number of files
-    dirent **files;             // Files
-    const char *ext;            // Extension
-    gui_dist_t *temp;           // Pointer to current distribution
-    FILE *fp;                   // File to read from
-    char line[1024];            // Line from file...
-
+void gui_get_installed(void) {
+    int i;            // Looping var
+    int num_files;    // Number of files
+    dirent **files;   // Files
+    const char *ext;  // Extension
+    gui_dist_t *temp; // Pointer to current distribution
+    FILE *fp;         // File to read from
+    char line[1024];  // Line from file...
 
     // See if there are any installed files...
     NumInstalled = 0;
-    Installed = (gui_dist_t *) 0;
+    Installed = (gui_dist_t *)0;
 
     if ((num_files = fl_filename_list(EPM_SOFTWARE, &files)) > 0) {
         // Build a distribution list...
@@ -153,7 +145,7 @@ void gui_get_installed(void)
                 temp->type = PACKAGE_PORTABLE;
 
                 strncpy(temp->product, files[i]->d_name, sizeof(temp->product) - 1);
-                *strrchr(temp->product, '.') = '\0';    // Drop .remove
+                *strrchr(temp->product, '.') = '\0'; // Drop .remove
 
                 // Read info from the removal script...
                 while (fgets(line, sizeof(line), fp)) {
@@ -187,11 +179,11 @@ void gui_get_installed(void)
     // Get a list of RPM packages that are installed...
     if (!access("/bin/rpm", 0) &&
         (fp = popen("/bin/rpm -qa --qf "
-                    "'%{NAME}|%{VERSION}|%{SIZE}|%{SUMMARY}\\n'", "r")) != NULL) {
-        char *version,          // Version number
-            *size,              // Size of package
-            *description;       // Summary string
-
+                    "'%{NAME}|%{VERSION}|%{SIZE}|%{SUMMARY}\\n'",
+                    "r")) != NULL) {
+        char *version,    // Version number
+            *size,        // Size of package
+            *description; // Summary string
 
         while (fgets(line, sizeof(line), fp)) {
             // Drop the trailing newline...
@@ -218,7 +210,7 @@ void gui_get_installed(void)
             strlcpy(temp->name, description, sizeof(temp->name));
             strlcpy(temp->version, version, sizeof(temp->version));
             temp->vernumber = get_vernumber(version);
-            temp->rootsize = (int) (atof(size) / 1024.0 + 0.5);
+            temp->rootsize = (int)(atof(size) / 1024.0 + 0.5);
         }
 
         pclose(fp);
@@ -226,23 +218,21 @@ void gui_get_installed(void)
 
     if (NumInstalled > 1)
         qsort(Installed, NumInstalled, sizeof(gui_dist_t),
-              (compare_func_t) gui_sort_dists);
+              (compare_func_t)gui_sort_dists);
 }
-
 
 //
 // 'gui_load_file()' - Load a file into a help widget.
 //
 
-void gui_load_file(Fl_Help_View * hv,   // I - Help widget
-                   const char *filename)        // I - File to load
+void gui_load_file(Fl_Help_View *hv,     // I - Help widget
+                   const char *filename) // I - File to load
 {
-    FILE *fp;                   // File pointer
-    struct stat info;           // Info about file
-    int ch;                     // Character from file
-    char *buffer,               // File buffer
-        *ptr;                   // Pointer into buffer
-
+    FILE *fp;         // File pointer
+    struct stat info; // Info about file
+    int ch;           // Character from file
+    char *buffer,     // File buffer
+        *ptr;         // Pointer into buffer
 
     // Try opening the file and getting the file size...
     if ((fp = fopen(filename, "r")) == NULL) {
@@ -264,8 +254,7 @@ void gui_load_file(Fl_Help_View * hv,   // I - Help widget
         buffer[0] = ch;
         fread(buffer + 1, 1, info.st_size - 1, fp);
         buffer[info.st_size] = '\0';
-    }
-    else {
+    } else {
         // No, treat it as plain text...
         ungetc(ch, fp);
 
@@ -277,12 +266,10 @@ void gui_load_file(Fl_Help_View * hv,   // I - Help widget
             if (ch == '&') {
                 strcpy(ptr, "&amp;");
                 ptr += 5;
-            }
-            else if (ch == '<') {
+            } else if (ch == '<') {
                 strcpy(ptr, "&lt;");
                 ptr += 4;
-            }
-            else
+            } else
                 *ptr++ = ch;
         }
 
@@ -297,18 +284,17 @@ void gui_load_file(Fl_Help_View * hv,   // I - Help widget
     hv->value(buffer);
 
     // Free memory and close the file...
-    delete[]buffer;
+    delete[] buffer;
     fclose(fp);
 }
-
 
 //
 // 'gui_sort_dists()' - Compare two distribution names...
 //
 
-int                             // O - Result of comparison
-gui_sort_dists(const gui_dist_t * d0,   // I - First distribution
-               const gui_dist_t * d1)   // I - Second distribution
+int                                  // O - Result of comparison
+gui_sort_dists(const gui_dist_t *d0, // I - First distribution
+               const gui_dist_t *d1) // I - Second distribution
 {
     return (strcmp(d0->name, d1->name));
 }

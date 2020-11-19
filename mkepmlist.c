@@ -19,29 +19,25 @@
 
 #include "epm.h"
 
-
 /*
  * Lookup hash table structure...
  */
 
 #define HASH_M 101
 
-struct node
-{
-    unsigned id;                /* User or group ID */
-    char *name;                 /* User or group name */
+struct node {
+    unsigned id; /* User or group ID */
+    char *name;  /* User or group name */
 };
-
 
 /*
  * Globals...
  */
 
-char *DefaultUser = NULL,       /* Default user for entries */
-    *DefaultGroup = NULL;       /* Default group for entries */
-struct node Users[HASH_M];      /* Hash table for users */
-struct node Groups[HASH_M];     /* Hash table for groups */
-
+char *DefaultUser = NULL,   /* Default user for entries */
+    *DefaultGroup = NULL;   /* Default group for entries */
+struct node Users[HASH_M];  /* Hash table for users */
+struct node Groups[HASH_M]; /* Hash table for groups */
 
 /*
  * Functions...
@@ -60,22 +56,20 @@ int process_file(const char *src, const char *dstpath);
 char *quote_string(char *q, const char *s, size_t qsize);
 void usage(void);
 
-
 /*
  * 'main()' - Scan directories to produce a distribution list.
  */
 
-int                             /* O - Exit status */
-main(int argc,                  /* I - Number of command-line arguments */
-     char *argv[])              /* I - Command-line arguments */
+int                /* O - Exit status */
+main(int argc,     /* I - Number of command-line arguments */
+     char *argv[]) /* I - Command-line arguments */
 {
-    int i;                      /* Looping var */
-    const char *prefix,         /* Installation prefix */
-        *dstpath;               /* Destination path  */
-    char dst[1024],             /* Destination */
-        *ptr;                   /* Pointer into filename */
-    struct stat info;           /* File information */
-
+    int i;              /* Looping var */
+    const char *prefix, /* Installation prefix */
+        *dstpath;       /* Destination path  */
+    char dst[1024],     /* Destination */
+        *ptr;           /* Pointer into filename */
+    struct stat info;   /* File information */
 
     /*
      * Initialize the hash tables...
@@ -103,8 +97,7 @@ main(int argc,                  /* I - Number of command-line arguments */
                 usage();
 
             DefaultUser = argv[i];
-        }
-        else if (strcmp(argv[i], "-g") == 0) {
+        } else if (strcmp(argv[i], "-g") == 0) {
             /*
              * -g groupname
              */
@@ -115,24 +108,21 @@ main(int argc,                  /* I - Number of command-line arguments */
                 usage();
 
             DefaultGroup = argv[i];
-        }
-        else if (strcmp(argv[i], "--prefix") == 0) {
+        } else if (strcmp(argv[i], "--prefix") == 0) {
             i++;
 
             if (i >= argc)
                 usage();
 
             prefix = argv[i];
-        }
-        else if (argv[i][0] == '-') {
+        } else if (argv[i][0] == '-') {
             /*
              * Unknown option...
              */
 
             fprintf(stderr, "Unknown option \"%s\"!\n", argv[i]);
             usage();
-        }
-        else {
+        } else {
             /*
              * Directory name...
              */
@@ -155,8 +145,7 @@ main(int argc,                  /* I - Number of command-line arguments */
 
                         if (strcmp(dstpath, ".") == 0)
                             dstpath = "";
-                    }
-                    else
+                    } else
                         dstpath = argv[i];
 
                     if (dstpath[0]) {
@@ -183,8 +172,7 @@ main(int argc,                  /* I - Number of command-line arguments */
                     }
 
                     process_file(argv[i], dstpath);
-                }
-                else
+                } else
                     process_dir(argv[i], dstpath);
             }
         }
@@ -199,18 +187,16 @@ main(int argc,                  /* I - Number of command-line arguments */
     return (0);
 }
 
-
 /*
  * 'get_group()' - Get a group name for the given group ID.
  */
 
-char *                          /* O - Name of group or NULL */
-get_group(gid_t gid)            /* I - Group ID */
+char *               /* O - Name of group or NULL */
+get_group(gid_t gid) /* I - Group ID */
 {
-    char *name;                 /* Name of group */
-    struct group *gr;           /* Group entry for group */
-    char buf[16];               /* Temporary string buffer for group numbers */
-
+    char *name;       /* Name of group */
+    struct group *gr; /* Group entry for group */
+    char buf[16];     /* Temporary string buffer for group numbers */
 
     /*
      * Always return the default group if set...
@@ -239,7 +225,7 @@ get_group(gid_t gid)            /* I - Group ID */
          * Unable to find group ID; just return the number...
          */
 
-        snprintf(buf, sizeof(buf), "%u", (unsigned) gid);
+        snprintf(buf, sizeof(buf), "%u", (unsigned)gid);
         name = buf;
     }
 
@@ -250,18 +236,16 @@ get_group(gid_t gid)            /* I - Group ID */
     return (hash_insert(Groups, gid, name));
 }
 
-
 /*
  * 'get_user()' - Get a user name for the given user ID.
  */
 
-char *                          /* O - Name of user or NULL */
-get_user(uid_t uid)             /* I - User ID */
+char *              /* O - Name of user or NULL */
+get_user(uid_t uid) /* I - User ID */
 {
-    char *name;                 /* Name of user */
-    struct passwd *pw;          /* Password entry for user */
-    char buf[16];               /* Temporary string buffer for user numbers */
-
+    char *name;        /* Name of user */
+    struct passwd *pw; /* Password entry for user */
+    char buf[16];      /* Temporary string buffer for user numbers */
 
     /*
      * Always return the default user if set...
@@ -290,7 +274,7 @@ get_user(uid_t uid)             /* I - User ID */
          * Unable to find user ID; just return the number...
          */
 
-        snprintf(buf, sizeof(buf), "%u", (unsigned) uid);
+        snprintf(buf, sizeof(buf), "%u", (unsigned)uid);
         name = buf;
     }
 
@@ -301,15 +285,13 @@ get_user(uid_t uid)             /* I - User ID */
     return (hash_insert(Users, uid, name));
 }
 
-
 /*
  * 'hash_deinit()' - Deinitialize a hash table.
  */
 
-void hash_deinit(struct node *a)  /* I - Hash table */
+void hash_deinit(struct node *a) /* I - Hash table */
 {
-    unsigned h;                 /* Looping var */
-
+    unsigned h; /* Looping var */
 
     for (h = 0; h < HASH_M; h++)
         if (a[h].name) {
@@ -318,43 +300,39 @@ void hash_deinit(struct node *a)  /* I - Hash table */
         }
 }
 
-
 /*
  * 'hash_id()' - Generate a hash for a user or group ID.
  */
 
-unsigned                        /* O - Hash number */
-hash_id(unsigned id)            /* I - User or group ID */
+unsigned             /* O - Hash number */
+hash_id(unsigned id) /* I - User or group ID */
 {
     return (id % HASH_M);
 }
-
 
 /*
  * 'hash_init()' - Initialize a hash table.
  */
 
-void hash_init(struct node *a)  /* I - Hash table to initialize */
+void hash_init(struct node *a) /* I - Hash table to initialize */
 {
     /*
      * Zero out the hash table...
      */
-     memset(a, 0, HASH_M * sizeof(struct node));
+    memset(a, 0, HASH_M * sizeof(struct node));
 }
-
 
 /*
  * 'hash_insert()' - Insert a new entry in a hash table.
  */
 
-char *                          /* O - New user or group name or NULL */
-hash_insert(struct node *a,     /* I - Hash table */
-            unsigned id,        /* I - User or group ID */
-            const char *name)   /* I - User or group name */
+char *                        /* O - New user or group name or NULL */
+hash_insert(struct node *a,   /* I - Hash table */
+            unsigned id,      /* I - User or group ID */
+            const char *name) /* I - User or group name */
 {
-    unsigned h,                 /* Current hash value */
-             start;             /* Starting hash value */
-
+    unsigned h, /* Current hash value */
+        start;  /* Starting hash value */
 
     for (h = start = hash_id(id); a[h].name;) {
         h = (h + 1) % HASH_M;
@@ -368,18 +346,16 @@ hash_insert(struct node *a,     /* I - Hash table */
     return (a[h].name);
 }
 
-
 /*
  * 'hash_search()' - Find a user or group ID in the hash table...
  */
 
-char *                          /* O - User or group name, or NULL */
-hash_search(struct node *a,     /* I - Hash table */
-            unsigned id)        /* I - User or group ID */
+char *                      /* O - User or group name, or NULL */
+hash_search(struct node *a, /* I - Hash table */
+            unsigned id)    /* I - User or group ID */
 {
-    unsigned h,                 /* Current hash value */
-             start;             /* Starting hash value */
-
+    unsigned h, /* Current hash value */
+        start;  /* Starting hash value */
 
     for (h = start = hash_id(id); a[h].name;) {
         h = (h + 1) % HASH_M;
@@ -394,13 +370,11 @@ hash_search(struct node *a,     /* I - Hash table */
     return (NULL);
 }
 
-
 /*
  * 'info()' - Show the EPM copyright and license.
  */
 
-void info(void)
-{
+void info(void) {
     puts(EPM_VERSION);
     puts("Copyright 1999-2019 by Michael R Sweet.");
     puts("");
@@ -411,20 +385,18 @@ void info(void)
     puts("");
 }
 
-
 /*
  * 'process_dir()' - Process a directory...
  */
 
-int                             /* O - 0 on success, -1 on error */
-process_dir(const char *srcpath,        /* I - Source path */
-            const char *dstpath)        /* I - Destination path */
+int                              /* O - 0 on success, -1 on error */
+process_dir(const char *srcpath, /* I - Source path */
+            const char *dstpath) /* I - Destination path */
 {
-    DIR *dir;                   /* Directory to read from */
-    struct dirent *dent;        /* Current directory entry */
-    size_t srclen;              /* Length of source path */
-    char src[1024];             /* Temporary source path */
-
+    DIR *dir;            /* Directory to read from */
+    struct dirent *dent; /* Current directory entry */
+    size_t srclen;       /* Length of source path */
+    char src[1024];      /* Temporary source path */
 
     /*
      * Try opening the source directory...
@@ -470,24 +442,22 @@ process_dir(const char *srcpath,        /* I - Source path */
     return (0);
 }
 
-
 /*
  * 'process_file()' - Process a file...
  */
 
-int                             /* O - 0 on success, -1 on error */
-process_file(const char *src,   /* I - Source path */
+int                               /* O - 0 on success, -1 on error */
+process_file(const char *src,     /* I - Source path */
              const char *dstpath) /* I - Destination path */
 {
-    const char *srcptr;         /* Pointer into source path */
-    struct stat srcinfo;        /* Information on the source file */
-    ssize_t linklen;            /* Length of link path */
-    size_t dstlen;              /* Length of destination path */
-    char link[1024],            /* Link for source */
-         dst[1024],             /* Temporary destination path */
-         qdst[1024],            /* Quoted destination */
-         qsrc[1024];            /* Quoted source/link */
-
+    const char *srcptr;  /* Pointer into source path */
+    struct stat srcinfo; /* Information on the source file */
+    ssize_t linklen;     /* Length of link path */
+    size_t dstlen;       /* Length of destination path */
+    char link[1024],     /* Link for source */
+        dst[1024],       /* Temporary destination path */
+        qdst[1024],      /* Quoted destination */
+        qsrc[1024];      /* Quoted source/link */
 
     /*
      * Get source file info...
@@ -519,16 +489,13 @@ process_file(const char *src,   /* I - Source path */
          * Directory...
          */
 
-        printf("d %o %s %s %s -\n", (unsigned) (srcinfo.st_mode & 07777),
-               get_user(srcinfo.st_uid), get_group(srcinfo.st_gid), quote_string(qdst,
-                                                                                 dst,
-                                                                                 sizeof
-                                                                                 (qdst)));
+        printf("d %o %s %s %s -\n", (unsigned)(srcinfo.st_mode & 07777),
+               get_user(srcinfo.st_uid), get_group(srcinfo.st_gid),
+               quote_string(qdst, dst, sizeof(qdst)));
 
         if (process_dir(src, dst))
             return (-1);
-    }
-    else if (S_ISLNK(srcinfo.st_mode)) {
+    } else if (S_ISLNK(srcinfo.st_mode)) {
         /*
          * Symlink...
          */
@@ -541,41 +508,34 @@ process_file(const char *src,   /* I - Source path */
 
         link[linklen] = '\0';
 
-        printf("l %o %s %s %s %s\n", (unsigned) (srcinfo.st_mode & 07777),
-               get_user(srcinfo.st_uid), get_group(srcinfo.st_gid), quote_string(qdst,
-                                                                                 dst,
-                                                                                 sizeof
-                                                                                 (qdst)),
+        printf("l %o %s %s %s %s\n", (unsigned)(srcinfo.st_mode & 07777),
+               get_user(srcinfo.st_uid), get_group(srcinfo.st_gid),
+               quote_string(qdst, dst, sizeof(qdst)),
                quote_string(qsrc, link, sizeof(qsrc)));
-    }
-    else if (S_ISREG(srcinfo.st_mode)) {
+    } else if (S_ISREG(srcinfo.st_mode)) {
         /*
          * Regular file...
          */
 
-        printf("f %o %s %s %s %s\n", (unsigned) (srcinfo.st_mode & 07777),
-               get_user(srcinfo.st_uid), get_group(srcinfo.st_gid), quote_string(qdst,
-                                                                                 dst,
-                                                                                 sizeof
-                                                                                 (qdst)),
+        printf("f %o %s %s %s %s\n", (unsigned)(srcinfo.st_mode & 07777),
+               get_user(srcinfo.st_uid), get_group(srcinfo.st_gid),
+               quote_string(qdst, dst, sizeof(qdst)),
                quote_string(qsrc, src, sizeof(qsrc)));
     }
 
     return (0);
 }
 
-
 /*
  * 'quote_string()' - Quote space, backslash, and $ in a string...
  */
 
-char *                          /* O - Quoted string */
-quote_string(char *q,           /* I - Quoted string buffer */
-             const char *s,     /* I - Original string */
-             size_t qsize)      /* I - Size of buffer */
+char *                      /* O - Quoted string */
+quote_string(char *q,       /* I - Quoted string buffer */
+             const char *s, /* I - Original string */
+             size_t qsize)  /* I - Size of buffer */
 {
     char *qptr, *qend;
-
 
     for (qptr = q, qend = q + qsize - 2; *s && qptr < qend;) {
         if (*s == '\\' || *s == ' ' || *s == '\t')
@@ -591,13 +551,11 @@ quote_string(char *q,           /* I - Quoted string buffer */
     return (q);
 }
 
-
 /*
  * 'usage()' - Show command-line usage instructions.
  */
 
-void usage(void)
-{
+void usage(void) {
     info();
 
     puts("Usage: mkepmlist [options] directory [... directory] >filename.list");

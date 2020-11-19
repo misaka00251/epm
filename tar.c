@@ -22,26 +22,23 @@
 
 #include "epm.h"
 
-
 /*
  * Local globals...
  */
 
 static char last_pathname[1024] = "";
 
-
 /*
  * 'tar_close()' - Close a tar file, padding as needed.
  */
 
-int                             /* O - -1 on error, 0 on success */
-tar_close(tarf_t * fp)          /* I - File to write to */
+int                   /* O - -1 on error, 0 on success */
+tar_close(tarf_t *fp) /* I - File to write to */
 {
-    size_t blocks;              /* Number of blocks to write */
-    int status;                 /* Return status */
+    size_t blocks; /* Number of blocks to write */
+    int status;    /* Return status */
     char padding[TAR_BLOCKS * TAR_BLOCK];
     /* Padding for tar blocks */
-
 
     if (fp->blocks > 0) {
         /*
@@ -71,8 +68,7 @@ tar_close(tarf_t * fp)          /* I - File to write to */
 
             if (fwrite(padding, TAR_BLOCK, blocks, fp->file) < blocks)
                 status = -1;
-        }
-        else {
+        } else {
             /*
              * Sun tar needs at least 2 0 blocks...
              */
@@ -80,8 +76,7 @@ tar_close(tarf_t * fp)          /* I - File to write to */
             if (fwrite(padding, TAR_BLOCK, blocks, fp->file) < blocks)
                 status = -1;
         }
-    }
-    else
+    } else
         status = 0;
 
     /*
@@ -91,8 +86,7 @@ tar_close(tarf_t * fp)          /* I - File to write to */
     if (fp->compressed) {
         if (pclose(fp->file))
             status = -1;
-    }
-    else if (fclose(fp->file))
+    } else if (fclose(fp->file))
         status = -1;
 
     free(fp);
@@ -100,23 +94,21 @@ tar_close(tarf_t * fp)          /* I - File to write to */
     return (status);
 }
 
-
 /*
  * 'tar_directory()' - Archive a directory.
  */
 
-int                             /* O - 0 on success, -1 on error */
-tar_directory(tarf_t * tar,     /* I - Tar file to write to */
-              const char *srcpath,      /* I - Source directory */
-              const char *dstpath)      /* I - Destination directory */
+int                                /* O - 0 on success, -1 on error */
+tar_directory(tarf_t *tar,         /* I - Tar file to write to */
+              const char *srcpath, /* I - Source directory */
+              const char *dstpath) /* I - Destination directory */
 {
-    DIR *dir;                   /* Directory */
-    DIRENT *dent;               /* Directory entry */
-    char src[1024],             /* Source file */
-         dst[1024],             /* Destination file */
-         srclink[1024];         /* Symlink value */
-    struct stat srcinfo;        /* Information on the source file */
-
+    DIR *dir;            /* Directory */
+    DIRENT *dent;        /* Directory entry */
+    char src[1024],      /* Source file */
+        dst[1024],       /* Destination file */
+        srclink[1024];   /* Symlink value */
+    struct stat srcinfo; /* Information on the source file */
 
     /*
      * Range check input...
@@ -175,14 +167,13 @@ tar_directory(tarf_t * tar,     /* I - Tar file to write to */
              * Directory...
              */
 
-            if (tar_header(tar, TAR_DIR, srcinfo.st_mode, 0,
-                           srcinfo.st_mtime, "root", "sys", dst, NULL))
+            if (tar_header(tar, TAR_DIR, srcinfo.st_mode, 0, srcinfo.st_mtime, "root",
+                           "sys", dst, NULL))
                 goto fail;
 
             if (tar_directory(tar, src, dst))
                 goto fail;
-        }
-        else if (S_ISLNK(srcinfo.st_mode)) {
+        } else if (S_ISLNK(srcinfo.st_mode)) {
             /*
              * Symlink...
              */
@@ -190,11 +181,10 @@ tar_directory(tarf_t * tar,     /* I - Tar file to write to */
             if (readlink(src, srclink, sizeof(srclink)) < 0)
                 goto fail;
 
-            if (tar_header(tar, TAR_SYMLINK, srcinfo.st_mode, 0,
-                           srcinfo.st_mtime, "root", "sys", dst, srclink))
+            if (tar_header(tar, TAR_SYMLINK, srcinfo.st_mode, 0, srcinfo.st_mtime, "root",
+                           "sys", dst, srclink))
                 goto fail;
-        }
-        else {
+        } else {
             /*
              * Regular file...
              */
@@ -211,27 +201,25 @@ tar_directory(tarf_t * tar,     /* I - Tar file to write to */
     closedir(dir);
     return (0);
 
-  fail:
+fail:
 
     closedir(dir);
     return (-1);
 }
 
-
 /*
  * 'tar_file()' - Write the contents of a file...
  */
 
-int                             /* O - 0 on success, -1 on error */
-tar_file(tarf_t * fp,           /* I - Tar file to write to */
-         const char *filename)  /* I - File to write */
+int                            /* O - 0 on success, -1 on error */
+tar_file(tarf_t *fp,           /* I - Tar file to write to */
+         const char *filename) /* I - File to write */
 {
-    FILE *file;                 /* File to write */
-    size_t nbytes,              /* Number of bytes read */
-           tbytes,              /* Total bytes read/written */
-           fill;                /* Number of fill bytes needed */
-    char buffer[8192];          /* Copy buffer */
-
+    FILE *file;        /* File to write */
+    size_t nbytes,     /* Number of bytes read */
+        tbytes,        /* Total bytes read/written */
+        fill;          /* Number of fill bytes needed */
+    char buffer[8192]; /* Copy buffer */
 
     /*
      * Try opening the file...
@@ -285,31 +273,29 @@ tar_file(tarf_t * fp,           /* I - Tar file to write to */
     return (0);
 }
 
-
 /*
  * 'tar_header()' - Write a TAR header for the specified file...
  */
 
-int                             /* O - 0 on success, -1 on error */
-tar_header(tarf_t * fp,         /* I - Tar file to write to */
-           int type,            /* I - File type */
-           mode_t mode,         /* I - File permissions */
-           off_t size,          /* I - File size */
-           time_t mtime,        /* I - File modification time */
-           const char *user,    /* I - File owner */
-           const char *group,   /* I - File group */
-           const char *pathname,        /* I - File name */
-           const char *linkname)        /* I - File link name (for links only) */
+int                              /* O - 0 on success, -1 on error */
+tar_header(tarf_t *fp,           /* I - Tar file to write to */
+           int type,             /* I - File type */
+           mode_t mode,          /* I - File permissions */
+           off_t size,           /* I - File size */
+           time_t mtime,         /* I - File modification time */
+           const char *user,     /* I - File owner */
+           const char *group,    /* I - File group */
+           const char *pathname, /* I - File name */
+           const char *linkname) /* I - File link name (for links only) */
 {
-    tar_t record;               /* TAR header record */
-    size_t pathlen;             /* Length of pathname */
-    const char *pathsep;        /* Path separator */
-    int i,                      /* Looping var... */
-        sum;                    /* Checksum */
-    unsigned char *sumptr;      /* Pointer into header record */
-    struct passwd *pwd;         /* Pointer to user record */
-    struct group *grp;          /* Pointer to group record */
-
+    tar_t record;          /* TAR header record */
+    size_t pathlen;        /* Length of pathname */
+    const char *pathsep;   /* Path separator */
+    int i,                 /* Looping var... */
+        sum;               /* Checksum */
+    unsigned char *sumptr; /* Pointer into header record */
+    struct passwd *pwd;    /* Pointer to user record */
+    struct group *grp;     /* Pointer to group record */
 
     /*
      * Find the username and groupname IDs...
@@ -338,8 +324,7 @@ tar_header(tarf_t * fp,         /* I - Tar file to write to */
         strlcpy(record.header.pathname, pathname, sizeof(record.header.pathname));
         if (type == TAR_DIR && pathname[pathlen - 1] != '/')
             record.header.pathname[pathlen] = '/';
-    }
-    else {
+    } else {
         /*
          * Copy directory information to prefix buffer and filename information
          * to pathname buffer.
@@ -379,16 +364,16 @@ tar_header(tarf_t * fp,         /* I - Tar file to write to */
         if (type == TAR_DIR && pathname[pathlen - 1] != '/')
             record.header.pathname[pathlen - (pathsep - pathname + 1)] = '/';
 
-        strlcpy(record.header.prefix, pathname, (size_t) (pathsep - pathname + 1));
+        strlcpy(record.header.prefix, pathname, (size_t)(pathsep - pathname + 1));
     }
 
-    snprintf(record.header.mode, sizeof(record.header.mode), "%-6o ", (unsigned) mode);
+    snprintf(record.header.mode, sizeof(record.header.mode), "%-6o ", (unsigned)mode);
     snprintf(record.header.uid, sizeof(record.header.uid), "%o ",
-             pwd == NULL ? 0 : (unsigned) pwd->pw_uid);
+             pwd == NULL ? 0 : (unsigned)pwd->pw_uid);
     snprintf(record.header.gid, sizeof(record.header.gid), "%o ",
-             grp == NULL ? 0 : (unsigned) grp->gr_gid);
-    snprintf(record.header.size, sizeof(record.header.size), "%011o", (unsigned) size);
-    snprintf(record.header.mtime, sizeof(record.header.mtime), "%011o", (unsigned) mtime);
+             grp == NULL ? 0 : (unsigned)grp->gr_gid);
+    snprintf(record.header.size, sizeof(record.header.size), "%011o", (unsigned)size);
+    snprintf(record.header.mtime, sizeof(record.header.mtime), "%011o", (unsigned)mtime);
     memset(&(record.header.chksum), ' ', sizeof(record.header.chksum));
     record.header.linkflag = type;
     if (type == TAR_SYMLINK)
@@ -413,15 +398,8 @@ tar_header(tarf_t * fp,         /* I - Tar file to write to */
 
     if (fwrite(&record, 1, sizeof(record), fp->file) < sizeof(record)) {
         static const char *const types[] = {
-            "file",
-            "link",
-            "symbolic link",
-            "character file",
-            "block file",
-            "directory",
-            "named pipe",
-            "contiguous file"
-        };
+            "file",       "link",      "symbolic link", "character file",
+            "block file", "directory", "named pipe",    "contiguous file"};
 
         fprintf(stderr, "epm: Error writing %s header for \"%s\": %s\n",
                 types[type - '0'], pathname, strerror(errno));
@@ -434,18 +412,16 @@ tar_header(tarf_t * fp,         /* I - Tar file to write to */
     return (0);
 }
 
-
 /*
  * 'tar_open()' - Open a TAR file for writing.
  */
 
-tarf_t *                        /* O - New tar file */
-tar_open(const char *filename,  /* I - File to create */
-         int compress)          /* I - Compress with gzip? */
+tarf_t *                       /* O - New tar file */
+tar_open(const char *filename, /* I - File to create */
+         int compress)         /* I - Compress with gzip? */
 {
-    tarf_t *fp;                 /* New tar file */
-    char command[1024];         /* Compression command */
-
+    tarf_t *fp;         /* New tar file */
+    char command[1024]; /* Compression command */
 
     /*
      * Allocate memory for the tar file state...
@@ -461,8 +437,7 @@ tar_open(const char *filename,  /* I - File to create */
     if (compress) {
         snprintf(command, sizeof(command), EPM_GZIP " > %s", filename);
         fp->file = popen(command, "w");
-    }
-    else
+    } else
         fp->file = fopen(filename, "wb");
 
     /*
@@ -483,25 +458,23 @@ tar_open(const char *filename,  /* I - File to create */
     return (fp);
 }
 
-
 /*
  * 'tar_package()' - Archive a package file.
  */
 
-int                             /* O - 0 on success, -1 on failure */
-tar_package(tarf_t * tar,       /* I - Tar file */
-            const char *ext,    /* I - Package filename extension */
-            const char *prodname,       /* I - Product short name */
-            const char *directory,      /* I - Directory for distribution files */
-            const char *platname,       /* I - Platform name */
-            dist_t * dist,      /* I - Distribution information */
-            const char *subpackage)     /* I - Subpackage */
+int                                 /* O - 0 on success, -1 on failure */
+tar_package(tarf_t *tar,            /* I - Tar file */
+            const char *ext,        /* I - Package filename extension */
+            const char *prodname,   /* I - Product short name */
+            const char *directory,  /* I - Directory for distribution files */
+            const char *platname,   /* I - Platform name */
+            dist_t *dist,           /* I - Distribution information */
+            const char *subpackage) /* I - Subpackage */
 {
-    char prodfull[255],         /* Full name of product */
-         name[1024],            /* Full product name */
-         filename[1024];        /* File to archive */
-    struct stat filestat;       /* File information */
-
+    char prodfull[255],   /* Full name of product */
+        name[1024],       /* Full product name */
+        filename[1024];   /* File to archive */
+    struct stat filestat; /* File information */
 
     /*
      * Figure out the full name of the distribution...
@@ -544,8 +517,8 @@ tar_package(tarf_t * tar,       /* I - Tar file */
      * Write the header and the file...
      */
 
-    if (tar_header(tar, TAR_NORMAL, (mode_t) 0644, filestat.st_size,
-                   filestat.st_mtime, "root", "root", name, NULL))
+    if (tar_header(tar, TAR_NORMAL, (mode_t)0644, filestat.st_size, filestat.st_mtime,
+                   "root", "root", name, NULL))
         return (-1);
 
     return (tar_file(tar, filename));

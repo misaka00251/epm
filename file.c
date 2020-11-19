@@ -22,24 +22,22 @@
 
 #include "epm.h"
 
-
 /*
  * 'copy_file()' - Copy a file.
  */
 
-int                             /* O - 0 on success, -1 on failure */
-copy_file(const char *dst,      /* I - Destination file */
-          const char *src,      /* I - Source file */
-          mode_t mode,          /* I - Permissions */
-          uid_t owner,          /* I - Owner ID */
-          gid_t group)          /* I - Group ID */
+int                        /* O - 0 on success, -1 on failure */
+copy_file(const char *dst, /* I - Destination file */
+          const char *src, /* I - Source file */
+          mode_t mode,     /* I - Permissions */
+          uid_t owner,     /* I - Owner ID */
+          gid_t group)     /* I - Group ID */
 {
-    FILE *dstfile,              /* Destination file */
-        *srcfile;               /* Source file */
-    char buffer[8192];          /* Copy buffer */
-    char *slash;                /* Pointer to trailing slash */
-    size_t bytes;               /* Number of bytes read/written */
-
+    FILE *dstfile,     /* Destination file */
+        *srcfile;      /* Source file */
+    char buffer[8192]; /* Copy buffer */
+    char *slash;       /* Pointer to trailing slash */
+    size_t bytes;      /* Number of bytes read/written */
 
     /*
      * Check that the destination directory exists...
@@ -96,26 +94,24 @@ copy_file(const char *dst,      /* I - Destination file */
     if (mode)
         chmod(dst, mode);
     if (!AooMode)
-        if (owner != (uid_t) - 1 && group != (gid_t) - 1)
+        if (owner != (uid_t)-1 && group != (gid_t)-1)
             chown(dst, owner, group);
 
     return (0);
 }
 
-
 /*
  * 'make_directory()' - Make a directory.
  */
 
-int                             /* O - 0 = success, -1 = error */
-make_directory(const char *directory,   /* I - Directory */
-               mode_t mode,     /* I - Permissions */
-               uid_t owner,     /* I - Owner ID */
-               gid_t group)     /* I - Group ID */
+int                                   /* O - 0 = success, -1 = error */
+make_directory(const char *directory, /* I - Directory */
+               mode_t mode,           /* I - Permissions */
+               uid_t owner,           /* I - Owner ID */
+               gid_t group)           /* I - Group ID */
 {
-    char buffer[8192],          /* Filename buffer */
-        *bufptr;                /* Pointer into buffer */
-
+    char buffer[8192], /* Filename buffer */
+        *bufptr;       /* Pointer into buffer */
 
     for (bufptr = buffer; *directory;) {
         if (*directory == '/' && bufptr > buffer) {
@@ -126,7 +122,7 @@ make_directory(const char *directory,   /* I - Directory */
                 if (mode)
                     chmod(buffer, mode | 0700);
                 if (!AooMode)
-                    if (owner != (uid_t) - 1 && group != (gid_t) - 1)
+                    if (owner != (uid_t)-1 && group != (gid_t)-1)
                         chown(buffer, owner, group);
             }
         }
@@ -141,25 +137,23 @@ make_directory(const char *directory,   /* I - Directory */
         if (mode)
             chmod(buffer, mode | 0700);
         if (!AooMode)
-            if (owner != (uid_t) - 1 && group != (gid_t) - 1)
+            if (owner != (uid_t)-1 && group != (gid_t)-1)
                 chown(buffer, owner, group);
     }
 
     return (0);
 }
 
-
 /*
  * 'make_link()' - Make a symbolic link.
  */
 
-int                             /* O - 0 = success, -1 = error */
-make_link(const char *dst,      /* I - Destination file */
-          const char *src)      /* I - Link */
+int                        /* O - 0 = success, -1 = error */
+make_link(const char *dst, /* I - Destination file */
+          const char *src) /* I - Link */
 {
-    char buffer[8192],          /* Copy buffer */
-        *slash;                 /* Pointer to trailing slash */
-
+    char buffer[8192], /* Copy buffer */
+        *slash;        /* Pointer to trailing slash */
 
     /*
      * Check that the destination directory exists...
@@ -179,18 +173,16 @@ make_link(const char *dst,      /* I - Destination file */
     return (symlink(src, dst));
 }
 
-
 /*
  * 'strip_execs()' - Strip symbols from executable files in the distribution.
  */
 
-void strip_execs(dist_t * dist) /* I - Distribution to strip... */
+void strip_execs(dist_t *dist) /* I - Distribution to strip... */
 {
-    int i;                      /* Looping var */
-    file_t *file;               /* Software file */
-    FILE *fp;                   /* File pointer */
-    char header[4];             /* File header... */
-
+    int i;          /* Looping var */
+    file_t *file;   /* Software file */
+    FILE *fp;       /* File pointer */
+    char header[4]; /* File header... */
 
     /*
      * Loop through the distribution files and strip any executable
@@ -224,14 +216,15 @@ void strip_execs(dist_t * dist) /* I - Distribution to strip... */
                 if (!strncmp(header, "#!/", 3) ||
                     (header[0] == '#' && isspace(header[1] & 255)))
                     continue;
-            }
-            else {
+            } else {
                 /*
                  * File could not be opened; error out...
                  */
 
-                fprintf(stderr, "epm: Unable to open file \"%s\" for destination "
-                        "\"%s\" -\n     %s\n", file->src, file->dst, strerror(errno));
+                fprintf(stderr,
+                        "epm: Unable to open file \"%s\" for destination "
+                        "\"%s\" -\n     %s\n",
+                        file->src, file->dst, strerror(errno));
 
                 exit(1);
             }
@@ -244,19 +237,17 @@ void strip_execs(dist_t * dist) /* I - Distribution to strip... */
         }
 }
 
-
 /*
  * 'unlink_directory()' - Delete a directory and all of its nodes.
  */
 
-int                             /* O - 0 on success, -1 on failure */
-unlink_directory(const char *directory)  /* I - Directory */
+int                                     /* O - 0 on success, -1 on failure */
+unlink_directory(const char *directory) /* I - Directory */
 {
-    DIR *dir;                   /* Directory */
-    DIRENT *dent;               /* Directory entry */
-    char filename[1024];        /* Filename */
-    struct stat fileinfo;       /* Information on the source file */
-
+    DIR *dir;             /* Directory */
+    DIRENT *dent;         /* Directory entry */
+    char filename[1024];  /* Filename */
+    struct stat fileinfo; /* Information on the source file */
 
     /*
      * Try opening the source directory...
@@ -307,8 +298,7 @@ unlink_directory(const char *directory)  /* I - Directory */
 
             if (unlink_directory(filename))
                 goto fail;
-        }
-        else {
+        } else {
             /*
              * Regular file or symlink...
              */
@@ -330,29 +320,27 @@ unlink_directory(const char *directory)  /* I - Directory */
 
     return (0);
 
-  fail:
+fail:
 
     closedir(dir);
     return (-1);
 }
 
-
 /*
  * 'unlink_package()' - Delete a package file.
  */
 
-int                             /* O - 0 on success, -1 on failure */
-unlink_package(const char *ext, /* I - Package filename extension */
-               const char *prodname,    /* I - Product short name */
-               const char *directory,   /* I - Directory for distribution files */
-               const char *platname,    /* I - Platform name */
-               dist_t * dist,   /* I - Distribution information */
-               const char *subpackage)  /* I - Subpackage */
+int                                    /* O - 0 on success, -1 on failure */
+unlink_package(const char *ext,        /* I - Package filename extension */
+               const char *prodname,   /* I - Product short name */
+               const char *directory,  /* I - Directory for distribution files */
+               const char *platname,   /* I - Platform name */
+               dist_t *dist,           /* I - Distribution information */
+               const char *subpackage) /* I - Subpackage */
 {
-    char prodfull[255],         /* Full name of product */
-         name[1024],            /* Full product name */
-         filename[1024];        /* File to archive */
-
+    char prodfull[255], /* Full name of product */
+        name[1024],     /* Full product name */
+        filename[1024]; /* File to archive */
 
     /*
      * Figure out the full name of the distribution...
@@ -389,7 +377,6 @@ unlink_package(const char *ext, /* I - Package filename extension */
     if (unlink(filename)) {
         fprintf(stderr, "epm: Unable to remove \"%s\": %s\n", filename, strerror(errno));
         return (-1);
-    }
-    else
+    } else
         return (0);
 }

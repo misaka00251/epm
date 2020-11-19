@@ -20,32 +20,31 @@
  * Include necessary headers...
  */
 
-#include <stdio.h>
-#include <ctype.h>
 #include "epmstring.h"
-
+#include <ctype.h>
+#include <stdio.h>
 
 /*
  * 'qprintf()' - Do formatted output to a file.
  */
 
-int                             /* O - Number of bytes formatted */
-qprintf(FILE *fp,               /* I - File to write to */
-        const char *format,     /* I - printf-style format string */
-        ...)                    /* I - Additional args as needed... */
+int                         /* O - Number of bytes formatted */
+qprintf(FILE *fp,           /* I - File to write to */
+        const char *format, /* I - printf-style format string */
+        ...)                /* I - Additional args as needed... */
 {
-    va_list ap;                 /* Pointer to additional arguments */
-    int bytes;                  /* Bytes written */
-    char sign,                  /* Sign of format width */
-         size,                  /* Size character (h, l, L) */
-         type;                  /* Format type character */
-    const char *bufformat;      /* Start of format */
-    int width,                  /* Width of field */
-        prec;                   /* Number of characters of precision */
-    char tformat[100];          /* Temporary format string for fprintf() */
-    char *s;                    /* Pointer to string */
-    int slen;                   /* Length of string */
-    int i;                      /* Looping var */
+    va_list ap;            /* Pointer to additional arguments */
+    int bytes;             /* Bytes written */
+    char sign,             /* Sign of format width */
+        size,              /* Size character (h, l, L) */
+        type;              /* Format type character */
+    const char *bufformat; /* Start of format */
+    int width,             /* Width of field */
+        prec;              /* Number of characters of precision */
+    char tformat[100];     /* Temporary format string for fprintf() */
+    char *s;               /* Pointer to string */
+    int slen;              /* Length of string */
+    int i;                 /* Looping var */
     char *pattern = "`~#$%^&*()[{]}\\|;\'\"<>? ";
 
 #if defined(__FreeBSD__)
@@ -69,8 +68,7 @@ qprintf(FILE *fp,               /* I - File to write to */
                 putc(*format++, fp);
                 bytes++;
                 continue;
-            }
-            else if (strchr(" -+#\'", *format))
+            } else if (strchr(" -+#\'", *format))
                 sign = *format++;
             else
                 sign = 0;
@@ -85,8 +83,7 @@ qprintf(FILE *fp,               /* I - File to write to */
 
                 while (isdigit(*format & 255))
                     prec = prec * 10 + *format++ - '0';
-            }
-            else
+            } else
                 prec = -1;
 
             if (*format == 'l')
@@ -100,7 +97,7 @@ qprintf(FILE *fp,               /* I - File to write to */
             type = *format++;
 
             switch (type) {
-            case 'E':          /* Floating point formats */
+            case 'E': /* Floating point formats */
             case 'G':
             case 'e':
             case 'f':
@@ -108,12 +105,12 @@ qprintf(FILE *fp,               /* I - File to write to */
                 if ((format - bufformat + 1) > sizeof(tformat))
                     break;
 
-                strlcpy(tformat, bufformat, (size_t) (format - bufformat + 1));
+                strlcpy(tformat, bufformat, (size_t)(format - bufformat + 1));
 
                 bytes += fprintf(fp, tformat, va_arg(ap, double));
                 break;
 
-            case 'B':          /* Integer formats */
+            case 'B': /* Integer formats */
             case 'X':
             case 'b':
             case 'd':
@@ -124,7 +121,7 @@ qprintf(FILE *fp,               /* I - File to write to */
                 if ((format - bufformat + 1) > sizeof(tformat))
                     break;
 
-                strlcpy(tformat, bufformat, (size_t) (format - bufformat + 1));
+                strlcpy(tformat, bufformat, (size_t)(format - bufformat + 1));
 
                 if (size == 'l')
                     bytes += fprintf(fp, tformat, va_arg(ap, long));
@@ -132,31 +129,30 @@ qprintf(FILE *fp,               /* I - File to write to */
                     bytes += fprintf(fp, tformat, va_arg(ap, int));
                 break;
 
-            case 'p':          /* Pointer value */
+            case 'p': /* Pointer value */
                 if ((format - bufformat + 1) > sizeof(tformat))
                     break;
 
-                strlcpy(tformat, bufformat, (size_t) (format - bufformat + 1));
+                strlcpy(tformat, bufformat, (size_t)(format - bufformat + 1));
 
                 bytes += fprintf(fp, tformat, va_arg(ap, void *));
                 break;
 
-            case 'c':          /* Character or character array */
+            case 'c': /* Character or character array */
                 if (width <= 1) {
                     bytes++;
                     putc(va_arg(ap, int), fp);
-                }
-                else {
-                    fwrite(va_arg(ap, char *), 1, (size_t) width, fp);
+                } else {
+                    fwrite(va_arg(ap, char *), 1, (size_t)width, fp);
                     bytes += width;
                 }
                 break;
 
-            case 's':          /* String */
+            case 's': /* String */
                 if ((s = va_arg(ap, char *)) == NULL)
                     s = "(null)";
 
-                slen = (int) strlen(s);
+                slen = (int)strlen(s);
                 if (slen > width && prec != width)
                     width = slen;
 
@@ -182,8 +178,7 @@ qprintf(FILE *fp,               /* I - File to write to */
                 }
                 break;
             }
-        }
-        else {
+        } else {
             putc(*format++, fp);
             bytes++;
         }

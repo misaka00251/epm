@@ -22,30 +22,27 @@
 
 #include "epm.h"
 
-
 /*
  * Local functions...
  */
 
 static int make_package(int format, const char *prodname, const char *directory,
-                        dist_t * dist, const char *setup);
-
+                        dist_t *dist, const char *setup);
 
 /*
  * 'make_macos()' - Make a Red Hat software distribution package.
  */
 
-int                             /* O - 0 = success, 1 = fail */
-make_macos(int format,            /* I - Format */
-           const char *prodname,  /* I - Product short name */
-           const char *directory, /* I - Directory for distribution files */
-           const char *platname,  /* I - Platform name */
-           dist_t * dist,         /* I - Distribution information */
-           struct utsname *platform,      /* I - Platform information */
-           const char *setup)     /* I - Setup GUI image */
+int                                  /* O - 0 = success, 1 = fail */
+make_macos(int format,               /* I - Format */
+           const char *prodname,     /* I - Product short name */
+           const char *directory,    /* I - Directory for distribution files */
+           const char *platname,     /* I - Platform name */
+           dist_t *dist,             /* I - Distribution information */
+           struct utsname *platform, /* I - Platform information */
+           const char *setup)        /* I - Setup GUI image */
 {
-    char filename[1024];        /* Destination filename */
-
+    char filename[1024]; /* Destination filename */
 
     REF(platname);
     REF(platform);
@@ -79,9 +76,8 @@ make_macos(int format,            /* I - Format */
         strlcat(filename, platname, sizeof(filename));
     }
 
-    if (run_command
-        (NULL, "hdiutil create -ov -srcfolder %s/%s.pkg %s/%s.dmg", directory, prodname,
-         directory, filename)) {
+    if (run_command(NULL, "hdiutil create -ov -srcfolder %s/%s.pkg %s/%s.dmg", directory,
+                    prodname, directory, filename)) {
         fputs("epm: Unable to create disk image.\n", stderr);
         return (1);
     }
@@ -89,30 +85,28 @@ make_macos(int format,            /* I - Format */
     return (0);
 }
 
-
 /*
  * 'make_package()' - Make a macOS package.
  */
 
-static int make_package(int format,     /* I - Format */
-                        const char *prodname,   /* I - Product short name */
-                        const char *directory,  /* I - Directory for distribution files */
-                        dist_t * dist,  /* I - Distribution  information */
-                        const char *setup)      /* I - Setup GUI image */
+static int make_package(int format,            /* I - Format */
+                        const char *prodname,  /* I - Product short name */
+                        const char *directory, /* I - Directory for distribution files */
+                        dist_t *dist,          /* I - Distribution  information */
+                        const char *setup)     /* I - Setup GUI image */
 {
-    int i;                      /* Looping var */
-    FILE *fp;                   /* Spec file */
-    char prodfull[1024],        /* Full product name */
-         title[1024],           /* Software title */
-         filename[1024],        /* Destination filename */
-         pkgname[1024];         /* Package name */
-    file_t *file;               /* Current distribution file */
-    command_t *c;               /* Current command */
-    struct passwd *pwd;         /* Pointer to user record */
-    struct group *grp;          /* Pointer to group record */
-    char current[1024];         /* Current directory */
-    const char *option;         /* Init script option */
-
+    int i;               /* Looping var */
+    FILE *fp;            /* Spec file */
+    char prodfull[1024], /* Full product name */
+        title[1024],     /* Software title */
+        filename[1024],  /* Destination filename */
+        pkgname[1024];   /* Package name */
+    file_t *file;        /* Current distribution file */
+    command_t *c;        /* Current command */
+    struct passwd *pwd;  /* Pointer to user record */
+    struct group *grp;   /* Pointer to group record */
+    char current[1024];  /* Current directory */
+    const char *option;  /* Init script option */
 
     strlcpy(prodfull, prodname, sizeof(prodfull));
     strlcpy(title, dist->product, sizeof(title));
@@ -221,11 +215,11 @@ static int make_package(int format,     /* I - Format */
         case 'c':
         case 'f':
             if (!strncmp(file->dst, "/etc/", 5) || !strncmp(file->dst, "/var/", 5))
-                snprintf(filename, sizeof(filename), "%s/%s/Package/private%s",
-                         directory, prodfull, file->dst);
+                snprintf(filename, sizeof(filename), "%s/%s/Package/private%s", directory,
+                         prodfull, file->dst);
             else
-                snprintf(filename, sizeof(filename), "%s/%s/Package%s",
-                         directory, prodfull, file->dst);
+                snprintf(filename, sizeof(filename), "%s/%s/Package%s", directory,
+                         prodfull, file->dst);
 
             if (Verbosity > 1)
                 printf("%s -> %s...\n", file->src, filename);
@@ -236,8 +230,8 @@ static int make_package(int format,     /* I - Format */
             break;
         case 'i':
             snprintf(filename, sizeof(filename),
-                     "%s/%s/Package/Library/StartupItems/%s/%s",
-                     directory, prodfull, file->dst, file->dst);
+                     "%s/%s/Package/Library/StartupItems/%s/%s", directory, prodfull,
+                     file->dst, file->dst);
 
             if (Verbosity > 1)
                 printf("%s -> %s...\n", file->src, filename);
@@ -274,7 +268,8 @@ static int make_package(int format,     /* I - Format */
             make_directory(filename, 0755, 0, 0);
 
             snprintf(filename, sizeof(filename),
-                     "%s/%s/Package/Library/StartupItems/%s/Resources/English.lproj/Localizable.strings",
+                     "%s/%s/Package/Library/StartupItems/%s/Resources/English.lproj/"
+                     "Localizable.strings",
                      directory, prodfull, file->dst);
             if ((fp = fopen(filename, "w")) == NULL) {
                 fprintf(stderr, "epm: Unable to create init strings file \"%s\": %s\n",
@@ -283,9 +278,9 @@ static int make_package(int format,     /* I - Format */
             }
 
             fputs("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n", fp);
-            fputs
-                ("<!DOCTYPE plist SYSTEM \"file://localhost/System/Library/DTDs/PropertyList.dtd\">\n",
-                 fp);
+            fputs("<!DOCTYPE plist SYSTEM "
+                  "\"file://localhost/System/Library/DTDs/PropertyList.dtd\">\n",
+                  fp);
             fputs("<plist version=\"0.9\">\n", fp);
             fputs("<dict>\n", fp);
             fprintf(fp, "        <key>Starting %s</key>\n", dist->product);
@@ -298,11 +293,11 @@ static int make_package(int format,     /* I - Format */
         case 'd':
             if (!strncmp(file->dst, "/etc/", 5) || !strncmp(file->dst, "/var/", 5) ||
                 !strcmp(file->dst, "/etc") || !strcmp(file->dst, "/var"))
-                snprintf(filename, sizeof(filename), "%s/%s/Package/private%s",
-                         directory, prodfull, file->dst);
+                snprintf(filename, sizeof(filename), "%s/%s/Package/private%s", directory,
+                         prodfull, file->dst);
             else
-                snprintf(filename, sizeof(filename), "%s/%s/Package%s",
-                         directory, prodfull, file->dst);
+                snprintf(filename, sizeof(filename), "%s/%s/Package%s", directory,
+                         prodfull, file->dst);
 
             if (Verbosity > 1)
                 printf("Directory %s...\n", filename);
@@ -312,11 +307,11 @@ static int make_package(int format,     /* I - Format */
             break;
         case 'l':
             if (!strncmp(file->dst, "/etc/", 5) || !strncmp(file->dst, "/var/", 5))
-                snprintf(filename, sizeof(filename), "%s/%s/Package/private%s",
-                         directory, prodfull, file->dst);
+                snprintf(filename, sizeof(filename), "%s/%s/Package/private%s", directory,
+                         prodfull, file->dst);
             else
-                snprintf(filename, sizeof(filename), "%s/%s/Package%s",
-                         directory, prodfull, file->dst);
+                snprintf(filename, sizeof(filename), "%s/%s/Package%s", directory,
+                         prodfull, file->dst);
 
             if (Verbosity > 1)
                 printf("%s -> %s...\n", file->src, filename);
@@ -354,13 +349,14 @@ static int make_package(int format,     /* I - Format */
         }
 
         run_command(NULL,
-                    "/usr/bin/pkgbuild --identifier %s --version %s --ownership preserve --scripts %s/%s/Resources --root %s/%s/Package --sign '%s' %s",
+                    "/usr/bin/pkgbuild --identifier %s --version %s --ownership preserve "
+                    "--scripts %s/%s/Resources --root %s/%s/Package --sign '%s' %s",
                     prodfull, dist->version, directory, prodfull, directory, prodfull,
                     identity, pkgname);
-    }
-    else {
+    } else {
         run_command(NULL,
-                    "/usr/bin/pkgbuild --identifier %s --version %s --ownership preserve --scripts %s/%s/Resources --root %s/%s/Package %s",
+                    "/usr/bin/pkgbuild --identifier %s --version %s --ownership preserve "
+                    "--scripts %s/%s/Resources --root %s/%s/Package %s",
                     prodfull, dist->version, directory, prodfull, directory, prodfull,
                     pkgname);
     }

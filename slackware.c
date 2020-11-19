@@ -24,28 +24,25 @@
 
 #include "epm.h"
 
-
 /*
  * Local functions...
  */
 
 static int make_subpackage(const char *prodname, const char *directory,
-                           const char *platname, dist_t * dist, const char *subpackage);
-
+                           const char *platname, dist_t *dist, const char *subpackage);
 
 /*
  * 'make_slackware()' - Make a Slackware software distribution packages.
  */
 
-int                             /* O - 0 = success, 1 = fail */
-make_slackware(const char *prodname,    /* I - Product short name */
-               const char *directory,   /* I - Directory for distribution files */
-               const char *platname,    /* I - Platform name */
-               dist_t * dist,   /* I - Distribution information */
+int                                      /* O - 0 = success, 1 = fail */
+make_slackware(const char *prodname,     /* I - Product short name */
+               const char *directory,    /* I - Directory for distribution files */
+               const char *platname,     /* I - Platform name */
+               dist_t *dist,             /* I - Distribution information */
                struct utsname *platform) /* I - Platform information */
 {
-    int i;                      /* Looping var */
-
+    int i; /* Looping var */
 
     REF(platform);
 
@@ -72,29 +69,27 @@ make_slackware(const char *prodname,    /* I - Product short name */
     return (0);
 }
 
-
 /*
  * 'make_subpackage()' - Make a Slackware subpackage.
  */
 
-static int                      /* O - 0 = success, 1 = fail */
+static int                              /* O - 0 = success, 1 = fail */
 make_subpackage(const char *prodname,   /* I - Product short name */
                 const char *directory,  /* I - Directory for distribution files */
                 const char *platname,   /* I - Platform name */
-                dist_t * dist,  /* I - Distribution information */
+                dist_t *dist,           /* I - Distribution information */
                 const char *subpackage) /* I - Subpackage name */
 {
-    int i;                      /* Looping var */
-    FILE *fp;                   /* Spec file */
-    char prodfull[1024],        /* Full name of product */
-         filename[1024],        /* Destination filename */
-         pkgname[1024];         /* Package filename */
-    file_t *file;               /* Current distribution file */
-    command_t *c;               /* Current command */
-    struct passwd *pwd;         /* Pointer to user record */
-    struct group *grp;          /* Pointer to group record */
-    struct utsname platform;    /* Original platform data */
-
+    int i;                   /* Looping var */
+    FILE *fp;                /* Spec file */
+    char prodfull[1024],     /* Full name of product */
+        filename[1024],      /* Destination filename */
+        pkgname[1024];       /* Package filename */
+    file_t *file;            /* Current distribution file */
+    command_t *c;            /* Current command */
+    struct passwd *pwd;      /* Pointer to user record */
+    struct group *grp;       /* Pointer to group record */
+    struct utsname platform; /* Original platform data */
 
     /*
      * Figure out the full product name...
@@ -118,8 +113,8 @@ make_subpackage(const char *prodname,   /* I - Product short name */
         return (1);
     }
 
-    snprintf(pkgname, sizeof(pkgname), "%s-%s-%s-%s.tgz", prodfull,
-             dist->version, platform.machine, dist->release);
+    snprintf(pkgname, sizeof(pkgname), "%s-%s-%s-%s.tgz", prodfull, dist->version,
+             platform.machine, dist->release);
 
     /*
      * Make a copy of the distribution files...
@@ -165,8 +160,8 @@ make_subpackage(const char *prodname,   /* I - Product short name */
             break;
 
         case 'i':
-            snprintf(filename, sizeof(filename), "%s/%s/etc/rc.d/%s", directory,
-                     prodfull, file->dst);
+            snprintf(filename, sizeof(filename), "%s/%s/etc/rc.d/%s", directory, prodfull,
+                     file->dst);
 
             if (Verbosity > 1)
                 printf("I %s -> %s...\n", file->src, filename);
@@ -256,9 +251,10 @@ make_subpackage(const char *prodname,   /* I - Product short name */
             if (c->subpackage == subpackage) {
                 switch (c->type) {
                 case COMMAND_PRE_INSTALL:
-                    fputs
-                        ("WARNING: Package contains pre-install commands which are not supported\n"
-                         "         by the Slackware packager.\n", stderr);
+                    fputs("WARNING: Package contains pre-install commands which are not "
+                          "supported\n"
+                          "         by the Slackware packager.\n",
+                          stderr);
                     break;
 
                 case COMMAND_POST_INSTALL:
@@ -266,15 +262,17 @@ make_subpackage(const char *prodname,   /* I - Product short name */
                     break;
 
                 case COMMAND_PRE_REMOVE:
-                    fputs
-                        ("WARNING: Package contains pre-removal commands which are not supported\n"
-                         "         by the Slackware packager.\n", stderr);
+                    fputs("WARNING: Package contains pre-removal commands which are not "
+                          "supported\n"
+                          "         by the Slackware packager.\n",
+                          stderr);
                     break;
 
                 case COMMAND_POST_REMOVE:
-                    fputs
-                        ("WARNING: Package contains post-removal commands which are not supported\n"
-                         "         by the Slackware packager.\n", stderr);
+                    fputs("WARNING: Package contains post-removal commands which are not "
+                          "supported\n"
+                          "         by the Slackware packager.\n",
+                          stderr);
                     break;
                 }
             }

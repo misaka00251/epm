@@ -22,20 +22,18 @@
 
 #include "epm.h"
 
-
 /*
  * 'get_vernumber()' - Convert a version string to a number...
  */
 
-int                             /* O - Version number */
+int                                /* O - Version number */
 get_vernumber(const char *version) /* I - Version string */
 {
-    int numbers[4],             /* Raw version numbers */
-        nnumbers,               /* Number of numbers in version */
-        temp,                   /* Temporary version number */
-        offset;                 /* Offset for last version number */
-    const char *ptr;            /* Pointer into string */
-
+    int numbers[4],  /* Raw version numbers */
+        nnumbers,    /* Number of numbers in version */
+        temp,        /* Temporary version number */
+        offset;      /* Offset for last version number */
+    const char *ptr; /* Pointer into string */
 
     /*
      * Loop through the version number string and construct a version number.
@@ -43,7 +41,8 @@ get_vernumber(const char *version) /* I - Version string */
 
     memset(numbers, 0, sizeof(numbers));
 
-    for (ptr = version; *ptr && !isdigit(*ptr & 255); ptr++);
+    for (ptr = version; *ptr && !isdigit(*ptr & 255); ptr++)
+        ;
     /* Skip leading letters, periods, etc. */
 
     for (offset = 0, temp = 0, nnumbers = 0; *ptr && !isspace(*ptr & 255); ptr++)
@@ -67,17 +66,14 @@ get_vernumber(const char *version) /* I - Version string */
                 if (strncmp(ptr, "pre", 3) == 0) {
                     ptr += 2;
                     offset = -20;
-                }
-                else
+                } else
                     offset = 0;
 
                 nnumbers = 3;
-            }
-            else if (*ptr == 'b') {
+            } else if (*ptr == 'b') {
                 offset = -50;
                 nnumbers = 3;
-            }
-            else {              /* if (*ptr == 'a') */
+            } else { /* if (*ptr == 'a') */
                 offset = -100;
                 nnumbers = 3;
             }
@@ -90,6 +86,6 @@ get_vernumber(const char *version) /* I - Version string */
      * Compute the version number as MMmmPPpp + offset
      */
 
-    return (((numbers[0] * 100 + numbers[1]) * 100 + numbers[2]) * 100 +
-            numbers[3] + offset);
+    return (((numbers[0] * 100 + numbers[1]) * 100 + numbers[2]) * 100 + numbers[3] +
+            offset);
 }

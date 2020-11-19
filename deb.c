@@ -22,7 +22,6 @@
 
 #include "epm.h"
 
-
 /*
  * Local functions...
  */
@@ -50,25 +49,24 @@ add_size(FILE *fpControl,       /* Control file stream */
 }
 
 static int make_subpackage(const char *prodname, const char *directory,
-                           const char *platname, dist_t * dist,
-                           struct utsname *platform, const char *subpackage);
-
+                           const char *platname, dist_t *dist, struct utsname *platform,
+                           const char *subpackage);
 
 /*
  * 'make_deb()' - Make a Debian software distribution package.
  */
 
-int                             /* O - 0 = success, 1 = fail */
-make_deb(const char *prodname,  /* I - Product short name */
-         const char *directory, /* I - Directory for distribution files */
-         const char *platname,  /* I - Platform name */
-         dist_t * dist,         /* I - Distribution information */
+int                                /* O - 0 = success, 1 = fail */
+make_deb(const char *prodname,     /* I - Product short name */
+         const char *directory,    /* I - Directory for distribution files */
+         const char *platname,     /* I - Platform name */
+         dist_t *dist,             /* I - Distribution information */
          struct utsname *platform) /* I - Platform information */
 {
-    int i;                      /* Looping var */
-    tarf_t *tarfile;            /* Distribution tar file */
-    char name[1024],            /* Full product name */
-         filename[1024];        /* File to archive */
+    int i;              /* Looping var */
+    tarf_t *tarfile;    /* Distribution tar file */
+    char name[1024],    /* Full product name */
+        filename[1024]; /* File to archive */
     char *sep;
 
     /*
@@ -95,12 +93,10 @@ make_deb(const char *prodname,  /* I - Product short name */
         else if (!strcmp(platname, "ppc"))
             platname = "powerpc";
 
-    }
-    else {
+    } else {
         /* Debian packages use "amd64" instead of "x86_64" for the architecture... */
         if (!strcmp(platname, "x86_64"))
             platname = "amd64";
-
     }
 
     if (make_subpackage(prodname, directory, platname, dist, platform, NULL))
@@ -120,8 +116,8 @@ make_deb(const char *prodname,  /* I - Product short name */
          * Figure out the full name of the distribution...
          */
         if (dist->release[0])
-            snprintf(name, sizeof(name), "%s%s%s%s%s", prodname, sep, dist->version,
-                     sep, dist->release);
+            snprintf(name, sizeof(name), "%s%s%s%s%s", prodname, sep, dist->version, sep,
+                     dist->release);
         else
             snprintf(name, sizeof(name), "%s%s%s", prodname, sep, dist->version);
 
@@ -181,37 +177,31 @@ make_deb(const char *prodname,  /* I - Product short name */
     return (0);
 }
 
-
 /*
  * 'make_subpackage()' - Make a subpackage...
  */
 
-static int                      /* O - 0 = success, 1 = fail */
-make_subpackage(const char *prodname,  /* I - Product short name */
-                const char *directory, /* I - Directory for distribution files */
-                const char *platname,  /* I - Platform name */
-                dist_t * dist,         /* I - Distribution information */
+static int                                /* O - 0 = success, 1 = fail */
+make_subpackage(const char *prodname,     /* I - Product short name */
+                const char *directory,    /* I - Directory for distribution files */
+                const char *platname,     /* I - Platform name */
+                dist_t *dist,             /* I - Distribution information */
                 struct utsname *platform, /* I - Platform information */
                 const char *subpackage)   /* I - Subpackage */
 {
-    int i, j;                   /* Looping vars */
-    const char *header;         /* Dependency header string */
-    FILE *fp;                   /* Control file */
-    char prodfull[255],         /* Full name of product */
-         name[1024],            /* Full product name */
-         filename[1024];        /* Destination filename */
-    command_t *c;               /* Current command */
-    depend_t *d;                /* Current dependency */
-    file_t *file;               /* Current distribution file */
-    struct passwd *pwd;         /* Pointer to user record */
-    struct group *grp;          /* Pointer to group record */
-    static const char *depends[] =      /* Dependency names */
-    {
-        "Depends:",
-        "Conflicts:",
-        "Replaces:",
-        "Provides:"
-    };
+    int i, j;                      /* Looping vars */
+    const char *header;            /* Dependency header string */
+    FILE *fp;                      /* Control file */
+    char prodfull[255],            /* Full name of product */
+        name[1024],                /* Full product name */
+        filename[1024];            /* Destination filename */
+    command_t *c;                  /* Current command */
+    depend_t *d;                   /* Current dependency */
+    file_t *file;                  /* Current distribution file */
+    struct passwd *pwd;            /* Pointer to user record */
+    struct group *grp;             /* Pointer to group record */
+    static const char *depends[] = /* Dependency names */
+        {"Depends:", "Conflicts:", "Replaces:", "Provides:"};
     char *sep;
 
     /*
@@ -232,8 +222,8 @@ make_subpackage(const char *prodname,  /* I - Product short name */
      */
 
     if (dist->release[0])
-        snprintf(name, sizeof(name), "%s%s%s%s%s", prodfull, sep, dist->version,
-                 sep, dist->release);
+        snprintf(name, sizeof(name), "%s%s%s%s%s", prodfull, sep, dist->version, sep,
+                 dist->release);
     else
         snprintf(name, sizeof(name), "%s%s%s", prodfull, sep, dist->version);
 
@@ -317,8 +307,7 @@ make_subpackage(const char *prodname,  /* I - Product short name */
                     if (d->vernumber[0] == 0) {
                         if (d->vernumber[1] < INT_MAX)
                             fprintf(fp, " (<= %s)", d->version[1]);
-                    }
-                    else {
+                    } else {
                         if (d->vernumber[1] < INT_MAX)
                             fprintf(fp, " (>= %s), %s (<= %s)", d->version[0], d->product,
                                     d->version[1]);
@@ -591,8 +580,8 @@ make_subpackage(const char *prodname,  /* I - Product short name */
                 return (1);
             break;
         case 'i':
-            snprintf(filename, sizeof(filename), "%s/%s/etc/init.d/%s",
-                     directory, name, file->dst);
+            snprintf(filename, sizeof(filename), "%s/%s/etc/init.d/%s", directory, name,
+                     file->dst);
 
             if (Verbosity > 1)
                 printf("%s -> %s...\n", file->src, filename);
@@ -631,8 +620,7 @@ make_subpackage(const char *prodname,  /* I - Product short name */
     if (geteuid() && !run_command(NULL, "fakeroot --version")) {
         if (run_command(directory, "fakeroot dpkg --build %s", name))
             return (1);
-    }
-    else if (run_command(directory, "dpkg --build %s", name))
+    } else if (run_command(directory, "dpkg --build %s", name))
         return (1);
 
     /*

@@ -23,7 +23,6 @@
 #include "epm.h"
 #include <pwd.h>
 
-
 /*
  * Some versions of Solaris don't define gethostname()...
  */
@@ -32,58 +31,55 @@
 extern int gethostname(char *, size_t);
 #endif /* __sun */
 
-
 /*
  * Local functions...
  */
 
-static int compare_files(const file_t * f0, const file_t * f1);
+static int compare_files(const file_t *f0, const file_t *f1);
 static void expand_name(char *buffer, char *name, size_t bufsize, int warn);
 static char *get_file(const char *filename, char *buffer, size_t size);
 static char *get_inline(const char *term, FILE *fp, char *buffer, size_t size);
-static char *get_line(char *buffer, int size, FILE *fp,
-                      struct utsname *platform, const char *format, int *skip);
+static char *get_line(char *buffer, int size, FILE *fp, struct utsname *platform,
+                      const char *format, int *skip);
 static char *get_string(char **src, char *dst, size_t dstsize);
 static int patmatch(const char *, const char *);
 static int sort_subpackages(char **a, char **b);
 static void update_architecture(char *buffer, size_t bufsize);
 
-
 /*
  * Conditional "skip" bits...
  */
 
-#define SKIP_SYSTEM	1       /* Not the right system */
-#define SKIP_FORMAT	2       /* Not the right format */
-#define SKIP_ARCH	4       /* Not the right architecture */
-#define SKIP_IF		8       /* Set if the current #if was not satisfied */
-#define SKIP_IFACTIVE	16      /* Set if we're in an #if */
-#define SKIP_IFSAT	32      /* Set if an #if statement has been satisfied */
-#define SKIP_MASK	15      /* Bits to look at */
-
+#define SKIP_SYSTEM 1    /* Not the right system */
+#define SKIP_FORMAT 2    /* Not the right format */
+#define SKIP_ARCH 4      /* Not the right architecture */
+#define SKIP_IF 8        /* Set if the current #if was not satisfied */
+#define SKIP_IFACTIVE 16 /* Set if we're in an #if */
+#define SKIP_IFSAT 32    /* Set if an #if statement has been satisfied */
+#define SKIP_MASK 15     /* Bits to look at */
 
 /*
  * 'add_command()' - Add a command to the distribution...
  */
 
-void add_command(dist_t * dist, /* I - Distribution */
-                 FILE *fp,      /* I - Distribution file */
-                 int type,      /* I - Command type */
-                 const char *command,   /* I - Command string */
-                 const char *subpkg,    /* I - Subpackage */
-                 const char *section)   /* I - Literal text section */
+void add_command(dist_t *dist,        /* I - Distribution */
+                 FILE *fp,            /* I - Distribution file */
+                 int type,            /* I - Command type */
+                 const char *command, /* I - Command string */
+                 const char *subpkg,  /* I - Subpackage */
+                 const char *section) /* I - Literal text section */
 {
-    command_t *temp;            /* New command */
-    char buf[16384];            /* File import buffer */
-
+    command_t *temp; /* New command */
+    char buf[16384]; /* File import buffer */
 
     if (!strncmp(command, "<<", 2)) {
-        for (command += 2; isspace(*command & 255); command++);
+        for (command += 2; isspace(*command & 255); command++)
+            ;
 
         command = get_inline(command, fp, buf, sizeof(buf));
-    }
-    else if (command[0] == '<' && command[1]) {
-        for (command++; isspace(*command & 255); command++);
+    } else if (command[0] == '<' && command[1]) {
+        for (command++; isspace(*command & 255); command++)
+            ;
 
         command = get_file(command, buf, sizeof(buf));
     }
@@ -117,28 +113,25 @@ void add_command(dist_t * dist, /* I - Distribution */
             free(temp->command);
             return;
         }
-    }
-    else
+    } else
         temp->section = NULL;
 
     dist->num_commands++;
 }
 
-
 /*
  * 'add_depend()' - Add a dependency to the distribution...
  */
 
-void add_depend(dist_t * dist,  /* I - Distribution */
-                int type,       /* I - Type of dependency */
-                const char *line,       /* I - Line from file */
-                const char *subpkg)     /* I - Subpackage */
+void add_depend(dist_t *dist,       /* I - Distribution */
+                int type,           /* I - Type of dependency */
+                const char *line,   /* I - Line from file */
+                const char *subpkg) /* I - Subpackage */
 {
-    int i;                      /* Looping var */
-    depend_t *temp;             /* New dependency */
-    char *ptr;                  /* Pointer into string */
-    const char *lineptr;        /* Temporary pointer into line */
-
+    int i;               /* Looping var */
+    depend_t *temp;      /* New dependency */
+    char *ptr;           /* Pointer into string */
+    const char *lineptr; /* Temporary pointer into line */
 
     /*
      * Allocate memory for the dependency...
@@ -215,7 +208,8 @@ void add_depend(dist_t * dist,  /* I - Distribution */
          * Get the version number, if any...
          */
 
-        for (lineptr = line; isdigit(*lineptr & 255); lineptr++);
+        for (lineptr = line; isdigit(*lineptr & 255); lineptr++)
+            ;
 
         if (!*line || (!isspace(*lineptr & 255) && *lineptr)) {
             /*
@@ -224,15 +218,15 @@ void add_depend(dist_t * dist,  /* I - Distribution */
              */
 
             temp->vernumber[i] = get_vernumber(temp->version[i]);
-        }
-        else {
+        } else {
             /*
              * Grab the version number directly from the line...
              */
 
             temp->vernumber[i] = atoi(line);
 
-            for (line = lineptr; isspace(*line & 255); line++);
+            for (line = lineptr; isspace(*line & 255); line++)
+                ;
         }
     }
 
@@ -251,27 +245,26 @@ void add_depend(dist_t * dist,  /* I - Distribution */
     }
 }
 
-
 /*
  * 'add_description()' - Add a description to the distribution.
  */
 
-void add_description(dist_t * dist,     /* I - Distribution */
-                     FILE *fp,  /* I - Source file */
-                     const char *description,   /* I - Description string */
-                     const char *subpkg)        /* I - Subpackage name */
+void add_description(dist_t *dist,            /* I - Distribution */
+                     FILE *fp,                /* I - Source file */
+                     const char *description, /* I - Description string */
+                     const char *subpkg)      /* I - Subpackage name */
 {
-    description_t *temp;        /* Temporary description array */
-    char buf[16384];            /* File import buffer */
-
+    description_t *temp; /* Temporary description array */
+    char buf[16384];     /* File import buffer */
 
     if (!strncmp(description, "<<", 2)) {
-        for (description += 2; isspace(*description & 255); description++);
+        for (description += 2; isspace(*description & 255); description++)
+            ;
 
         description = get_inline(description, fp, buf, sizeof(buf));
-    }
-    else if (description[0] == '<' && description[1]) {
-        for (description++; isspace(*description & 255); description++);
+    } else if (description[0] == '<' && description[1]) {
+        for (description++; isspace(*description & 255); description++)
+            ;
 
         description = get_file(description, buf, sizeof(buf));
     }
@@ -300,23 +293,21 @@ void add_description(dist_t * dist,     /* I - Distribution */
         perror("epm: Out of memory duplicating description");
 }
 
-
 /*
  * 'add_file()' - Add a file to the distribution.
  */
 
-file_t *                        /* O - New file */
-add_file(dist_t * dist,         /* I - Distribution */
-         const char *subpkg)    /* I - Subpackage name */
+file_t *                     /* O - New file */
+add_file(dist_t *dist,       /* I - Distribution */
+         const char *subpkg) /* I - Subpackage name */
 {
-    file_t *file;               /* New file */
-
+    file_t *file; /* New file */
 
     if (dist->num_files == 0)
-        dist->files = (file_t *) malloc(sizeof(file_t));
+        dist->files = (file_t *)malloc(sizeof(file_t));
     else
-        dist->files = (file_t *) realloc(dist->files, sizeof(file_t) *
-                                         (dist->num_files + 1));
+        dist->files =
+            (file_t *)realloc(dist->files, sizeof(file_t) * (dist->num_files + 1));
 
     file = dist->files + dist->num_files;
     dist->num_files++;
@@ -326,18 +317,16 @@ add_file(dist_t * dist,         /* I - Distribution */
     return (file);
 }
 
-
 /*
  * 'add_subpackage()' - Add a subpackage to the distribution.
  */
 
-char *                          /* O - Subpackage pointer */
-add_subpackage(dist_t * dist,   /* I - Distribution */
+char *                             /* O - Subpackage pointer */
+add_subpackage(dist_t *dist,       /* I - Distribution */
                const char *subpkg) /* I - Subpackage name */
 {
-    char **temp,                /* Temporary array pointer */
-        *s;                     /* Subpackage pointer */
-
+    char **temp, /* Temporary array pointer */
+        *s;      /* Subpackage pointer */
 
     if (dist->num_subpackages == 0)
         temp = malloc(sizeof(char *));
@@ -354,8 +343,8 @@ add_subpackage(dist_t * dist,   /* I - Distribution */
     *temp = s = strdup(subpkg);
 
     if (dist->num_subpackages > 1)
-        qsort(dist->subpackages, (size_t) dist->num_subpackages, sizeof(char *),
-              (int (*)(const void *, const void *)) sort_subpackages);
+        qsort(dist->subpackages, (size_t)dist->num_subpackages, sizeof(char *),
+              (int (*)(const void *, const void *))sort_subpackages);
 
     /*
      * Return the new string...
@@ -364,25 +353,23 @@ add_subpackage(dist_t * dist,   /* I - Distribution */
     return (s);
 }
 
-
 /*
  * 'find_subpackage()' - Find a subpackage in the distribution.
  */
 
-char *                          /* O - Subpackage pointer */
-find_subpackage(dist_t * dist,  /* I - Distribution */
+char *                              /* O - Subpackage pointer */
+find_subpackage(dist_t *dist,       /* I - Distribution */
                 const char *subpkg) /* I - Subpackage name */
 {
-    char **match;               /* Matching subpackage */
-
+    char **match; /* Matching subpackage */
 
     if (!subpkg || !*subpkg)
         return (NULL);
 
     if (dist->num_subpackages > 0)
-        match = bsearch(&subpkg, dist->subpackages, (size_t) dist->num_subpackages,
+        match = bsearch(&subpkg, dist->subpackages, (size_t)dist->num_subpackages,
                         sizeof(char *),
-                        (int (*)(const void *, const void *)) sort_subpackages);
+                        (int (*)(const void *, const void *))sort_subpackages);
     else
         match = NULL;
 
@@ -392,15 +379,13 @@ find_subpackage(dist_t * dist,  /* I - Distribution */
         return (add_subpackage(dist, subpkg));
 }
 
-
 /*
  * 'free_dist()' - Free memory used by a distribution.
  */
 
-void free_dist(dist_t * dist)   /* I - Distribution to free */
+void free_dist(dist_t *dist) /* I - Distribution to free */
 {
-    int i;                      /* Looping var */
-
+    int i; /* Looping var */
 
     if (dist->num_files > 0)
         free(dist->files);
@@ -432,20 +417,17 @@ void free_dist(dist_t * dist)   /* I - Distribution to free */
     free(dist);
 }
 
-
-
 /*
  * 'getoption()' - Get an option from a file.
  */
 
-const char *                    /* O - Value */
-get_option(file_t * file,       /* I - File */
-           const char *name,    /* I - Name of option */
-           const char *defval)  /* I - Default value of option */
+const char *                   /* O - Value */
+get_option(file_t *file,       /* I - File */
+           const char *name,   /* I - Name of option */
+           const char *defval) /* I - Default value of option */
 {
-    char *ptr;                  /* Pointer to option */
-    static char option[256];    /* Copy of file option */
-
+    char *ptr;               /* Pointer to option */
+    static char option[256]; /* Copy of file option */
 
     /*
      * See if the option exists...
@@ -466,28 +448,23 @@ get_option(file_t * file,       /* I - File */
     if ((ptr = strchr(option, ')')) != NULL) {
         *ptr = '\0';
         return (option);
-    }
-    else
+    } else
         return (defval);
 }
-
-
-
 
 /*
  * 'get_platform()' - Get the operating system information...
  */
 
-void get_platform(struct utsname *platform)  /* O - Platform info */
+void get_platform(struct utsname *platform) /* O - Platform info */
 {
-    char *temp;                 /* Temporary pointer */
+    char *temp; /* Temporary pointer */
 #ifdef __APPLE__
-    FILE *fp;                   /* SystemVersion.plist file */
-    char line[1024],            /* Line from file */
-        *ptr;                   /* Pointer into line */
-    int major, minor;           /* Major and minor release numbers */
-#endif /* __APPLE__ */
-
+    FILE *fp;         /* SystemVersion.plist file */
+    char line[1024],  /* Line from file */
+        *ptr;         /* Pointer into line */
+    int major, minor; /* Major and minor release numbers */
+#endif                /* __APPLE__ */
 
     /*
      * Get the system identification information...
@@ -518,8 +495,7 @@ void get_platform(struct utsname *platform)  /* O - Platform info */
                 sscanf(ptr + 8, "%d.%d", &major, &minor);
 
             snprintf(platform->release, sizeof(platform->release), "%d.%d", major, minor);
-        }
-        else {
+        } else {
             /*
              * Couldn't find the version number, so assume it is 10.1...
              */
@@ -561,16 +537,18 @@ void get_platform(struct utsname *platform)  /* O - Platform info */
      * major and minor numbers...
      */
 
-    while (!isdigit((int) platform->release[0]) && platform->release[0])
+    while (!isdigit((int)platform->release[0]) && platform->release[0])
         memmove(platform->release, platform->release + 1, strlen(platform->release));
 
     if (platform->release[0] == '.')
         memmove(platform->release, platform->release + 1, strlen(platform->release));
 
-    for (temp = platform->release; *temp && isdigit(*temp & 255); temp++);
+    for (temp = platform->release; *temp && isdigit(*temp & 255); temp++)
+        ;
 
     if (*temp == '.')
-        for (temp++; *temp && isdigit(*temp & 255); temp++);
+        for (temp++; *temp && isdigit(*temp & 255); temp++)
+            ;
 
     *temp = '\0';
 #endif /* _AIX */
@@ -584,8 +562,7 @@ void get_platform(struct utsname *platform)  /* O - Platform info */
         if (*temp == '-' || *temp == '_') {
             memmove(temp, temp + 1, strlen(temp));
             temp--;
-        }
-        else
+        } else
             *temp = tolower(*temp);
 
     /*
@@ -608,11 +585,11 @@ void get_platform(struct utsname *platform)  /* O - Platform info */
 
             *temp = '\0';
         }
-    }
-    else if (!strcmp(platform->sysname, "osf1"))
-        strlcpy(platform->sysname, "tru64", sizeof(platform->sysname)); /* AKA Digital UNIX */
+    } else if (!strcmp(platform->sysname, "osf1"))
+        strlcpy(platform->sysname, "tru64",
+                sizeof(platform->sysname)); /* AKA Digital UNIX */
     else if (!strcmp(platform->sysname, "irix64"))
-        strlcpy(platform->sysname, "irix", sizeof(platform->sysname));  /* IRIX */
+        strlcpy(platform->sysname, "irix", sizeof(platform->sysname)); /* IRIX */
 
 #ifdef DEBUG
     printf("sysname = %s\n", platform->sysname);
@@ -621,39 +598,35 @@ void get_platform(struct utsname *platform)  /* O - Platform info */
 #endif /* DEBUG */
 }
 
-
 /*
  * 'get_runlevels()' - Get the run levels for the specified init script.
  */
 
-const char *                    /* O - Run levels */
-get_runlevels(file_t * file,    /* I - File */
-              const char *deflevels)  /* I - Default run levels */
+const char *                         /* O - Run levels */
+get_runlevels(file_t *file,          /* I - File */
+              const char *deflevels) /* I - Default run levels */
 {
-    const char *runlevels;      /* Pointer to runlevels option */
-
+    const char *runlevels; /* Pointer to runlevels option */
 
     if ((runlevels = strstr(file->options, "runlevel(")) != NULL)
         runlevels += 9;
     else if ((runlevels = strstr(file->options, "runlevels(")) != NULL)
-        runlevels += 10;        /* Compatible mis-spelling... */
+        runlevels += 10; /* Compatible mis-spelling... */
     else
         runlevels = deflevels;
 
     return (runlevels);
 }
 
-
 /*
  * 'get_start()' - Get the start number for an init script.
  */
 
-int                             /* O - Start number */
-get_start(file_t * file,        /* I - File */
-          int defstart)         /* I - Default start number */
+int                     /* O - Start number */
+get_start(file_t *file, /* I - File */
+          int defstart) /* I - Default start number */
 {
-    const char *start;          /* Pointer to start option */
-
+    const char *start; /* Pointer to start option */
 
     if ((start = strstr(file->options, "start(")) != NULL)
         return (atoi(start + 6));
@@ -661,17 +634,15 @@ get_start(file_t * file,        /* I - File */
         return (defstart);
 }
 
-
 /*
  * 'get_stop()' - Get the stop number for an init script.
  */
 
-int                             /* O - Start number */
-get_stop(file_t * file,         /* I - File */
-         int defstop)           /* I - Default stop number */
+int                    /* O - Start number */
+get_stop(file_t *file, /* I - File */
+         int defstop)  /* I - Default stop number */
 {
-    const char *stop;           /* Pointer to stop option */
-
+    const char *stop; /* Pointer to stop option */
 
     if ((stop = strstr(file->options, "stop(")) != NULL)
         return (atoi(stop + 5));
@@ -679,53 +650,49 @@ get_stop(file_t * file,         /* I - File */
         return (defstop);
 }
 
-
 /*
  * 'new_dist()' - Create a new, empty software distribution.
  */
 
-dist_t *                        /* O - New distribution */
-new_dist(void)
-{
+dist_t * /* O - New distribution */
+new_dist(void) {
     /*
      * Create a new, blank distribution...
      */
 
-    return ((dist_t *) calloc(sizeof(dist_t), 1));
+    return ((dist_t *)calloc(sizeof(dist_t), 1));
 }
-
 
 /*
  * 'read_dist()' - Read a software distribution.
  */
 
-dist_t *                        /* O - New distribution */
-read_dist(const char *filename, /* I - Main distribution list file */
-          struct utsname *platform,     /* I - Platform information */
-          const char *format)           /* I - Format of distribution */
+dist_t *                            /* O - New distribution */
+read_dist(const char *filename,     /* I - Main distribution list file */
+          struct utsname *platform, /* I - Platform information */
+          const char *format)       /* I - Format of distribution */
 {
-    FILE *listfiles[10];        /* File lists */
-    int listlevel;              /* Level in file list */
-    char line[2048],            /* Expanded line from list file */
-         buf[1024];             /* Original line from list file */
-    int type;                   /* File type */
-    char dst[256],              /* Destination path */
-         src[256],              /* Source path */
-         pattern[256],          /* Pattern for source files */
-         user[32],              /* User */
-         group[32],             /* Group */
-        *temp,                  /* Temporary pointer */
-         options[256];          /* File options */
-    mode_t mode;                /* File permissions */
-    int skip;                   /* 1 = skip files, 0 = archive files */
-    dist_t *dist;               /* Distribution data */
-    file_t *file;               /* Distribution file */
-    struct stat fileinfo;       /* File information */
-    DIR *dir;                   /* Directory */
-    DIRENT *dent;               /* Directory entry */
-    struct passwd *pwd;         /* Password entry */
-    const char *subpkg;         /* Subpackage */
-
+    FILE *listfiles[10];  /* File lists */
+    int listlevel;        /* Level in file list */
+    char line[2048],      /* Expanded line from list file */
+        buf[1024];        /* Original line from list file */
+    int type;             /* File type */
+    char dst[256],        /* Destination path */
+        src[256],         /* Source path */
+        pattern[256],     /* Pattern for source files */
+        user[32],         /* User */
+        group[32],        /* Group */
+        *temp,            /* Temporary pointer */
+        options[256];     /* File options */
+    mode_t mode;          /* File permissions */
+    int skip;             /* 1 = skip files, 0 = archive files */
+    dist_t *dist;         /* Distribution data */
+    file_t *file;         /* Distribution file */
+    struct stat fileinfo; /* File information */
+    DIR *dir;             /* Directory */
+    DIRENT *dent;         /* Directory entry */
+    struct passwd *pwd;   /* Password entry */
+    const char *subpkg;   /* Subpackage */
 
     /*
      * Create a new, blank distribution...
@@ -738,8 +705,8 @@ read_dist(const char *filename, /* I - Main distribution list file */
      */
 
     if ((listfiles[0] = fopen(filename, "r")) == NULL) {
-        fprintf(stderr, "epm: Unable to open list file \"%s\" -\n     %s\n",
-                filename, strerror(errno));
+        fprintf(stderr, "epm: Unable to open list file \"%s\" -\n     %s\n", filename,
+                strerror(errno));
         return (NULL);
     }
 
@@ -761,7 +728,7 @@ read_dist(const char *filename, /* I - Main distribution list file */
              * Do variable substitution...
              */
 
-            line[0] = buf[0];   /* Don't expand initial $ */
+            line[0] = buf[0]; /* Don't expand initial $ */
             expand_name(line + 1, buf + 1, sizeof(line) - 1,
                         strncmp(buf, "%if", 3) || strncmp(buf, "%elseif", 7));
 
@@ -774,8 +741,10 @@ read_dist(const char *filename, /* I - Main distribution list file */
                  * Find whitespace...
                  */
 
-                for (temp = line; !isspace(*temp & 255) && *temp; temp++);
-                for (; isspace(*temp & 255); *temp++ = '\0');
+                for (temp = line; !isspace(*temp & 255) && *temp; temp++)
+                    ;
+                for (; isspace(*temp & 255); *temp++ = '\0')
+                    ;
 
                 /*
                  * Process directive...
@@ -789,8 +758,7 @@ read_dist(const char *filename, /* I - Main distribution list file */
                                 temp, strerror(errno));
                         listlevel--;
                     }
-                }
-                else if (!strcmp(line, "%description"))
+                } else if (!strcmp(line, "%description"))
                     add_description(dist, listfiles[listlevel], temp, subpkg);
                 else if (!strcmp(line, "%preinstall"))
                     add_command(dist, listfiles[listlevel], COMMAND_PRE_INSTALL, temp,
@@ -811,9 +779,8 @@ read_dist(const char *filename, /* I - Main distribution list file */
                     add_command(dist, listfiles[listlevel], COMMAND_POST_PATCH, temp,
                                 subpkg, NULL);
                 else if (!strncmp(line, "%literal(", 9)) {
-                    char *ptr,  /* Pointer to parenthesis */
-                        *section;       /* Section for literal text */
-
+                    char *ptr,    /* Pointer to parenthesis */
+                        *section; /* Section for literal text */
 
                     section = line + 9;
                     if ((ptr = strchr(section, ')')) != NULL) {
@@ -821,58 +788,49 @@ read_dist(const char *filename, /* I - Main distribution list file */
 
                         add_command(dist, listfiles[listlevel], COMMAND_LITERAL, temp,
                                     subpkg, section);
-                    }
-                    else
+                    } else
                         fputs("epm: Ignoring bad %literal(section) line in list file.\n",
                               stderr);
-                }
-                else if (!strcmp(line, "%product")) {
+                } else if (!strcmp(line, "%product")) {
                     if (!dist->product[0])
                         strlcpy(dist->product, temp, sizeof(dist->product));
                     else
                         fputs("epm: Ignoring %product line in list file.\n", stderr);
-                }
-                else if (!strcmp(line, "%copyright")) {
+                } else if (!strcmp(line, "%copyright")) {
                     if (!dist->copyright[0])
                         strlcpy(dist->copyright, temp, sizeof(dist->copyright));
                     else
                         fputs("epm: Ignoring %copyright line in list file.\n", stderr);
-                }
-                else if (!strcmp(line, "%vendor")) {
+                } else if (!strcmp(line, "%vendor")) {
                     if (!dist->vendor[0])
                         strlcpy(dist->vendor, temp, sizeof(dist->vendor));
                     else
                         fputs("epm: Ignoring %vendor line in list file.\n", stderr);
-                }
-                else if (!strcmp(line, "%packager")) {
+                } else if (!strcmp(line, "%packager")) {
                     if (!dist->packager[0])
                         strlcpy(dist->packager, temp, sizeof(dist->packager));
                     else
                         fputs("epm: Ignoring %packager line in list file.\n", stderr);
-                }
-                else if (!strcmp(line, "%license")) {
+                } else if (!strcmp(line, "%license")) {
                     if (!dist->license[0])
                         strlcpy(dist->license, temp, sizeof(dist->license));
                     else
                         fputs("epm: Ignoring %license line in list file.\n", stderr);
-                }
-                else if (!strcmp(line, "%readme")) {
+                } else if (!strcmp(line, "%readme")) {
                     if (!dist->readme[0])
                         strlcpy(dist->readme, temp, sizeof(dist->readme));
                     else
                         fputs("epm: Ignoring %readme line in list file.\n", stderr);
-                }
-                else if (!strcmp(line, "%subpackage")) {
+                } else if (!strcmp(line, "%subpackage")) {
                     subpkg = find_subpackage(dist, temp);
-                }
-                else if (!strcmp(line, "%version")) {
+                } else if (!strcmp(line, "%version")) {
                     if (!dist->version[0]) {
                         if (strchr(temp, ':')) {
                             /*
                              * Grab the epoch...
                              */
 
-                            dist->epoch = (int) strtol(temp, &temp, 10);
+                            dist->epoch = (int)strtol(temp, &temp, 10);
 
                             if (*temp == ':')
                                 temp++;
@@ -882,8 +840,7 @@ read_dist(const char *filename, /* I - Main distribution list file */
                         if ((temp = strchr(dist->version, ' ')) != NULL) {
                             *temp++ = '\0';
                             dist->vernumber = atoi(temp);
-                        }
-                        else
+                        } else
                             dist->vernumber = get_vernumber(dist->version);
 
                         if ((temp = strrchr(dist->version, '-')) != NULL) {
@@ -891,12 +848,10 @@ read_dist(const char *filename, /* I - Main distribution list file */
                             strlcpy(dist->release, temp, sizeof(dist->release));
                         }
                     }
-                }
-                else if (!strcmp(line, "%release")) {
+                } else if (!strcmp(line, "%release")) {
                     strlcpy(dist->release, temp, sizeof(dist->release));
                     dist->vernumber += atoi(temp);
-                }
-                else if (!strcmp(line, "%incompat"))
+                } else if (!strcmp(line, "%incompat"))
                     add_depend(dist, DEPEND_INCOMPAT, temp, subpkg);
                 else if (!strcmp(line, "%provides"))
                     add_depend(dist, DEPEND_PROVIDES, temp, subpkg);
@@ -908,8 +863,7 @@ read_dist(const char *filename, /* I - Main distribution list file */
                     fprintf(stderr, "epm: Unknown directive \"%s\" ignored.\n", line);
                     fprintf(stderr, "     %s %s\n", line, temp);
                 }
-            }
-            else if (line[0] == '$') {
+            } else if (line[0] == '$') {
                 /*
                  * Define a variable...
                  */
@@ -921,8 +875,7 @@ read_dist(const char *filename, /* I - Main distribution list file */
 
                     memmove(temp, temp + 1, strlen(temp));
                     memmove(line + 1, line + 2, strlen(line + 1));
-                }
-                else if (line[1] == '(' && (temp = strchr(line + 2, ')')) != NULL) {
+                } else if (line[1] == '(' && (temp = strchr(line + 2, ')')) != NULL) {
                     /*
                      * Remove () from name...
                      */
@@ -945,8 +898,7 @@ read_dist(const char *filename, /* I - Main distribution list file */
                             putenv(temp);
                     }
                 }
-            }
-            else {
+            } else {
                 type = line[0];
                 if (!isspace(line[1] & 255)) {
                     fprintf(stderr, "epm: Expected whitespace after file type: %s\n",
@@ -987,13 +939,13 @@ read_dist(const char *filename, /* I - Main distribution list file */
                     src[0] = '\0';
                 }
 
-#ifdef __osf__                  /* Remap group "sys" to "system" */
+#ifdef __osf__ /* Remap group "sys" to "system" */
                 if (!strcmp(group, "sys"))
                     strlcpy(group, "system", sizeof(group));
-#elif defined(__linux)          /* Remap group "sys" to "root" */
+#elif defined(__linux) /* Remap group "sys" to "root" */
                 if (!strcmp(group, "sys"))
                     strlcpy(group, "root", sizeof(group));
-#endif /* __osf__ */
+#endif                 /* __osf__ */
 
                 if ((temp = strrchr(src, '/')) == NULL)
                     temp = src;
@@ -1037,12 +989,12 @@ read_dist(const char *filename, /* I - Main distribution list file */
 
                         while ((dent = readdir(dir)) != NULL) {
                             strlcpy(temp, dent->d_name,
-                                    sizeof(src) - (size_t) (temp - src));
+                                    sizeof(src) - (size_t)(temp - src));
                             if (stat(src, &fileinfo))
-                                continue;       /* Skip files we can't read */
+                                continue; /* Skip files we can't read */
 
                             if (S_ISDIR(fileinfo.st_mode))
-                                continue;       /* Skip directories */
+                                continue; /* Skip directories */
 
                             if (!patmatch(dent->d_name, pattern))
                                 continue;
@@ -1061,8 +1013,7 @@ read_dist(const char *filename, /* I - Main distribution list file */
 
                         closedir(dir);
                     }
-                }
-                else {
+                } else {
                     /*
                      * Add single file...
                      */
@@ -1082,8 +1033,7 @@ read_dist(const char *filename, /* I - Main distribution list file */
 
         fclose(listfiles[listlevel]);
         listlevel--;
-    }
-    while (listlevel >= 0);
+    } while (listlevel >= 0);
 
     if (!dist->packager[0]) {
         /*
@@ -1104,24 +1054,22 @@ read_dist(const char *filename, /* I - Main distribution list file */
     return (dist);
 }
 
-
 /*
  * 'sort_dist_files()' - Sort the files in the distribution.
  */
 
-void sort_dist_files(dist_t * dist)  /* I - Distribution to sort */
+void sort_dist_files(dist_t *dist) /* I - Distribution to sort */
 {
-    int i;                      /* Looping var */
-    file_t *file;               /* File in distribution */
-
+    int i;        /* Looping var */
+    file_t *file; /* File in distribution */
 
     /*
      * Sort the files...
      */
 
     if (dist->num_files > 1)
-        qsort(dist->files, (size_t) dist->num_files, sizeof(file_t),
-              (int (*)(const void *, const void *)) compare_files);
+        qsort(dist->files, (size_t)dist->num_files, sizeof(file_t),
+              (int (*)(const void *, const void *))compare_files);
 
     /*
      * Remove duplicates...
@@ -1141,53 +1089,40 @@ void sort_dist_files(dist_t * dist)  /* I - Distribution to sort */
                 memcpy(file, file + 1, i * sizeof(file_t));
                 dist->num_files--;
                 file--;
-            }
-            else
+            } else
                 fprintf(stderr,
                         "epm: Duplicate destination path \"%s\" with different info:\n"
                         "     \"%c %04o %s %s\" from source \"%s\"\n"
-                        "     \"%c %04o %s %s\" from source \"%s\"\n", file[0].dst,
-                        file[0].type, file[0].mode, file[0].user, file[0].group,
-                        file[0].src, file[1].type, file[1].mode, file[1].user,
-                        file[1].group, file[1].src);
+                        "     \"%c %04o %s %s\" from source \"%s\"\n",
+                        file[0].dst, file[0].type, file[0].mode, file[0].user,
+                        file[0].group, file[0].src, file[1].type, file[1].mode,
+                        file[1].user, file[1].group, file[1].src);
         }
 }
-
 
 /*
  * 'write_dist()' - Write a distribution list file...
  */
 
-int                             /* O - 0 on success, -1 on failure */
-write_dist(const char *listname,        /* I - File to write to */
-           dist_t * dist)               /* I - Distribution to write */
+int                              /* O - 0 on success, -1 on failure */
+write_dist(const char *listname, /* I - File to write to */
+           dist_t *dist)         /* I - Distribution to write */
 {
-    int i;                      /* Looping var */
-    int is_inline;              /* Inline text? */
-    char listbck[1024],         /* Backup filename */
-        *ptr;                   /* Pointer into command string */
-    FILE *listfile;             /* Output file */
-    file_t *file;               /* Current file entry */
-    time_t curtime;             /* Current time */
-    struct tm curdate;          /* Current date */
-    char curstring[256];        /* Current date/time string */
-    const char *subpkg;         /* Current subpackage */
-    static const char *commands[] =     /* Command strings */
-    {
-        "%preinstall",
-        "%postinstall",
-        "%prepatch",
-        "%postpatch",
-        "%preremove",
-        "%postremove"
-    }, *depends[] =             /* Dependency strings */
-    {
-        "%requires",
-        "%incompat",
-        "%replaces",
-        "%provides"
-    };
-
+    int i;                          /* Looping var */
+    int is_inline;                  /* Inline text? */
+    char listbck[1024],             /* Backup filename */
+        *ptr;                       /* Pointer into command string */
+    FILE *listfile;                 /* Output file */
+    file_t *file;                   /* Current file entry */
+    time_t curtime;                 /* Current time */
+    struct tm curdate;              /* Current date */
+    char curstring[256];            /* Current date/time string */
+    const char *subpkg;             /* Current subpackage */
+    static const char *commands[] = /* Command strings */
+        {"%preinstall", "%postinstall", "%prepatch",
+         "%postpatch",  "%preremove",   "%postremove"},
+                      *depends[] = /* Dependency strings */
+                      {"%requires", "%incompat", "%replaces", "%provides"};
 
     /*
      * Make a backup of the list file...
@@ -1213,8 +1148,8 @@ write_dist(const char *listname,        /* I - File to write to */
     time(&curtime);
     localtime_r(&curtime, &curdate);
 
-    strftime(curstring, sizeof(curstring), "# List file created on %c by "
-             EPM_VERSION "\n", &curdate);
+    strftime(curstring, sizeof(curstring),
+             "# List file created on %c by " EPM_VERSION "\n", &curdate);
     fputs(curstring, listfile);
 
     if (dist->product[0])
@@ -1254,16 +1189,14 @@ write_dist(const char *listname,        /* I - File to write to */
             fprintf(listfile, "%%subpackage %s\n", subpkg ? subpkg : "");
         }
 
-        fprintf(listfile, "%s %s", depends[(int) dist->depends[i].type],
+        fprintf(listfile, "%s %s", depends[(int)dist->depends[i].type],
                 dist->depends[i].product);
 
         if (dist->depends[i].version[0][0] || dist->depends[i].version[1][0]) {
-            fprintf(listfile, " %s %d %s %d\n",
-                    dist->depends[i].version[0],
-                    dist->depends[i].vernumber[0],
-                    dist->depends[i].version[1], dist->depends[i].vernumber[1]);
-        }
-        else
+            fprintf(listfile, " %s %d %s %d\n", dist->depends[i].version[0],
+                    dist->depends[i].vernumber[0], dist->depends[i].version[1],
+                    dist->depends[i].vernumber[1]);
+        } else
             putc('\n', listfile);
     }
 
@@ -1273,7 +1206,7 @@ write_dist(const char *listname,        /* I - File to write to */
             fprintf(listfile, "%%subpackage %s\n", subpkg ? subpkg : "");
         }
 
-        fputs(commands[(int) dist->commands[i].type], listfile);
+        fputs(commands[(int)dist->commands[i].type], listfile);
 
         is_inline = strchr(dist->commands[i].command, '\n') != NULL;
 
@@ -1300,8 +1233,8 @@ write_dist(const char *listname,        /* I - File to write to */
             fprintf(listfile, "%%subpackage %s\n", subpkg ? subpkg : "");
         }
 
-        fprintf(listfile, "%c %04o %s %s %s %s",
-                file->type, file->mode, file->user, file->group, file->dst, file->src);
+        fprintf(listfile, "%c %04o %s %s %s %s", file->type, file->mode, file->user,
+                file->group, file->dst, file->src);
 
         if (file->options[0])
             fprintf(listfile, "%s\n", file->options);
@@ -1312,18 +1245,16 @@ write_dist(const char *listname,        /* I - File to write to */
     return (fclose(listfile));
 }
 
-
 /*
  * 'compare_files()' - Compare the destination filenames.
  */
 
 static int                      /* O - Result of comparison */
-compare_files(const file_t * f0,        /* I - First file */
-              const file_t * f1)        /* I - Second file */
+compare_files(const file_t *f0, /* I - First file */
+              const file_t *f1) /* I - Second file */
 {
     return (strcmp(f0->dst, f1->dst));
 }
-
 
 /*
  * 'expand_name()' - Expand a filename with environment variables.
@@ -1334,10 +1265,9 @@ static void expand_name(char *buffer,   /* O - Output string */
                         size_t bufsize, /* I - Size of output string */
                         int warn)       /* I - Warn when not set? */
 {
-    char var[255],              /* Environment variable name */
-        *varptr,                /* Current position in name */
-         delim;                 /* Delimiter character */
-
+    char var[255], /* Environment variable name */
+        *varptr,   /* Current position in name */
+        delim;     /* Delimiter character */
 
     bufsize--;
     while (*name != '\0' && bufsize > 0) {
@@ -1351,8 +1281,7 @@ static void expand_name(char *buffer,   /* O - Output string */
                 *buffer++ = *name++;
                 bufsize--;
                 continue;
-            }
-            else if (*name == '{' || *name == '(') {
+            } else if (*name == '{' || *name == '(') {
                 /*
                  * Bracketed variable name...
                  */
@@ -1365,8 +1294,7 @@ static void expand_name(char *buffer,   /* O - Output string */
 
                 if (*name == delim)
                     name++;
-            }
-            else {
+            } else {
                 /*
                  * Unbracketed variable name...
                  */
@@ -1382,11 +1310,9 @@ static void expand_name(char *buffer,   /* O - Output string */
                 strlcpy(buffer, varptr, bufsize + 1);
                 bufsize -= strlen(buffer);
                 buffer += strlen(buffer);
-            }
-            else if (warn)
+            } else if (warn)
                 fprintf(stderr, "epm: Variable \"%s\" undefined.\n", var);
-        }
-        else {
+        } else {
             *buffer++ = *name++;
             bufsize--;
         }
@@ -1395,20 +1321,18 @@ static void expand_name(char *buffer,   /* O - Output string */
     *buffer = '\0';
 }
 
-
 /*
  * 'get_file()' - Read a file into a string...
  */
 
-static char *                   /* O  - Pointer to string or NULL on EOF */
-get_file(const char *filename,  /* I  - File to read from */
-         char *buffer,          /* IO - String buffer */
-         size_t size)           /* I  - Size of string buffer */
+static char *                  /* O  - Pointer to string or NULL on EOF */
+get_file(const char *filename, /* I  - File to read from */
+         char *buffer,         /* IO - String buffer */
+         size_t size)          /* I  - Size of string buffer */
 {
-    FILE *fp;                   /* File buffer */
-    struct stat info;           /* File information */
-    char *expand;               /* Expansion buffer */
-
+    FILE *fp;         /* File buffer */
+    struct stat info; /* File information */
+    char *expand;     /* Expansion buffer */
 
     if (stat(filename, &info)) {
         fprintf(stderr, "epm: Unable to stat \"%s\": %s\n", filename, strerror(errno));
@@ -1418,7 +1342,7 @@ get_file(const char *filename,  /* I  - File to read from */
     if (info.st_size > (size - 1)) {
         fprintf(stderr,
                 "epm: File \"%s\" is too large (%d bytes) for buffer (%d bytes)\n",
-                filename, (int) info.st_size, (int) size - 1);
+                filename, (int)info.st_size, (int)size - 1);
         return (NULL);
     }
 
@@ -1427,7 +1351,7 @@ get_file(const char *filename,  /* I  - File to read from */
         return (NULL);
     }
 
-    if ((fread(buffer, 1, (size_t) info.st_size, fp)) < info.st_size) {
+    if ((fread(buffer, 1, (size_t)info.st_size, fp)) < info.st_size) {
         fprintf(stderr, "epm: Unable to read \"%s\": %s\n", filename, strerror(errno));
         fclose(fp);
         return (NULL);
@@ -1455,23 +1379,21 @@ get_file(const char *filename,  /* I  - File to read from */
     return (buffer);
 }
 
-
 /*
  * 'get_inline()' - Read inline lines into a string...
  */
 
-static char *                   /* O  - Pointer to string or NULL on EOF */
-get_inline(const char *term,    /* I  - Termination string */
-           FILE *fp,            /* I  - File to read from */
-           char *buffer,        /* IO - String buffer */
-           size_t size)         /* I  - Size of string buffer */
+static char *                /* O  - Pointer to string or NULL on EOF */
+get_inline(const char *term, /* I  - Termination string */
+           FILE *fp,         /* I  - File to read from */
+           char *buffer,     /* IO - String buffer */
+           size_t size)      /* I  - Size of string buffer */
 {
-    char *bufptr;               /* Pointer into buffer */
-    size_t left;                /* Remaining bytes in buffer */
-    size_t termlen;             /* Length of termination string */
-    size_t linelen;             /* Length of line */
-    char *expand;               /* Expansion buffer */
-
+    char *bufptr;   /* Pointer into buffer */
+    size_t left;    /* Remaining bytes in buffer */
+    size_t termlen; /* Length of termination string */
+    size_t linelen; /* Length of line */
+    char *expand;   /* Expansion buffer */
 
     bufptr = buffer;
     left = size;
@@ -1480,8 +1402,8 @@ get_inline(const char *term,    /* I  - Termination string */
     if (termlen == 0)
         return (NULL);
 
-    while (fgets(bufptr, (int) left, fp) != NULL) {
-        if (!strncmp(bufptr, term, (size_t) termlen) && bufptr[termlen] == '\n') {
+    while (fgets(bufptr, (int)left, fp) != NULL) {
+        if (!strncmp(bufptr, term, (size_t)termlen) && bufptr[termlen] == '\n') {
             *bufptr = '\0';
             break;
         }
@@ -1514,34 +1436,31 @@ get_inline(const char *term,    /* I  - Termination string */
         }
 
         return (buffer);
-    }
-    else
+    } else
         return (NULL);
 }
-
 
 /*
  * 'get_line()' - Get a line from a file, filtering for uname lines...
  */
 
-static char *                   /* O - String read or NULL at EOF */
-get_line(char *buffer,          /* I - Buffer to read into */
-         int size,              /* I - Size of buffer */
-         FILE *fp,              /* I - File to read from */
-         struct utsname *platform,      /* I - Platform information */
-         const char *format,    /* I - Distribution format */
-         int *skip)             /* IO - Skip lines? */
+static char *                      /* O - String read or NULL at EOF */
+get_line(char *buffer,             /* I - Buffer to read into */
+         int size,                 /* I - Size of buffer */
+         FILE *fp,                 /* I - File to read from */
+         struct utsname *platform, /* I - Platform information */
+         const char *format,       /* I - Distribution format */
+         int *skip)                /* IO - Skip lines? */
 {
-    int op,                     /* Operation (0 = OR, 1 = AND) */
-        match;                  /* 1 = match, 0 = not */
-    size_t namelen,             /* Length of system name + version */
-           len;                 /* Length of string */
-    char *ptr,                  /* Pointer into value */
-        *bufptr,                /* Pointer into buffer */
-         namever[255],          /* Name + version */
-         value[255];            /* Value string */
-    const char *var;            /* Variable value */
-
+    int op,           /* Operation (0 = OR, 1 = AND) */
+        match;        /* 1 = match, 0 = not */
+    size_t namelen,   /* Length of system name + version */
+        len;          /* Length of string */
+    char *ptr,        /* Pointer into value */
+        *bufptr,      /* Pointer into buffer */
+        namever[255], /* Name + version */
+        value[255];   /* Value string */
+    const char *var;  /* Variable value */
 
     while (fgets(buffer, size, fp) != NULL) {
         /*
@@ -1588,21 +1507,21 @@ get_line(char *buffer,          /* I - Buffer to read into */
                     if (*bufptr == '!') {
                         op = 1;
                         bufptr++;
-                    }
-                    else
+                    } else
                         op = 0;
 
-                    for (ptr = value;
-                         *bufptr && !isspace(*bufptr & 255) &&
-                         ptr < (value + sizeof(value) - 1); *ptr++ = *bufptr++);
+                    for (ptr = value; *bufptr && !isspace(*bufptr & 255) &&
+                                      ptr < (value + sizeof(value) - 1);
+                         *ptr++ = *bufptr++)
+                        ;
 
                     *ptr = '\0';
 
                     if (!strncmp(value, "dunix", 5))
-                        memcpy(value, "tru64", 5);      /* Keep existing nul/version */
-                    else if ((!strncmp(value, "darwin", 6)
-                              || !strncmp(value, "macosx", 6))
-                             && !strcmp(platform->sysname, "macos")) {
+                        memcpy(value, "tru64", 5); /* Keep existing nul/version */
+                    else if ((!strncmp(value, "darwin", 6) ||
+                              !strncmp(value, "macosx", 6)) &&
+                             !strcmp(platform->sysname, "macos")) {
                         /*
                          * Convert "darwin*" and "macosx*" to "macos*"
                          */
@@ -1619,8 +1538,8 @@ get_line(char *buffer,          /* I - Buffer to read into */
                     if (len < namelen)
                         match = 0;
                     else
-                        match = !strncasecmp(value, namever, strlen(value)) ?
-                            SKIP_SYSTEM : 0;
+                        match =
+                            !strncasecmp(value, namever, strlen(value)) ? SKIP_SYSTEM : 0;
 
                     if (op)
                         *skip |= match;
@@ -1628,8 +1547,7 @@ get_line(char *buffer,          /* I - Buffer to read into */
                         *skip &= ~match;
                 }
             }
-        }
-        else if (!strncmp(buffer, "%format ", 8)) {
+        } else if (!strncmp(buffer, "%format ", 8)) {
             /*
              * Yes, do filtering based on the distribution format...
              */
@@ -1659,13 +1577,13 @@ get_line(char *buffer,          /* I - Buffer to read into */
                     if (*bufptr == '!') {
                         op = 1;
                         bufptr++;
-                    }
-                    else
+                    } else
                         op = 0;
 
-                    for (ptr = value;
-                         *bufptr && !isspace(*bufptr & 255) &&
-                         ptr < (value + sizeof(value) - 1); *ptr++ = *bufptr++);
+                    for (ptr = value; *bufptr && !isspace(*bufptr & 255) &&
+                                      ptr < (value + sizeof(value) - 1);
+                         *ptr++ = *bufptr++)
+                        ;
 
                     *ptr = '\0';
 
@@ -1680,8 +1598,7 @@ get_line(char *buffer,          /* I - Buffer to read into */
                         *skip &= ~match;
                 }
             }
-        }
-        else if (!strncmp(buffer, "%arch ", 6)) {
+        } else if (!strncmp(buffer, "%arch ", 6)) {
             /*
              * Yes, do filtering based on the current architecture...
              */
@@ -1711,13 +1628,13 @@ get_line(char *buffer,          /* I - Buffer to read into */
                     if (*bufptr == '!') {
                         op = 1;
                         bufptr++;
-                    }
-                    else
+                    } else
                         op = 0;
 
-                    for (ptr = value;
-                         *bufptr && !isspace(*bufptr & 255) &&
-                         ptr < (value + sizeof(value) - 1); *ptr++ = *bufptr++);
+                    for (ptr = value; *bufptr && !isspace(*bufptr & 255) &&
+                                      ptr < (value + sizeof(value) - 1);
+                         *ptr++ = *bufptr++)
+                        ;
 
                     *ptr = '\0';
 
@@ -1731,8 +1648,8 @@ get_line(char *buffer,          /* I - Buffer to read into */
                         *skip &= ~match;
                 }
             }
-        }
-        else if (!strncmp(buffer, "%ifdef ", 7) || !strncmp(buffer, "%elseifdef ", 11)) {
+        } else if (!strncmp(buffer, "%ifdef ", 7) ||
+                   !strncmp(buffer, "%elseifdef ", 11)) {
             /*
              * Yes, do filtering based on the presence of variables...
              */
@@ -1780,13 +1697,13 @@ get_line(char *buffer,          /* I - Buffer to read into */
                 if (*bufptr == '!') {
                     op = 1;
                     bufptr++;
-                }
-                else
+                } else
                     op = 0;
 
-                for (ptr = value;
-                     *bufptr && !isspace(*bufptr & 255) &&
-                     ptr < (value + sizeof(value) - 1); *ptr++ = *bufptr++);
+                for (ptr = value; *bufptr && !isspace(*bufptr & 255) &&
+                                  ptr < (value + sizeof(value) - 1);
+                     *ptr++ = *bufptr++)
+                    ;
 
                 *ptr = '\0';
 
@@ -1800,8 +1717,7 @@ get_line(char *buffer,          /* I - Buffer to read into */
                 if (match)
                     *skip |= SKIP_IFSAT;
             }
-        }
-        else if (!strncmp(buffer, "%if ", 4) || !strncmp(buffer, "%elseif ", 8)) {
+        } else if (!strncmp(buffer, "%if ", 4) || !strncmp(buffer, "%elseif ", 8)) {
             /*
              * Yes, do filtering based on the value of variables...
              */
@@ -1849,13 +1765,13 @@ get_line(char *buffer,          /* I - Buffer to read into */
                 if (*bufptr == '!') {
                     op = 1;
                     bufptr++;
-                }
-                else
+                } else
                     op = 0;
 
-                for (ptr = value;
-                     *bufptr && !isspace(*bufptr & 255) &&
-                     ptr < (value + sizeof(value) - 1); *ptr++ = *bufptr++);
+                for (ptr = value; *bufptr && !isspace(*bufptr & 255) &&
+                                  ptr < (value + sizeof(value) - 1);
+                     *ptr++ = *bufptr++)
+                    ;
 
                 *ptr = '\0';
 
@@ -1869,8 +1785,7 @@ get_line(char *buffer,          /* I - Buffer to read into */
                 if (match)
                     *skip |= SKIP_IFSAT;
             }
-        }
-        else if (!strcmp(buffer, "%else\n")) {
+        } else if (!strcmp(buffer, "%else\n")) {
             /*
              * Handle "else" condition of %ifdef statement...
              */
@@ -1890,8 +1805,7 @@ get_line(char *buffer,          /* I - Buffer to read into */
                 *skip &= ~SKIP_IF;
                 *skip |= SKIP_IFSAT;
             }
-        }
-        else if (!strcmp(buffer, "%endif\n")) {
+        } else if (!strcmp(buffer, "%endif\n")) {
             /*
              * Cancel any filtering based on environment variables.
              */
@@ -1906,8 +1820,7 @@ get_line(char *buffer,          /* I - Buffer to read into */
             }
 
             *skip &= ~(SKIP_IF | SKIP_IFACTIVE | SKIP_IFSAT);
-        }
-        else if (!(*skip & SKIP_MASK)) {
+        } else if (!(*skip & SKIP_MASK)) {
             /*
              * Otherwise strip any trailing newlines and return the string!
              */
@@ -1922,21 +1835,19 @@ get_line(char *buffer,          /* I - Buffer to read into */
     return (NULL);
 }
 
-
 /*
  * 'get_string()' - Get a delimited string from a line.
  */
 
-static char *                   /* O  - String or NULL */
-get_string(char **src,          /* IO - Source string */
-           char *dst,           /* O  - Destination string */
-           size_t dstsize)      /* I  - Size of destination string */
+static char *              /* O  - String or NULL */
+get_string(char **src,     /* IO - Source string */
+           char *dst,      /* O  - Destination string */
+           size_t dstsize) /* I  - Size of destination string */
 {
-    char *srcptr,               /* Current source pointer */
-        *dstptr,                /* Current destination pointer */
-        *dstend,                /* End of destination string */
-         quote;                 /* Quoting char */
-
+    char *srcptr, /* Current source pointer */
+        *dstptr,  /* Current destination pointer */
+        *dstend,  /* End of destination string */
+        quote;    /* Quoting char */
 
     /*
      * Initialize things...
@@ -1977,8 +1888,7 @@ get_string(char **src,          /* IO - Source string */
 
                 return (NULL);
             }
-        }
-        else if (*srcptr == '\'' || *srcptr == '\"') {
+        } else if (*srcptr == '\'' || *srcptr == '\"') {
             /*
              * Read a quoted string...
              */
@@ -2042,14 +1952,13 @@ get_string(char **src,          /* IO - Source string */
     return (dst);
 }
 
-
 /*
  * 'patmatch()' - Pattern matching...
  */
 
-static int                      /* O - 1 if match, 0 if no match */
-patmatch(const char *s,         /* I - String to match against */
-         const char *pat)       /* I - Pattern to match against */
+static int                /* O - 1 if match, 0 if no match */
+patmatch(const char *s,   /* I - String to match against */
+         const char *pat) /* I - Pattern to match against */
 {
     /*
      * Range check the input...
@@ -2070,7 +1979,7 @@ patmatch(const char *s,         /* I - String to match against */
 
             pat++;
             if (*pat == '\0')
-                return (1);     /* Last pattern char is *, so everything matches now... */
+                return (1); /* Last pattern char is *, so everything matches now... */
 
             /*
              * Test all remaining combinations until we get to the end of the string.
@@ -2082,8 +1991,7 @@ patmatch(const char *s,         /* I - String to match against */
 
                 s++;
             }
-        }
-        else if (*pat == '?') {
+        } else if (*pat == '?') {
             /*
              * Wildcard - 1 character...
              */
@@ -2091,8 +1999,7 @@ patmatch(const char *s,         /* I - String to match against */
             pat++;
             s++;
             continue;
-        }
-        else if (*pat == '[') {
+        } else if (*pat == '[') {
             /*
              * Match a character from the input set [chars]...
              */
@@ -2118,8 +2025,7 @@ patmatch(const char *s,         /* I - String to match against */
             s++;
 
             continue;
-        }
-        else if (*pat == '\\') {
+        } else if (*pat == '\\') {
             /*
              * Handle quoted characters...
              */
@@ -2151,18 +2057,16 @@ patmatch(const char *s,         /* I - String to match against */
     return (*s == *pat);
 }
 
-
 /*
  * 'sort_subpackages()' - Compare two subpackage names.
  */
 
-static int                      /* O - Result of comparison */
-sort_subpackages(char **a,      /* I - First subpackage */
-                 char **b)      /* I - Second subpackage */
+static int                 /* O - Result of comparison */
+sort_subpackages(char **a, /* I - First subpackage */
+                 char **b) /* I - Second subpackage */
 {
     return (strcmp(*a, *b));
 }
-
 
 /*
  * 'update_architecture()' - Normalize the machine architecture name.
@@ -2171,8 +2075,7 @@ sort_subpackages(char **a,      /* I - First subpackage */
 static void update_architecture(char *buffer,   /* I - String buffer */
                                 size_t bufsize) /* I - Size of string buffer */
 {
-    char *temp;                 /* Pointer into string buffer */
-
+    char *temp; /* Pointer into string buffer */
 
     /*
      * Convert the name to lowercase with no underscores or dashes.
@@ -2180,15 +2083,14 @@ static void update_architecture(char *buffer,   /* I - String buffer */
 
     for (temp = buffer; *temp != '\0'; temp++)
         if (*temp == '-' || *temp == '_') {
-            char *ptr;          /* Pointer into string */
+            char *ptr; /* Pointer into string */
 
             for (ptr = temp; ptr[1]; ptr++)
                 *ptr = ptr[1];
             *ptr = '\0';
 
             temp--;
-        }
-        else
+        } else
             *temp = tolower(*temp);
 
     /*
@@ -2200,8 +2102,7 @@ static void update_architecture(char *buffer,   /* I - String buffer */
             strlcpy(buffer, "x86_64", bufsize);
         else
             strlcpy(buffer, "intel", bufsize);
-    }
-    else if (!strncmp(buffer, "arm", 3))
+    } else if (!strncmp(buffer, "arm", 3))
         strlcpy(buffer, "arm", bufsize);
     else if (!strncmp(buffer, "ppc", 3))
         strlcpy(buffer, "powerpc", bufsize);

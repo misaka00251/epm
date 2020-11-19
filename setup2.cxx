@@ -22,16 +22,16 @@
 #include <FL/Fl_JPEG_Image.H>
 #include <FL/Fl_PNG_Image.H>
 #include <FL/Fl_XPM_Image.H>
-#include <FL/x.H>
 #include <FL/filename.H>
 #include <FL/fl_ask.H>
-#include <errno.h>
+#include <FL/x.H>
 #include <ctype.h>
-#include <unistd.h>
+#include <errno.h>
 #include <fcntl.h>
+#include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <sys/stat.h>
+#include <unistd.h>
 
 #ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
@@ -51,11 +51,10 @@
 
 #ifdef __osf__
 // No prototype for statfs under Tru64...
-extern "C"
-{
-    extern int statfs(const char *, struct statfs *);
+extern "C" {
+extern int statfs(const char *, struct statfs *);
 }
-#endif                          // __osf__
+#endif // __osf__
 
 #ifdef __APPLE__
 #include <CoreFoundation/CoreFoundation.h>
@@ -65,54 +64,48 @@ extern "C"
 AuthorizationRef SetupAuthorizationRef;
 #endif // __APPLE__
 
-
 //
 // Panes...
 //
 
-#define PANE_WELCOME	0
-#define PANE_TYPE	1
-#define PANE_SELECT	2
-#define PANE_CONFIRM	3
-#define PANE_LICENSE	4
-#define PANE_INSTALL	5
-
+#define PANE_WELCOME 0
+#define PANE_TYPE 1
+#define PANE_SELECT 2
+#define PANE_CONFIRM 3
+#define PANE_LICENSE 4
+#define PANE_INSTALL 5
 
 //
 // Define a C API function type for comparisons...
 //
 
-extern "C"
-{
-    typedef int (*compare_func_t)(const void *, const void *);
+extern "C" {
+typedef int (*compare_func_t)(const void *, const void *);
 }
-
 
 //
 // Local functions...
 //
 
 void get_dists(const char *d);
-int install_dist(const gui_dist_t * dist);
-int license_dist(const gui_dist_t * dist);
+int install_dist(const gui_dist_t *dist);
+int license_dist(const gui_dist_t *dist);
 void load_image(void);
 void load_readme(void);
 void load_types(void);
 void log_cb(int fd, int *fdptr);
 void update_sizes(void);
 
-
 //
 // 'main()' - Main entry for software wizard...
 //
 
-int                             // O - Exit status
-main(int argc,                  // I - Number of command-line arguments
-     char *argv[])              // I - Command-line arguments
+int                // O - Exit status
+main(int argc,     // I - Number of command-line arguments
+     char *argv[]) // I - Command-line arguments
 {
-    Fl_Window *w;               // Main window...
-    const char *distdir = ".";  // Distribution directory
-
+    Fl_Window *w;              // Main window...
+    const char *distdir = "."; // Distribution directory
 
     // Use GTK+ scheme for all operating systems...
     Fl::background(230, 230, 230);
@@ -127,8 +120,8 @@ main(int argc,                  // I - Number of command-line arguments
         CFURLRef mainURL = CFBundleCopyBundleURL(mainBundle);
         CFStringRef mainCFPath = CFURLCopyFileSystemPath(mainURL, kCFURLPOSIXPathStyle);
 
-        if (CFStringGetCString
-            (mainCFPath, mainPath, sizeof(mainPath), kCFStringEncodingUTF8)) {
+        if (CFStringGetCString(mainCFPath, mainPath, sizeof(mainPath),
+                               kCFStringEncodingUTF8)) {
             strlcat(mainPath, "/Contents/Resources", sizeof(mainPath));
             fprintf(stderr, "Using \"%s\" as the distribution directory.\n", mainPath);
             distdir = mainPath;
@@ -136,12 +129,11 @@ main(int argc,                  // I - Number of command-line arguments
 
         CFRelease(mainCFPath);
         CFRelease(mainURL);
-    }
-    else
+    } else
 #endif // __APPLE__
 
         // Get the directory that has the software in it...
-    if (argc > 1 && argv[1][0] != '-')
+        if (argc > 1 && argv[1][0] != '-')
         distdir = argv[1];
 
     w = make_window();
@@ -172,14 +164,14 @@ main(int argc,                  // I - Number of command-line arguments
         return (1);
     }
 
-    AuthorizationItem items = { kAuthorizationRightExecute, 0, NULL, 0 };
-    AuthorizationRights rights = { 1, &items };
+    AuthorizationItem items = {kAuthorizationRightExecute, 0, NULL, 0};
+    AuthorizationRights rights = {1, &items};
 
-    status = AuthorizationCopyRights(SetupAuthorizationRef, &rights, NULL,
-                                     kAuthorizationFlagDefaults |
-                                     kAuthorizationFlagInteractionAllowed |
-                                     kAuthorizationFlagPreAuthorize |
-                                     kAuthorizationFlagExtendRights, NULL);
+    status = AuthorizationCopyRights(
+        SetupAuthorizationRef, &rights, NULL,
+        kAuthorizationFlagDefaults | kAuthorizationFlagInteractionAllowed |
+            kAuthorizationFlagPreAuthorize | kAuthorizationFlagExtendRights,
+        NULL);
 
     if (status != errAuthorizationSuccess) {
         fl_alert("You must have administrative priviledges to install this software!");
@@ -203,24 +195,22 @@ main(int argc,                  // I - Number of command-line arguments
     return (0);
 }
 
-
 //
 // 'get_dists()' - Get a list of available software products.
 //
 
-void get_dists(const char *d)   // I - Directory to look in
+void get_dists(const char *d) // I - Directory to look in
 {
-    int i;                      // Looping var
-    int num_files;              // Number of files
-    dirent **files;             // Files
-    const char *ext;            // Extension
-    gui_dist_t *temp,           // Pointer to current distribution
-              *installed;       // Pointer to installed product
-    FILE *fp;                   // File to read from
-    char line[1024],            // Line from file...
-         product[64];           // Product name...
-    int lowver, hiver;          // Version numbers for dependencies
-
+    int i;             // Looping var
+    int num_files;     // Number of files
+    dirent **files;    // Files
+    const char *ext;   // Extension
+    gui_dist_t *temp,  // Pointer to current distribution
+        *installed;    // Pointer to installed product
+    FILE *fp;          // File to read from
+    char line[1024],   // Line from file...
+        product[64];   // Product name...
+    int lowver, hiver; // Version numbers for dependencies
 
     // Get the files in the specified directory...
     if (chdir(d)) {
@@ -236,7 +226,7 @@ void get_dists(const char *d)   // I - Directory to look in
 
     // Build a distribution list...
     NumDists = 0;
-    Dists = (gui_dist_t *) 0;
+    Dists = (gui_dist_t *)0;
 
     for (i = 0; i < num_files; i++) {
         ext = fl_filename_ext(files[i]->d_name);
@@ -253,7 +243,7 @@ void get_dists(const char *d)   // I - Directory to look in
             temp->filename = strdup(files[i]->d_name);
 
             strncpy(temp->product, files[i]->d_name, sizeof(temp->product) - 1);
-            *strrchr(temp->product, '.') = '\0';        // Drop .install
+            *strrchr(temp->product, '.') = '\0'; // Drop .install
 
             // Read info from the installation script...
             while (fgets(line, sizeof(line), fp) != NULL) {
@@ -279,19 +269,18 @@ void get_dists(const char *d)   // I - Directory to look in
                     hiver = 0;
 
                     if (sscanf(line + 11, "%s%*s%d%*s%d", product, &lowver, &hiver) > 0)
-                        gui_add_depend(temp, (line[2] == 'i') ? DEPEND_INCOMPAT :
-                                       DEPEND_REQUIRES, product, lowver, hiver);
+                        gui_add_depend(
+                            temp, (line[2] == 'i') ? DEPEND_INCOMPAT : DEPEND_REQUIRES,
+                            product, lowver, hiver);
                 }
             }
 
             fclose(fp);
-        }
-        else if (!strcmp(ext, ".rpm")) {
+        } else if (!strcmp(ext, ".rpm")) {
             // Found an RPM package...
-            char *version,      // Version number
-                *size,          // Size of package
-                *description;   // Summary string
-
+            char *version,    // Version number
+                *size,        // Size of package
+                *description; // Summary string
 
             // Get the package information...
             snprintf(line, sizeof(line),
@@ -333,7 +322,7 @@ void get_dists(const char *d)   // I - Directory to look in
             strlcpy(temp->name, description, sizeof(temp->name));
             strlcpy(temp->version, version, sizeof(temp->version));
             temp->vernumber = get_vernumber(version);
-            temp->rootsize = (int) (atof(size) / 1024.0 + 0.5);
+            temp->rootsize = (int)(atof(size) / 1024.0 + 0.5);
 
             pclose(fp);
         }
@@ -344,13 +333,13 @@ void get_dists(const char *d)   // I - Directory to look in
     free(files);
 
     if (NumDists == 0) {
-//    fl_alert("No software found to install!");
+        //    fl_alert("No software found to install!");
         fl_alert("No software found to install in \"%s\".", d);
         exit(1);
     }
 
     if (NumDists > 1)
-        qsort(Dists, NumDists, sizeof(gui_dist_t), (compare_func_t) gui_sort_dists);
+        qsort(Dists, NumDists, sizeof(gui_dist_t), (compare_func_t)gui_sort_dists);
 
     for (i = 0, temp = Dists; i < NumDists; i++, temp++) {
         sprintf(line, "%s v%s", temp->name, temp->version);
@@ -358,16 +347,13 @@ void get_dists(const char *d)   // I - Directory to look in
         if ((installed = gui_find_dist(temp->product, NumInstalled, Installed)) == NULL) {
             strcat(line, " (new)");
             SoftwareList->add(line, 0);
-        }
-        else if (installed->vernumber > temp->vernumber) {
+        } else if (installed->vernumber > temp->vernumber) {
             strcat(line, " (downgrade)");
             SoftwareList->add(line, 0);
-        }
-        else if (installed->vernumber == temp->vernumber) {
+        } else if (installed->vernumber == temp->vernumber) {
             strcat(line, " (installed)");
             SoftwareList->add(line, 0);
-        }
-        else {
+        } else {
             strcat(line, " (upgrade)");
             SoftwareList->add(line, 1);
         }
@@ -376,21 +362,19 @@ void get_dists(const char *d)   // I - Directory to look in
     update_sizes();
 }
 
-
 //
 // 'install_dist()' - Install a distribution...
 //
 
-int                             // O - Install status
-install_dist(const gui_dist_t * dist)   // I - Distribution to install
+int                                  // O - Install status
+install_dist(const gui_dist_t *dist) // I - Distribution to install
 {
-    char command[1024];         // Command string
-    int fds[2];                 // Pipe FDs
-    int status = 0;             // Exit status
+    char command[1024]; // Command string
+    int fds[2];         // Pipe FDs
+    int status = 0;     // Exit status
 #ifndef __APPLE__
-    int pid;                    // Process ID
-#endif // !__APPLE__
-
+    int pid; // Process ID
+#endif       // !__APPLE__
 
     sprintf(command, "**** %s ****", dist->name);
     InstallLog->add(command);
@@ -398,12 +382,10 @@ install_dist(const gui_dist_t * dist)   // I - Distribution to install
 #ifdef __APPLE__
     // Run the install script using Apple's authorization API...
     FILE *fp = NULL;
-    char *args[2] = { (char *) "now", NULL };
+    char *args[2] = {(char *)"now", NULL};
     OSStatus astatus;
 
-
-    astatus = AuthorizationExecuteWithPrivileges(SetupAuthorizationRef,
-                                                 dist->filename,
+    astatus = AuthorizationExecuteWithPrivileges(SetupAuthorizationRef, dist->filename,
                                                  kAuthorizationFlagDefaults, args, &fp);
 
     if (astatus != errAuthorizationSuccess) {
@@ -429,13 +411,12 @@ install_dist(const gui_dist_t * dist)   // I - Distribution to install
 
         // Execute the command; if an error occurs, return it...
         if (dist->type == PACKAGE_PORTABLE)
-            execl(dist->filename, dist->filename, "now", (char *) 0);
+            execl(dist->filename, dist->filename, "now", (char *)0);
         else
-            execlp("rpm", "rpm", "-U", "--nodeps", dist->filename, (char *) 0);
+            execlp("rpm", "rpm", "-U", "--nodeps", dist->filename, (char *)0);
 
         exit(errno);
-    }
-    else if (pid < 0) {
+    } else if (pid < 0) {
         // Unable to fork!
         sprintf(command, "Unable to install %s:", dist->name);
         InstallLog->add(command);
@@ -454,13 +435,13 @@ install_dist(const gui_dist_t * dist)   // I - Distribution to install
 #endif // __APPLE__
 
     // Listen for data on the input pipe...
-    Fl::add_fd(fds[0], (void (*)(int, void *)) log_cb, fds);
+    Fl::add_fd(fds[0], (void (*)(int, void *))log_cb, fds);
 
     // Show the user that we're busy...
     SetupWindow->cursor(FL_CURSOR_WAIT);
 
     // Loop until the child is done...
-    while (fds[0])              // log_cb() will close and zero fds[0]...
+    while (fds[0]) // log_cb() will close and zero fds[0]...
     {
         // Wait for events...
         Fl::wait();
@@ -480,8 +461,7 @@ install_dist(const gui_dist_t * dist)   // I - Distribution to install
         // Close the pipe - have all the data from the child...
         Fl::remove_fd(fds[0]);
         close(fds[0]);
-    }
-    else {
+    } else {
         // Get the child's exit status...
         wait(&status);
     }
@@ -493,19 +473,17 @@ install_dist(const gui_dist_t * dist)   // I - Distribution to install
     return (status);
 }
 
-
 //
 // 'license_dist()' - Show the license for a distribution...
 //
 
-int                             // O - 0 if accepted, 1 if not
-license_dist(const gui_dist_t * dist)   // I - Distribution to license
+int                                  // O - 0 if accepted, 1 if not
+license_dist(const gui_dist_t *dist) // I - Distribution to license
 {
     char licfile[1024];         // License filename
     struct stat licinfo;        // License file info
     static int liclength = 0;   // Size of license file
     static char liclabel[1024]; // Label for license pane
-
 
     // See if we need to show the license file...
     sprintf(licfile, "%s.license", dist->product);
@@ -543,7 +521,6 @@ license_dist(const gui_dist_t * dist)   // I - Distribution to license
             // Can't install without acceptance...
             char message[1024]; // Message for log
 
-
             liclength = 0;
             snprintf(message, sizeof(message), "License not accepted for %s!",
                      dist->name);
@@ -555,17 +532,14 @@ license_dist(const gui_dist_t * dist)   // I - Distribution to license
     return (0);
 }
 
-
 //
 // 'list_cb()' - Handle selections in the software list.
 //
 
-void list_cb(Fl_Check_Browser *, void *)
-{
+void list_cb(Fl_Check_Browser *, void *) {
     int i, j, k;
     gui_dist_t *dist, *dist2;
     gui_depend_t *depend;
-
 
     if (SoftwareList->nchecked() == 0) {
         update_sizes();
@@ -580,7 +554,8 @@ void list_cb(Fl_Check_Browser *, void *)
             for (j = 0, depend = dist->depends; j < dist->num_depends; j++, depend++)
                 switch (depend->type) {
                 case DEPEND_REQUIRES:
-                    if ((dist2 = gui_find_dist(depend->product, NumDists, Dists)) != NULL) {
+                    if ((dist2 = gui_find_dist(depend->product, NumDists, Dists)) !=
+                        NULL) {
                         // Software is in the list, is it selected?
                         k = dist2 - Dists;
 
@@ -594,13 +569,13 @@ void list_cb(Fl_Check_Browser *, void *)
                             SoftwareList->checked(i + 1, 0);
                             break;
                         }
-                    }
-                    else if ((dist2 = gui_find_dist(depend->product, NumInstalled,
-                                                    Installed)) == NULL) {
+                    } else if ((dist2 = gui_find_dist(depend->product, NumInstalled,
+                                                      Installed)) == NULL) {
                         // Required but not installed or available!
-                        fl_alert
-                            ("%s requires %s to be installed, but it is not available "
-                             "for installation.", dist->name, depend->product);
+                        fl_alert(
+                            "%s requires %s to be installed, but it is not available "
+                            "for installation.",
+                            dist->name, depend->product);
                         SoftwareList->checked(i + 1, 0);
                         break;
                     }
@@ -611,12 +586,12 @@ void list_cb(Fl_Check_Browser *, void *)
                                                Installed)) != NULL) {
                         // Already installed!
                         fl_alert("%s is incompatible with %s. Please remove it before "
-                                 "installing this software.", dist->name, dist2->name);
+                                 "installing this software.",
+                                 dist->name, dist2->name);
                         SoftwareList->checked(i + 1, 0);
                         break;
-                    }
-                    else if ((dist2 = gui_find_dist(depend->product, NumDists,
-                                                    Dists)) != NULL) {
+                    } else if ((dist2 = gui_find_dist(depend->product, NumDists,
+                                                      Dists)) != NULL) {
                         // Software is in the list, is it selected?
                         k = dist2 - Dists;
 
@@ -626,7 +601,8 @@ void list_cb(Fl_Check_Browser *, void *)
 
                         // Yes, tell the user...
                         fl_alert("%s is incompatible with %s. Please deselect it before "
-                                 "installing this software.", dist->name, dist2->name);
+                                 "installing this software.",
+                                 dist->name, dist2->name);
                         SoftwareList->checked(i + 1, 0);
                         break;
                     }
@@ -643,15 +619,12 @@ void list_cb(Fl_Check_Browser *, void *)
         NextButton->deactivate();
 }
 
-
 //
 // 'load_image()' - Load the setup image file (setup.gif/xpm)...
 //
 
-void load_image(void)
-{
-    Fl_Image *img;              // New image
-
+void load_image(void) {
+    Fl_Image *img; // New image
 
     if (!access("setup.xpm", 0))
         img = new Fl_XPM_Image("setup.xpm");
@@ -668,27 +641,24 @@ void load_image(void)
         WelcomeImage->image(img);
 }
 
-
 //
 // 'load_readme()' - Load the readme file...
 //
 
-void load_readme(void)
-{
+void load_readme(void) {
     ReadmeFile->textfont(FL_HELVETICA);
     ReadmeFile->textsize(14);
 
     if (access("setup.readme", 0)) {
-        int i;                  // Looping var
-        gui_dist_t *dist;       // Current distribution
-        char *buffer,           // Text buffer
-            *ptr;               // Pointer into buffer
-
+        int i;            // Looping var
+        gui_dist_t *dist; // Current distribution
+        char *buffer,     // Text buffer
+            *ptr;         // Pointer into buffer
 
         buffer = new char[1024 + NumDists * 300];
 
-        strcpy(buffer,
-               "This program allows you to install the following software:\n" "<ul>\n");
+        strcpy(buffer, "This program allows you to install the following software:\n"
+                       "<ul>\n");
         ptr = buffer + strlen(buffer);
 
         for (i = NumDists, dist = Dists; i > 0; i--, dist++) {
@@ -700,28 +670,23 @@ void load_readme(void)
 
         ReadmeFile->value(buffer);
 
-        delete[]buffer;
-    }
-    else
+        delete[] buffer;
+    } else
         gui_load_file(ReadmeFile, "setup.readme");
-
 }
-
 
 //
 // 'load_types()' - Load the installation types from the setup.types file.
 //
 
-void load_types(void)
-{
-    int i;                      // Looping var
-    FILE *fp;                   // File to read from
-    char line[1024],            // Line from file
-        *lineptr,               // Pointer into line
-        *sep;                   // Separator
-    gui_intype_t *dt;           // Current install type
-    gui_dist_t *dist;           // Distribution
-
+void load_types(void) {
+    int i;            // Looping var
+    FILE *fp;         // File to read from
+    char line[1024],  // Line from file
+        *lineptr,     // Pointer into line
+        *sep;         // Separator
+    gui_intype_t *dt; // Current install type
+    gui_dist_t *dist; // Distribution
 
     NumInstTypes = 0;
 
@@ -738,15 +703,16 @@ void load_types(void)
 
             if (!strncasecmp(line, "TYPE", 4) && isspace(line[4])) {
                 // New type...
-                if (NumInstTypes >= (int) (sizeof(InstTypes) / sizeof(InstTypes[0]))) {
+                if (NumInstTypes >= (int)(sizeof(InstTypes) / sizeof(InstTypes[0]))) {
                     fprintf(stderr, "setup: Too many TYPEs (> %d) in setup.types!\n",
-                            (int) (sizeof(InstTypes) / sizeof(InstTypes[0])));
+                            (int)(sizeof(InstTypes) / sizeof(InstTypes[0])));
                     fclose(fp);
                     exit(1);
                 }
 
                 // Skip whitespace...
-                for (lineptr = line + 5; isspace(*lineptr); lineptr++);
+                for (lineptr = line + 5; isspace(*lineptr); lineptr++)
+                    ;
 
                 // Copy name and label string...
                 dt = InstTypes + NumInstTypes;
@@ -760,19 +726,19 @@ void load_types(void)
 
                 strncpy(dt->name, lineptr, sizeof(dt->name));
                 strncpy(dt->label, sep, sizeof(dt->label) - 10);
-            }
-            else if (!strncasecmp(line, "INSTALL", 7) && dt && isspace(line[7])) {
+            } else if (!strncasecmp(line, "INSTALL", 7) && dt && isspace(line[7])) {
                 // Install a product...
                 if (dt->num_products >=
-                    (int) (sizeof(dt->products) / sizeof(dt->products[0]))) {
+                    (int)(sizeof(dt->products) / sizeof(dt->products[0]))) {
                     fprintf(stderr, "setup: Too many INSTALLs (> %d) in setup.types!\n",
-                            (int) (sizeof(dt->products) / sizeof(dt->products[0])));
+                            (int)(sizeof(dt->products) / sizeof(dt->products[0])));
                     fclose(fp);
                     exit(1);
                 }
 
                 // Skip whitespace...
-                for (lineptr = line + 8; isspace(*lineptr); lineptr++);
+                for (lineptr = line + 8; isspace(*lineptr); lineptr++)
+                    ;
 
                 // Add product to list...
                 if ((dist = gui_find_dist(lineptr, NumDists, Dists)) != NULL) {
@@ -782,12 +748,10 @@ void load_types(void)
 
                     if ((dist = gui_find_dist(lineptr, NumInstalled, Installed)) != NULL)
                         dt->size -= dist->rootsize + dist->usrsize;
-                }
-                else
+                } else
                     fprintf(stderr, "setup: Unable to find product \"%s\" for \"%s\"!\n",
                             lineptr, dt->label);
-            }
-            else {
+            } else {
                 fprintf(stderr, "setup: Bad line - %s\n", line);
                 fclose(fp);
                 exit(1);
@@ -795,8 +759,7 @@ void load_types(void)
         }
 
         fclose(fp);
-    }
-    else {
+    } else {
         Title[PANE_TYPE]->hide();
         Title[PANE_SELECT]->position(10, 35);
         Title[PANE_CONFIRM]->position(10, 60);
@@ -819,23 +782,21 @@ void load_types(void)
         TypeButton[i]->show();
     }
 
-    for (; i < (int) (sizeof(TypeButton) / sizeof(TypeButton[0])); i++)
+    for (; i < (int)(sizeof(TypeButton) / sizeof(TypeButton[0])); i++)
         TypeButton[i]->hide();
 }
-
 
 //
 // 'log_cb()' - Add one or more lines of text to the installation log.
 //
 
-void log_cb(int fd,             // I - Pipe to read from
-            int *fdptr)         // O - Pipe to read from
+void log_cb(int fd,     // I - Pipe to read from
+            int *fdptr) // O - Pipe to read from
 {
-    int bytes;                  // Bytes read/to read
-    char *bufptr;               // Pointer into buffer
-    static int bufused = 0;     // Number of bytes used
-    static char buffer[8193];   // Buffer
-
+    int bytes;                // Bytes read/to read
+    char *bufptr;             // Pointer into buffer
+    static int bufused = 0;   // Number of bytes used
+    static char buffer[8193]; // Buffer
 
     bytes = 8192 - bufused;
     if ((bytes = read(fd, buffer + bufused, bytes)) <= 0) {
@@ -852,8 +813,7 @@ void log_cb(int fd,             // I - Pipe to read from
             InstallLog->add(buffer);
             bufused = 0;
         }
-    }
-    else {
+    } else {
         // Add bytes to the buffer, then add lines as needed...
         bufused += bytes;
         buffer[bufused] = '\0';
@@ -869,20 +829,17 @@ void log_cb(int fd,             // I - Pipe to read from
     InstallLog->bottomline(InstallLog->size());
 }
 
-
 //
 // 'next_cb()' - Show software selections or install software.
 //
 
-void next_cb(Fl_Button *, void *)
-{
-    int i;                      // Looping var
-    int progress;               // Progress so far...
-    int error;                  // Errors?
-    static char message[1024];  // Progress message...
-    static char install_type[1024];     // EPM_INSTALL_TYPE env variable
-    static int installing = 0;  // Installing software?
-
+void next_cb(Fl_Button *, void *) {
+    int i;                          // Looping var
+    int progress;                   // Progress so far...
+    int error;                      // Errors?
+    static char message[1024];      // Progress message...
+    static char install_type[1024]; // EPM_INSTALL_TYPE env variable
+    static int installing = 0;      // Installing software?
 
     Wizard->next();
 
@@ -891,17 +848,16 @@ void next_cb(Fl_Button *, void *)
     if (Wizard->value() == Pane[PANE_TYPE]) {
         if (NumInstTypes == 0)
             Wizard->next();
-    }
-    else if (Wizard->value() == Pane[PANE_SELECT]) {
+    } else if (Wizard->value() == Pane[PANE_SELECT]) {
         if (NumInstTypes)
             PrevButton->activate();
 
         // Figure out which type is chosen...
-        for (i = 0; i < (int) (sizeof(TypeButton) / sizeof(TypeButton[0])); i++)
+        for (i = 0; i < (int)(sizeof(TypeButton) / sizeof(TypeButton[0])); i++)
             if (TypeButton[i]->value())
                 break;
 
-        if (i < (int) (sizeof(TypeButton) / sizeof(TypeButton[0]))) {
+        if (i < (int)(sizeof(TypeButton) / sizeof(TypeButton[0]))) {
             // Set the EPM_INSTALL_TYPE environment variable...
             snprintf(install_type, sizeof(install_type), "EPM_INSTALL_TYPE=%s",
                      InstTypes[i].name);
@@ -920,8 +876,7 @@ void next_cb(Fl_Button *, void *)
         for (i = 0; i < NumDists; i++)
             if (SoftwareList->checked(i + 1))
                 ConfirmList->add(SoftwareList->text(i + 1));
-    }
-    else if (Wizard->value() == Pane[PANE_LICENSE])
+    } else if (Wizard->value() == Pane[PANE_LICENSE])
         Wizard->next();
 
     if (Wizard->value() == Pane[PANE_INSTALL] && !installing) {
@@ -973,8 +928,7 @@ void next_cb(Fl_Button *, void *)
         fl_beep();
 
         installing = 0;
-    }
-    else if (Wizard->value() == Pane[PANE_SELECT] && SoftwareList->nchecked() == 0)
+    } else if (Wizard->value() == Pane[PANE_SELECT] && SoftwareList->nchecked() == 0)
         NextButton->deactivate();
 
     for (i = 0; i <= PANE_INSTALL; i++) {
@@ -985,24 +939,22 @@ void next_cb(Fl_Button *, void *)
     }
 }
 
-
 //
 // 'type_cb()' - Handle selections in the type list.
 //
 
-void type_cb(Fl_Round_Button * w, void *)       // I - Radio button widget
+void type_cb(Fl_Round_Button *w, void *) // I - Radio button widget
 {
-    int i;                      // Looping var
-    gui_intype_t *dt;           // Current install type
-    gui_dist_t *temp,           // Current software
-              *installed;       // Installed software
+    int i;            // Looping var
+    gui_intype_t *dt; // Current install type
+    gui_dist_t *temp, // Current software
+        *installed;   // Installed software
 
-
-    for (i = 0; i < (int) (sizeof(TypeButton) / sizeof(TypeButton[0])); i++)
+    for (i = 0; i < (int)(sizeof(TypeButton) / sizeof(TypeButton[0])); i++)
         if (w == TypeButton[i])
             break;
 
-    if (i >= (int) (sizeof(TypeButton) / sizeof(TypeButton[0])))
+    if (i >= (int)(sizeof(TypeButton) / sizeof(TypeButton[0])))
         return;
 
     dt = InstTypes + i;
@@ -1015,8 +967,7 @@ void type_cb(Fl_Round_Button * w, void *)       // I - Radio button widget
 
     // And then any upgrade products...
     for (i = 0, temp = Dists; i < NumDists; i++, temp++) {
-        if ((installed = gui_find_dist(temp->product, NumInstalled,
-                                       Installed)) != NULL &&
+        if ((installed = gui_find_dist(temp->product, NumInstalled, Installed)) != NULL &&
             installed->vernumber < temp->vernumber)
             SoftwareList->checked(i + 1, 1);
     }
@@ -1026,24 +977,21 @@ void type_cb(Fl_Round_Button * w, void *)       // I - Radio button widget
     NextButton->activate();
 }
 
-
 //
 // 'update_size()' - Update the total +/- sizes of the installations.
 //
 
-void update_sizes(void)
-{
-    int i;                      // Looping var
-    gui_dist_t *dist,           // Distribution
-              *installed;       // Installed distribution
-    int rootsize,               // Total root size difference in kbytes
-        usrsize;                // Total /usr size difference in kbytes
-    struct statfs rootpart,     // Available root partition
-           usrpart;             // Available /usr partition
-    int rootfree,               // Free space on root partition
-        usrfree;                // Free space on /usr partition
-    static char sizelabel[1024];        // Label for selected sizes...
-
+void update_sizes(void) {
+    int i;                       // Looping var
+    gui_dist_t *dist,            // Distribution
+        *installed;              // Installed distribution
+    int rootsize,                // Total root size difference in kbytes
+        usrsize;                 // Total /usr size difference in kbytes
+    struct statfs rootpart,      // Available root partition
+        usrpart;                 // Available /usr partition
+    int rootfree,                // Free space on root partition
+        usrfree;                 // Free space on /usr partition
+    static char sizelabel[1024]; // Label for selected sizes...
 
     // Get the sizes for the selected products...
     for (i = 0, dist = Dists, rootsize = 0, usrsize = 0; i < NumDists; i++, dist++)
@@ -1051,14 +999,14 @@ void update_sizes(void)
             rootsize += dist->rootsize;
             usrsize += dist->usrsize;
 
-            if ((installed = gui_find_dist(dist->product, NumInstalled,
-                                           Installed)) != NULL) {
+            if ((installed = gui_find_dist(dist->product, NumInstalled, Installed)) !=
+                NULL) {
                 rootsize -= installed->rootsize;
                 usrsize -= installed->usrsize;
             }
         }
 
-    // Get the sizes of the root and /usr partition...
+        // Get the sizes of the root and /usr partition...
 #if defined(__sgi) || defined(__svr4__) || defined(__SVR4) || defined(M_XENIX)
     if (statfs("/", &rootpart, sizeof(rootpart), 0))
 #else
@@ -1066,8 +1014,9 @@ void update_sizes(void)
 #endif // __sgi || __svr4__ || __SVR4 || M_XENIX
         rootfree = 1024;
     else
-        rootfree = (int) ((double) rootpart.f_bfree * (double) rootpart.f_bsize /
-                          1024.0 / 1024.0 + 0.5);
+        rootfree =
+            (int)((double)rootpart.f_bfree * (double)rootpart.f_bsize / 1024.0 / 1024.0 +
+                  0.5);
 
 #if defined(__sgi) || defined(__svr4__) || defined(__SVR4) || defined(M_XENIX)
     if (statfs("/usr", &usrpart, sizeof(usrpart), 0))
@@ -1076,21 +1025,21 @@ void update_sizes(void)
 #endif // __sgi || __svr4__ || __SVR4 || M_XENIX
         usrfree = 1024;
     else
-        usrfree = (int) ((double) usrpart.f_bfree * (double) usrpart.f_bsize /
-                         1024.0 / 1024.0 + 0.5);
+        usrfree =
+            (int)((double)usrpart.f_bfree * (double)usrpart.f_bsize / 1024.0 / 1024.0 +
+                  0.5);
 
     // Display the results to the user...
     if (rootfree == usrfree) {
         rootsize += usrsize;
 
         if (rootsize >= 1024)
-            snprintf(sizelabel, sizeof(sizelabel),
-                     "%+.1fm required, %dm available.", rootsize / 1024.0, rootfree);
+            snprintf(sizelabel, sizeof(sizelabel), "%+.1fm required, %dm available.",
+                     rootsize / 1024.0, rootfree);
         else
-            snprintf(sizelabel, sizeof(sizelabel),
-                     "%+dk required, %dm available.", rootsize, rootfree);
-    }
-    else if (rootsize >= 1024 && usrsize >= 1024)
+            snprintf(sizelabel, sizeof(sizelabel), "%+dk required, %dm available.",
+                     rootsize, rootfree);
+    } else if (rootsize >= 1024 && usrsize >= 1024)
         snprintf(sizelabel, sizeof(sizelabel),
                  "%+.1fm required on /, %dm available,\n"
                  "%+.1fm required on /usr, %dm available.",

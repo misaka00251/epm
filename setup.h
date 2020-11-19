@@ -2,9 +2,9 @@
 
 #ifndef setup_h
 #define setup_h
+#include "gui-common.h"
 #include <FL/Fl.H>
 #include <FL/Fl_Double_Window.H>
-#include "gui-common.h"
 extern Fl_Double_Window *SetupWindow;
 #include <FL/Fl_Box.H>
 extern Fl_Box *Title[6];

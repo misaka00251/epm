@@ -22,52 +22,44 @@
 
 #include "epm.h"
 
-
 /*
  * Local functions...
  */
 
-void inst_subsys(FILE *fp, const char *prodname, dist_t * dist,
-                 const char *subpackage, const char *category, const char *section);
-
+void inst_subsys(FILE *fp, const char *prodname, dist_t *dist, const char *subpackage,
+                 const char *category, const char *section);
 
 /*
  * 'make_inst()' - Make an IRIX software distribution package.
  */
 
-int                             /* O - 0 = success, 1 = fail */
-make_inst(const char *prodname, /* I - Product short name */
-          const char *directory,        /* I - Directory for distribution files */
-          const char *platname, /* I - Platform name */
-          dist_t * dist,        /* I - Distribution information */
-          struct utsname *platform)     /* I - Platform information */
+int                                 /* O - 0 = success, 1 = fail */
+make_inst(const char *prodname,     /* I - Product short name */
+          const char *directory,    /* I - Directory for distribution files */
+          const char *platname,     /* I - Platform name */
+          dist_t *dist,             /* I - Distribution information */
+          struct utsname *platform) /* I - Platform information */
 {
-    int i;                      /* Looping var */
-    FILE *fp;                   /* Spec/IDB/script file */
-    tarf_t *tarfile;            /* .tardist file */
-    char name[1024];            /* Full product name */
-    char specname[1024];        /* Spec filename */
-    char idbname[1024];         /* IDB filename */
-    char filename[1024],        /* Destination filename */
-         srcname[1024],         /* Name of source file in distribution */
-         dstname[1024];         /* Name of destination file in distribution */
-    char preinstall[1024],      /* Pre install script */
-         postinstall[1024],     /* Post install script */
-         preremove[1024],       /* Pre remove script */
-         postremove[1024];      /* Post remove script */
-    char subsys[255];           /* Subsystem name */
-    file_t *file;               /* Current distribution file */
-    command_t *c;               /* Current command */
-    struct stat fileinfo;       /* File information */
-    const char *runlevels;      /* Run levels */
-    static const char *extensions[] =   /* INST file extensions */
-    {
-        "",
-        ".idb",
-        ".man",
-        ".sw"
-    };
-
+    int i;                            /* Looping var */
+    FILE *fp;                         /* Spec/IDB/script file */
+    tarf_t *tarfile;                  /* .tardist file */
+    char name[1024];                  /* Full product name */
+    char specname[1024];              /* Spec filename */
+    char idbname[1024];               /* IDB filename */
+    char filename[1024],              /* Destination filename */
+        srcname[1024],                /* Name of source file in distribution */
+        dstname[1024];                /* Name of destination file in distribution */
+    char preinstall[1024],            /* Pre install script */
+        postinstall[1024],            /* Post install script */
+        preremove[1024],              /* Pre remove script */
+        postremove[1024];             /* Post remove script */
+    char subsys[255];                 /* Subsystem name */
+    file_t *file;                     /* Current distribution file */
+    command_t *c;                     /* Current command */
+    struct stat fileinfo;             /* File information */
+    const char *runlevels;            /* Run levels */
+    static const char *extensions[] = /* INST file extensions */
+        {"", ".idb", ".man", ".sw"};
 
     REF(platform);
 
@@ -81,8 +73,7 @@ make_inst(const char *prodname, /* I - Product short name */
         else
             snprintf(name, sizeof(name), "%s-%s-%s", prodname, dist->version,
                      dist->release);
-    }
-    else if (platname[0])
+    } else if (platname[0])
         snprintf(name, sizeof(name), "%s-%s-%s", prodname, dist->version, platname);
     else
         snprintf(name, sizeof(name), "%s-%s", prodname, dist->version);
@@ -215,8 +206,7 @@ make_inst(const char *prodname, /* I - Product short name */
                 fprintf(fp, "%s\n", c->command);
 
         fclose(fp);
-    }
-    else
+    } else
         preinstall[0] = '\0';
 
     /*
@@ -267,8 +257,7 @@ make_inst(const char *prodname, /* I - Product short name */
                 fprintf(fp, "%s\n", c->command);
 
         fclose(fp);
-    }
-    else
+    } else
         postinstall[0] = '\0';
 
     /*
@@ -319,8 +308,7 @@ make_inst(const char *prodname, /* I - Product short name */
         qprintf(fp, "/bin/rm -f %s.copy\n", file->dst);
 
         fclose(fp);
-    }
-    else
+    } else
         preremove[0] = '\0';
 
     /*
@@ -371,8 +359,7 @@ make_inst(const char *prodname, /* I - Product short name */
         qprintf(fp, "/bin/rm -f %s.copy\n", file->dst);
 
         fclose(fp);
-    }
-    else
+    } else
         postremove[0] = '\0';
 
     /*
@@ -418,37 +405,39 @@ make_inst(const char *prodname, /* I - Product short name */
             break;
         case '3':
         case '4':
-            qprintf(fp, "f %04o %s %s %s %s %s "
+            qprintf(fp,
+                    "f %04o %s %s %s %s %s "
                     "postop(cp $rbase/%s $rbase/%s.copy) "
                     "removeop($rbase/%s.copy; rm -f $rbase/%s.copy)\n",
-                    file->mode, file->user, file->group, file->dst + 1,
-                    file->src, subsys, file->dst + 1, file->dst + 1, file->dst + 1);
+                    file->mode, file->user, file->group, file->dst + 1, file->src, subsys,
+                    file->dst + 1, file->dst + 1, file->dst + 1);
             break;
         case 'c':
-            qprintf(fp, "f %04o %s %s %s %s %s config(suggest)\n", file->mode,
-                    file->user, file->group, file->dst + 1, file->src, subsys);
+            qprintf(fp, "f %04o %s %s %s %s %s config(suggest)\n", file->mode, file->user,
+                    file->group, file->dst + 1, file->src, subsys);
             break;
         case 'd':
-            qprintf(fp, "d %04o %s %s %s - %s\n", file->mode,
-                    file->user, file->group, file->dst + 1, subsys);
+            qprintf(fp, "d %04o %s %s %s - %s\n", file->mode, file->user, file->group,
+                    file->dst + 1, subsys);
             break;
         case 'f':
-            qprintf(fp, "f %04o %s %s %s %s %s\n", file->mode,
-                    file->user, file->group, file->dst + 1, file->src, subsys);
+            qprintf(fp, "f %04o %s %s %s %s %s\n", file->mode, file->user, file->group,
+                    file->dst + 1, file->src, subsys);
             break;
         case 'i':
-            qprintf(fp, "f %04o %s %s %s %s %s "
+            qprintf(fp,
+                    "f %04o %s %s %s %s %s "
                     "postop(cp $rbase/etc/init.d/%s $rbase/etc/init.d/%s.copy) "
                     "exitop($rbase/etc/init.d/%s start) "
-                    "removeop($rbase/etc/init.d/%s.copy stop; rm -f $rbase/etc/init.d/%s.copy)\n",
-                    file->mode, file->user, file->group, file->dst + 1,
-                    file->src, subsys,
-                    file->dst + 12, file->dst + 12,
-                    file->dst + 12, file->dst + 12, file->dst + 12);
+                    "removeop($rbase/etc/init.d/%s.copy stop; rm -f "
+                    "$rbase/etc/init.d/%s.copy)\n",
+                    file->mode, file->user, file->group, file->dst + 1, file->src, subsys,
+                    file->dst + 12, file->dst + 12, file->dst + 12, file->dst + 12,
+                    file->dst + 12);
             break;
         case 'l':
-            qprintf(fp, "l %04o %s %s %s - %s symval(%s)\n", file->mode,
-                    file->user, file->group, file->dst + 1, subsys, file->src);
+            qprintf(fp, "l %04o %s %s %s - %s symval(%s)\n", file->mode, file->user,
+                    file->group, file->dst + 1, subsys, file->src);
             break;
         }
     }
@@ -478,8 +467,8 @@ make_inst(const char *prodname, /* I - Product short name */
         if (Verbosity)
             puts("");
 
-        fprintf(stderr, "epm: Unable to create file \"%s\" -\n     %s\n",
-                filename, strerror(errno));
+        fprintf(stderr, "epm: Unable to create file \"%s\" -\n     %s\n", filename,
+                strerror(errno));
         return (1);
     }
 
@@ -535,24 +524,22 @@ make_inst(const char *prodname, /* I - Product short name */
     return (0);
 }
 
-
 /*
  * 'inst_subsys()' - Write a subsystem definition for the product.
  */
 
-void inst_subsys(FILE *fp,      /* I - File to write to */
-                 const char *prodname,  /* I - Product short name */
-                 dist_t * dist, /* I - Distribution */
-                 const char *subpackage,        /* I - Subpackage name or NULL */
-                 const char *category,  /* I - "Software" or "Man Pages" */
-                 const char *section)   /* I - "sw" or "man" */
+void inst_subsys(FILE *fp,               /* I - File to write to */
+                 const char *prodname,   /* I - Product short name */
+                 dist_t *dist,           /* I - Distribution */
+                 const char *subpackage, /* I - Subpackage name or NULL */
+                 const char *category,   /* I - "Software" or "Man Pages" */
+                 const char *section)    /* I - "sw" or "man" */
 {
-    int i;                      /* Looping var */
-    depend_t *d;                /* Current dependency */
-    const char *product;        /* Product for dependency */
-    char selfname[1024];        /* Self product name */
-    char title[1024];           /* Product description/title */
-
+    int i;               /* Looping var */
+    depend_t *d;         /* Current dependency */
+    const char *product; /* Product for dependency */
+    char selfname[1024]; /* Self product name */
+    char title[1024];    /* Product description/title */
 
     snprintf(selfname, sizeof(selfname), "%s.%s.eoe", prodname, section);
 
@@ -568,8 +555,7 @@ void inst_subsys(FILE *fp,      /* I - File to write to */
                      dist->descriptions[i].description);
         else
             strlcpy(title, dist->product, sizeof(title));
-    }
-    else {
+    } else {
         fputs("		subsys eoe default\n", fp);
 
         strlcpy(title, dist->product, sizeof(title));
@@ -595,11 +581,11 @@ void inst_subsys(FILE *fp,      /* I - File to write to */
                     product = d->product;
 
                 if (strchr(product, '.') != NULL)
-                    fprintf(fp, "				%s %d %d\n",
-                            product, d->vernumber[0], d->vernumber[1]);
+                    fprintf(fp, "				%s %d %d\n", product,
+                            d->vernumber[0], d->vernumber[1]);
                 else if (product[0] != '/')
-                    fprintf(fp, "				%s.%s.* %d %d\n",
-                            product, section, d->vernumber[0], d->vernumber[1]);
+                    fprintf(fp, "				%s.%s.* %d %d\n", product,
+                            section, d->vernumber[0], d->vernumber[1]);
             }
         fputs("			)\n", fp);
     }
@@ -612,30 +598,28 @@ void inst_subsys(FILE *fp,      /* I - File to write to */
                 product = d->product;
 
             if (strchr(product, '.') != NULL) {
-                fprintf(fp, "			replaces %s %d %d\n",
-                        product, d->vernumber[0], d->vernumber[1]);
-                fprintf(fp, "			updates %s %d %d\n",
-                        product, d->vernumber[0], d->vernumber[1]);
+                fprintf(fp, "			replaces %s %d %d\n", product,
+                        d->vernumber[0], d->vernumber[1]);
+                fprintf(fp, "			updates %s %d %d\n", product,
+                        d->vernumber[0], d->vernumber[1]);
+            } else if (product[0] != '/') {
+                fprintf(fp, "			replaces %s.%s.* %d %d\n", product,
+                        section, d->vernumber[0], d->vernumber[1]);
+                fprintf(fp, "			updates %s.%s.* %d %d\n", product,
+                        section, d->vernumber[0], d->vernumber[1]);
             }
-            else if (product[0] != '/') {
-                fprintf(fp, "			replaces %s.%s.* %d %d\n",
-                        product, section, d->vernumber[0], d->vernumber[1]);
-                fprintf(fp, "			updates %s.%s.* %d %d\n",
-                        product, section, d->vernumber[0], d->vernumber[1]);
-            }
-        }
-        else if (d->type == DEPEND_INCOMPAT && d->subpackage == subpackage) {
+        } else if (d->type == DEPEND_INCOMPAT && d->subpackage == subpackage) {
             if (!strcmp(d->product, "_self"))
                 product = selfname;
             else
                 product = d->product;
 
             if (strchr(product, '.') != NULL)
-                fprintf(fp, "			incompat %s %d %d\n",
-                        product, d->vernumber[0], d->vernumber[1]);
+                fprintf(fp, "			incompat %s %d %d\n", product,
+                        d->vernumber[0], d->vernumber[1]);
             else if (product[0] != '/')
-                fprintf(fp, "			incompat %s.%s.* %d %d\n",
-                        product, section, d->vernumber[0], d->vernumber[1]);
+                fprintf(fp, "			incompat %s.%s.* %d %d\n", product,
+                        section, d->vernumber[0], d->vernumber[1]);
         }
 
     fputs("		endsubsys\n", fp);

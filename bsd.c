@@ -22,13 +22,11 @@
 
 #include "epm.h"
 
-
 /*
  * Local functions...
  */
 
-static void cr2semicolon(char *command)
-{
+static void cr2semicolon(char *command) {
     int len, i;
 
     len = strlen(command);
@@ -38,22 +36,20 @@ static void cr2semicolon(char *command)
 }
 
 static int make_subpackage(const char *prodname, const char *directory,
-                           const char *platname, dist_t * dist, const char *subpackage);
-
+                           const char *platname, dist_t *dist, const char *subpackage);
 
 /*
  * 'make_bsd()' - Make a Free/Net/OpenBSD software distribution package.
  */
 
-int                             /* O - 0 = success, 1 = fail */
-make_bsd(const char *prodname,  /* I - Product short name */
-         const char *directory, /* I - Directory for distribution files */
-         const char *platname,  /* I - Platform name */
-         dist_t * dist,         /* I - Distribution information */
+int                                /* O - 0 = success, 1 = fail */
+make_bsd(const char *prodname,     /* I - Product short name */
+         const char *directory,    /* I - Directory for distribution files */
+         const char *platname,     /* I - Platform name */
+         dist_t *dist,             /* I - Distribution information */
          struct utsname *platform) /* I - Platform information */
 {
-    int i;                      /* Looping var */
-
+    int i; /* Looping var */
 
     if (make_subpackage(prodname, directory, platname, dist, NULL))
         return (1);
@@ -65,36 +61,34 @@ make_bsd(const char *prodname,  /* I - Product short name */
     return (0);
 }
 
-
 /*
  * 'make_subpackage()' - Create a subpackage...
  */
 
-static int                      /* O - 0 = success, 1 = fail */
+static int                              /* O - 0 = success, 1 = fail */
 make_subpackage(const char *prodname,   /* I - Product short name */
                 const char *directory,  /* I - Directory for distribution files */
                 const char *platname,   /* I - Platform name */
-                dist_t * dist,  /* I - Distribution information */
+                dist_t *dist,           /* I - Distribution information */
                 const char *subpackage) /* I - Subpackage name */
 {
-    int i;                      /* Looping var */
-    FILE *fp;                   /* Spec file */
-    char prodfull[1024];        /* Full subpackage name */
-    char name[1024];            /* Full product name */
-    char commentname[1024];     /* pkg comment filename */
-    char descrname[1024];       /* pkg descr filename */
-    char plistname[1024];       /* pkg plist filename */
-    char filename[1024];        /* Destination filename */
-    char *old_user,             /* Old owner UID */
-        *old_group;             /* Old group ID */
-    int old_mode;               /* Old permissions */
-    file_t *file;               /* Current distribution file */
-    command_t *c;               /* Current command */
-    depend_t *d;                /* Current dependency */
-    struct passwd *pwd;         /* Pointer to user record */
-    struct group *grp;          /* Pointer to group record */
-    char current[1024];         /* Current directory */
-
+    int i;                  /* Looping var */
+    FILE *fp;               /* Spec file */
+    char prodfull[1024];    /* Full subpackage name */
+    char name[1024];        /* Full product name */
+    char commentname[1024]; /* pkg comment filename */
+    char descrname[1024];   /* pkg descr filename */
+    char plistname[1024];   /* pkg plist filename */
+    char filename[1024];    /* Destination filename */
+    char *old_user,         /* Old owner UID */
+        *old_group;         /* Old group ID */
+    int old_mode;           /* Old permissions */
+    file_t *file;           /* Current distribution file */
+    command_t *c;           /* Current command */
+    depend_t *d;            /* Current dependency */
+    struct passwd *pwd;     /* Pointer to user record */
+    struct group *grp;      /* Pointer to group record */
+    char current[1024];     /* Current directory */
 
     getcwd(current, sizeof(current));
 
@@ -113,8 +107,7 @@ make_subpackage(const char *prodname,   /* I - Product short name */
         else
             snprintf(name, sizeof(name), "%s-%s-%s", prodfull, dist->version,
                      dist->release);
-    }
-    else if (platname[0])
+    } else if (platname[0])
         snprintf(name, sizeof(name), "%s-%s-%s", prodfull, dist->version, platname);
     else
         snprintf(name, sizeof(name), "%s-%s", prodfull, dist->version);
@@ -208,8 +201,7 @@ make_subpackage(const char *prodname,   /* I - Product short name */
                 if (dist->relnumber) {
                     fprintf(fp, "@pkgdep %s-%s-%d-%s", d->product, dist->version,
                             dist->relnumber, platname);
-                }
-                else {
+                } else {
                     fprintf(fp, "@pkgdep %s-%s-%s", d->product, dist->version, platname);
                 }
 #elif defined(__OpenBSD__)
@@ -217,8 +209,7 @@ make_subpackage(const char *prodname,   /* I - Product short name */
 #else
                 fprintf(fp, "@pkgdep %s", d->product);
 #endif /* __FreeBSD__ */
-            }
-            else {
+            } else {
 #ifdef __FreeBSD__
                 /*
                  * FreeBSD uses @conflicts...
@@ -241,9 +232,10 @@ make_subpackage(const char *prodname,   /* I - Product short name */
         if (c->subpackage == subpackage)
             switch (c->type) {
             case COMMAND_PRE_INSTALL:
-                fputs
-                    ("WARNING: Package contains pre-install commands which are not supported\n"
-                     "         by the BSD packager.\n", stderr);
+                fputs("WARNING: Package contains pre-install commands which are not "
+                      "supported\n"
+                      "         by the BSD packager.\n",
+                      stderr);
                 break;
             case COMMAND_POST_INSTALL:
                 if (AooMode) {
@@ -258,9 +250,10 @@ make_subpackage(const char *prodname,   /* I - Product short name */
                 fprintf(fp, "@unexec %s\n", c->command);
                 break;
             case COMMAND_POST_REMOVE:
-                fputs
-                    ("WARNING: Package contains post-removal commands which are not supported\n"
-                     "         by the BSD packager.\n", stderr);
+                fputs("WARNING: Package contains post-removal commands which are not "
+                      "supported\n"
+                      "         by the BSD packager.\n",
+                      stderr);
                 break;
             }
 
@@ -277,7 +270,8 @@ make_subpackage(const char *prodname,   /* I - Product short name */
         }
 
     for (i = dist->num_files, file = dist->files, old_mode = 0, old_user = "",
-         old_group = ""; i > 0; i--, file++) {
+        old_group = "";
+         i > 0; i--, file++) {
         /*
          * The FreeBSD pkg_delete command (at least) doesn't like creating
          * and deleting directories.  I don't know if other BSD's have the
@@ -352,8 +346,8 @@ make_subpackage(const char *prodname,   /* I - Product short name */
         switch (tolower(file->type)) {
         case 'c':
         case 'f':
-            snprintf(filename, sizeof(filename), "%s/%s.buildroot%s",
-                     directory, prodfull, file->dst);
+            snprintf(filename, sizeof(filename), "%s/%s.buildroot%s", directory, prodfull,
+                     file->dst);
 
             if (Verbosity > 1)
                 printf("%s -> %s...\n", file->src, filename);
@@ -363,9 +357,8 @@ make_subpackage(const char *prodname,   /* I - Product short name */
                 return (1);
             break;
         case 'i':
-            snprintf(filename, sizeof(filename),
-                     "%s/%s.buildroot/usr/local/etc/rc.d/%s", directory,
-                     prodfull, file->dst);
+            snprintf(filename, sizeof(filename), "%s/%s.buildroot/usr/local/etc/rc.d/%s",
+                     directory, prodfull, file->dst);
 
             if (Verbosity > 1)
                 printf("%s -> %s...\n", file->src, filename);
@@ -375,8 +368,8 @@ make_subpackage(const char *prodname,   /* I - Product short name */
                 return (1);
             break;
         case 'd':
-            snprintf(filename, sizeof(filename), "%s/%s.buildroot%s",
-                     directory, prodfull, file->dst);
+            snprintf(filename, sizeof(filename), "%s/%s.buildroot%s", directory, prodfull,
+                     file->dst);
 
             if (Verbosity > 1)
                 printf("Directory %s...\n", filename);
@@ -385,8 +378,8 @@ make_subpackage(const char *prodname,   /* I - Product short name */
                            grp ? grp->gr_gid : 0);
             break;
         case 'l':
-            snprintf(filename, sizeof(filename), "%s/%s.buildroot%s",
-                     directory, prodfull, file->dst);
+            snprintf(filename, sizeof(filename), "%s/%s.buildroot%s", directory, prodfull,
+                     file->dst);
 
             if (Verbosity > 1)
                 printf("%s -> %s...\n", file->src, filename);
@@ -404,7 +397,8 @@ make_subpackage(const char *prodname,   /* I - Product short name */
         printf("Building %s *BSD pkg binary distribution...\n", prodfull);
 
 #ifdef __OpenBSD__
-    if (run_command(NULL, "pkg_create -p / -B %s/%s.buildroot "
+    if (run_command(NULL,
+                    "pkg_create -p / -B %s/%s.buildroot "
                     "-c %s "
                     "-d %s "
                     "-f %s "
@@ -415,18 +409,22 @@ make_subpackage(const char *prodname,   /* I - Product short name */
     if (run_command(NULL, "mv %s.tgz %s", name, directory))
         return (1);
 #elif defined(__FreeBSD__)
-    if (run_command(NULL, "/usr/sbin/pkg_create -p / "
+    if (run_command(NULL,
+                    "/usr/sbin/pkg_create -p / "
                     "-c %s "
                     "-d %s "
                     "-f %s "
-                    "%s/%s.tbz", commentname, descrname, plistname, directory, name))
+                    "%s/%s.tbz",
+                    commentname, descrname, plistname, directory, name))
         return (1);
 #else
-    if (run_command(NULL, "pkg_create -p / "
+    if (run_command(NULL,
+                    "pkg_create -p / "
                     "-c %s "
                     "-d %s "
                     "-f %s "
-                    "%s/%s.tgz", commentname, descrname, plistname, directory, name))
+                    "%s/%s.tgz",
+                    commentname, descrname, plistname, directory, name))
         return (1);
 #endif /* __OpenBSD__ */
 

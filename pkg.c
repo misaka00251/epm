@@ -22,43 +22,40 @@
 
 #include "epm.h"
 
-
 /*
  * Local functions...
  */
 
 static const char *pkg_path(const char *filename, const char *dirname);
 
-
 /*
  * 'make_pkg()' - Make an AT&T software distribution package.
  */
 
-int                             /* O - 0 = success, 1 = fail */
-make_pkg(const char *prodname,  /* I - Product short name */
-         const char *directory, /* I - Directory for distribution files */
-         const char *platname,  /* I - Platform name */
-         dist_t * dist,         /* I - Distribution information */
+int                                /* O - 0 = success, 1 = fail */
+make_pkg(const char *prodname,     /* I - Product short name */
+         const char *directory,    /* I - Directory for distribution files */
+         const char *platname,     /* I - Platform name */
+         dist_t *dist,             /* I - Distribution information */
          struct utsname *platform) /* I - Platform information */
 {
-    int i;                      /* Looping var */
-    FILE *fp;                   /* Control file */
-    char name[1024];            /* Full product name */
-    char filename[1024],        /* Destination filename */
-         preinstall[1024],      /* Pre install script */
-         postinstall[1024],     /* Post install script */
-         preremove[1024],       /* Pre remove script */
-         postremove[1024],      /* Post remove script */
-         request[1024];         /* Request script */
-    char current[1024];         /* Current directory */
-    file_t *file;               /* Current distribution file */
-    command_t *c;               /* Current command */
-    depend_t *d;                /* Current dependency */
-    tarf_t *tarfile;            /* Distribution file */
-    time_t curtime;             /* Current time info */
-    struct tm *curdate;         /* Current date info */
-    const char *runlevels;      /* Run levels */
-
+    int i;                 /* Looping var */
+    FILE *fp;              /* Control file */
+    char name[1024];       /* Full product name */
+    char filename[1024],   /* Destination filename */
+        preinstall[1024],  /* Pre install script */
+        postinstall[1024], /* Post install script */
+        preremove[1024],   /* Pre remove script */
+        postremove[1024],  /* Post remove script */
+        request[1024];     /* Request script */
+    char current[1024];    /* Current directory */
+    file_t *file;          /* Current distribution file */
+    command_t *c;          /* Current command */
+    depend_t *d;           /* Current dependency */
+    tarf_t *tarfile;       /* Distribution file */
+    time_t curtime;        /* Current time info */
+    struct tm *curdate;    /* Current date info */
+    const char *runlevels; /* Run levels */
 
     if (Verbosity)
         puts("Creating PKG distribution...");
@@ -70,8 +67,7 @@ make_pkg(const char *prodname,  /* I - Product short name */
         else
             snprintf(name, sizeof(name), "%s-%s-%s", prodname, dist->version,
                      dist->release);
-    }
-    else if (platname[0])
+    } else if (platname[0])
         snprintf(name, sizeof(name), "%s-%s-%s", prodname, dist->version, platname);
     else
         snprintf(name, sizeof(name), "%s-%s", prodname, dist->version);
@@ -100,9 +96,9 @@ make_pkg(const char *prodname,  /* I - Product short name */
     fprintf(fp, "NAME=%s\n", dist->product);
     fprintf(fp, "VERSION=%s\n", dist->version);
     fprintf(fp, "VENDOR=%s\n", dist->vendor);
-    fprintf(fp, "PSTAMP=epm%04d%02d%02d%02d%02d%02d\n",
-            curdate->tm_year + 1900, curdate->tm_mon + 1, curdate->tm_mday,
-            curdate->tm_hour, curdate->tm_min, curdate->tm_sec);
+    fprintf(fp, "PSTAMP=epm%04d%02d%02d%02d%02d%02d\n", curdate->tm_year + 1900,
+            curdate->tm_mon + 1, curdate->tm_mday, curdate->tm_hour, curdate->tm_min,
+            curdate->tm_sec);
 
     if (dist->num_descriptions > 0)
         fprintf(fp, "DESC=%s\n", dist->descriptions[0].description);
@@ -179,8 +175,7 @@ make_pkg(const char *prodname,  /* I - Product short name */
                 fprintf(fp, "%s\n", c->command);
 
         fclose(fp);
-    }
-    else
+    } else
         preinstall[0] = '\0';
 
     /*
@@ -227,8 +222,7 @@ make_pkg(const char *prodname,  /* I - Product short name */
                 qprintf(fp, "/etc/init.d/%s start\n", file->dst);
 
         fclose(fp);
-    }
-    else
+    } else
         postinstall[0] = '\0';
 
     /*
@@ -274,8 +268,7 @@ make_pkg(const char *prodname,  /* I - Product short name */
                 fprintf(fp, "%s\n", c->command);
 
         fclose(fp);
-    }
-    else
+    } else
         preremove[0] = '\0';
 
     /*
@@ -312,8 +305,7 @@ make_pkg(const char *prodname,  /* I - Product short name */
                 fprintf(fp, "%s\n", c->command);
 
         fclose(fp);
-    }
-    else
+    } else
         postremove[0] = '\0';
 
     /*
@@ -350,8 +342,7 @@ make_pkg(const char *prodname,  /* I - Product short name */
                 fprintf(fp, "%s\n", c->command);
 
         fclose(fp);
-    }
-    else
+    } else
         request[0] = '\0';
 
     /*
@@ -428,25 +419,23 @@ make_pkg(const char *prodname,  /* I - Product short name */
         switch (tolower(file->type)) {
         case 'c':
             qprintf(fp, "e %s %s=%s %04o %s %s\n",
-                    file->subpackage ? file->subpackage : "none",
-                    file->dst, pkg_path(file->src, current),
-                    file->mode, file->user, file->group);
+                    file->subpackage ? file->subpackage : "none", file->dst,
+                    pkg_path(file->src, current), file->mode, file->user, file->group);
             break;
         case 'd':
             qprintf(fp, "d %s %s %04o %s %s\n",
-                    file->subpackage ? file->subpackage : "none",
-                    file->dst, file->mode, file->user, file->group);
+                    file->subpackage ? file->subpackage : "none", file->dst, file->mode,
+                    file->user, file->group);
             break;
         case 'f':
         case 'i':
             qprintf(fp, "f %s %s=%s %04o %s %s\n",
-                    file->subpackage ? file->subpackage : "none",
-                    file->dst, pkg_path(file->src, current),
-                    file->mode, file->user, file->group);
+                    file->subpackage ? file->subpackage : "none", file->dst,
+                    pkg_path(file->src, current), file->mode, file->user, file->group);
             break;
         case 'l':
-            qprintf(fp, "s %s %s=%s\n",
-                    file->subpackage ? file->subpackage : "none", file->dst, file->src);
+            qprintf(fp, "s %s %s=%s\n", file->subpackage ? file->subpackage : "none",
+                    file->dst, file->src);
             break;
         }
 
@@ -462,8 +451,8 @@ make_pkg(const char *prodname,  /* I - Product short name */
     if (Verbosity)
         puts("Building PKG binary distribution...");
 
-    if (run_command(NULL, "pkgmk -o -f %s/%s.prototype -d %s/%s",
-                    directory, prodname, current, directory))
+    if (run_command(NULL, "pkgmk -o -f %s/%s.prototype -d %s/%s", directory, prodname,
+                    current, directory))
         return (1);
 
     /*
@@ -494,8 +483,8 @@ make_pkg(const char *prodname,  /* I - Product short name */
     if (Verbosity)
         puts("Copying into package stream file...");
 
-    if (run_command(directory, "pkgtrans -s %s/%s %s.pkg %s",
-                    current, directory, name, prodname))
+    if (run_command(directory, "pkgtrans -s %s/%s %s.pkg %s", current, directory, name,
+                    prodname))
         return (1);
 
     /*
@@ -539,17 +528,15 @@ make_pkg(const char *prodname,  /* I - Product short name */
     return (0);
 }
 
-
 /*
  * 'pkg_path()' - Return an absolute path for the prototype file.
  */
 
-static const char *             /* O - Absolute filename */
-pkg_path(const char *filename,  /* I - Source filename */
-         const char *dirname)   /* I - Source directory */
+static const char *            /* O - Absolute filename */
+pkg_path(const char *filename, /* I - Source filename */
+         const char *dirname)  /* I - Source directory */
 {
-    static char absname[1024];  /* Absolute filename */
-
+    static char absname[1024]; /* Absolute filename */
 
     if (filename[0] == '/')
         return (filename);

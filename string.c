@@ -22,17 +22,15 @@
 
 #include "epmstring.h"
 
-
 /*
  * 'epm_strdup()' - Duplicate a string.
  */
 
 #ifndef HAVE_STRDUP
-char *                          /* O - New string pointer */
-epm_strdup(const char *s)       /* I - String to duplicate */
+char *                    /* O - New string pointer */
+epm_strdup(const char *s) /* I - String to duplicate */
 {
-    char *t;                    /* New string pointer */
-
+    char *t; /* New string pointer */
 
     if (s == NULL)
         return (NULL);
@@ -44,15 +42,14 @@ epm_strdup(const char *s)       /* I - String to duplicate */
 }
 #endif /* !HAVE_STRDUP */
 
-
 /*
  * 'epm_strcasecmp()' - Do a case-insensitive comparison.
  */
 
 #ifndef HAVE_STRCASECMP
-int                             /* O - Result of comparison (-1, 0, or 1) */
-epm_strcasecmp(const char *s,   /* I - First string */
-               const char *t)   /* I - Second string */
+int                           /* O - Result of comparison (-1, 0, or 1) */
+epm_strcasecmp(const char *s, /* I - First string */
+               const char *t) /* I - Second string */
 {
     while (*s != '\0' && *t != '\0') {
         if (tolower(*s) < tolower(*t))
@@ -73,20 +70,18 @@ epm_strcasecmp(const char *s,   /* I - First string */
 }
 #endif /* !HAVE_STRCASECMP */
 
-
 #ifndef HAVE_STRLCAT
 /*
  * 'epm_strlcat()' - Safely concatenate two strings.
  */
 
-size_t                          /* O - Length of string */
-epm_strlcat(char *dst,          /* O - Destination string */
-            const char *src,    /* I - Source string */
-            size_t size)        /* I - Size of destination string buffer */
+size_t                       /* O - Length of string */
+epm_strlcat(char *dst,       /* O - Destination string */
+            const char *src, /* I - Source string */
+            size_t size)     /* I - Size of destination string buffer */
 {
-    size_t srclen;              /* Length of source string */
-    size_t dstlen;              /* Length of destination string */
-
+    size_t srclen; /* Length of source string */
+    size_t dstlen; /* Length of destination string */
 
     /*
      * Figure out how much room is left...
@@ -96,7 +91,7 @@ epm_strlcat(char *dst,          /* O - Destination string */
     size -= dstlen + 1;
 
     if (!size)
-        return (dstlen);        /* No room, return immediately... */
+        return (dstlen); /* No room, return immediately... */
 
     /*
      * Figure out how much room is needed...
@@ -118,19 +113,17 @@ epm_strlcat(char *dst,          /* O - Destination string */
 }
 #endif /* !HAVE_STRLCAT */
 
-
 #ifndef HAVE_STRLCPY
 /*
  * 'epm_strlcpy()' - Safely copy two strings.
  */
 
-size_t                          /* O - Length of string */
-epm_strlcpy(char *dst,          /* O - Destination string */
-            const char *src,    /* I - Source string */
-            size_t size)        /* I - Size of destination string buffer */
+size_t                       /* O - Length of string */
+epm_strlcpy(char *dst,       /* O - Destination string */
+            const char *src, /* I - Source string */
+            size_t size)     /* I - Size of destination string buffer */
 {
-    size_t srclen;              /* Length of source string */
-
+    size_t srclen; /* Length of source string */
 
     /*
      * Figure out how much room is needed...
@@ -154,16 +147,15 @@ epm_strlcpy(char *dst,          /* O - Destination string */
 }
 #endif /* !HAVE_STRLCPY */
 
-
 /*
  * 'epm_strncasecmp()' - Do a case-insensitive comparison on up to N chars.
  */
 
 #ifndef HAVE_STRNCASECMP
-int                             /* O - Result of comparison (-1, 0, or 1) */
-epm_strncasecmp(const char *s,  /* I - First string */
-                const char *t,  /* I - Second string */
-                size_t n)       /* I - Maximum number of characters to compare */
+int                            /* O - Result of comparison (-1, 0, or 1) */
+epm_strncasecmp(const char *s, /* I - First string */
+                const char *t, /* I - Second string */
+                size_t n)      /* I - Maximum number of characters to compare */
 {
     while (*s != '\0' && *t != '\0' && n > 0) {
         if (tolower(*s) < tolower(*t))

@@ -22,19 +22,17 @@
 
 #include "epm.h"
 
-
 /*
  * Global variable used by dist functions...
  */
 
 int Verbosity = 0;
 
-
 /*
  * Local functions...
  */
 
-static file_t *find_file(dist_t * dist, const char *dst);
+static file_t *find_file(dist_t *dist, const char *dst);
 static void info(void);
 static void usage(void)
 #ifdef __GNUC__
@@ -42,32 +40,30 @@ static void usage(void)
 #endif /* __GNUC__ */
     ;
 
-
 /*
  * 'main()' - Add or replace files, directories, and symlinks.
  */
 
-     int                        /* O - Exit status */
-     main(int argc,             /* I - Number of command-line arguments */
-          char *argv[])         /* I - Command-line arguments */
+int                /* O - Exit status */
+main(int argc,     /* I - Number of command-line arguments */
+     char *argv[]) /* I - Command-line arguments */
 {
-    int i;                      /* Looping var */
-    int mode,                   /* Permissions */
-        directories;            /* Installing directories? */
-    char *user,                 /* Owner */
-        *group,                 /* Group */
-        *listname,              /* List filename */
-        *src,                   /* Source filename */
-         dst[1024],             /* Destination filename */
-         linkname[1024];        /* Symlink name */
-    ssize_t linklen;            /* Length of symlink */
-    int num_files;              /* Number of files to install */
-    char *files[1000];          /* Files to install */
-    struct stat fileinfo;       /* File information */
-    dist_t *dist;               /* Distribution */
-    file_t *file;               /* File in distribution */
-    struct utsname platform;    /* Platform information */
-
+    int i;                   /* Looping var */
+    int mode,                /* Permissions */
+        directories;         /* Installing directories? */
+    char *user,              /* Owner */
+        *group,              /* Group */
+        *listname,           /* List filename */
+        *src,                /* Source filename */
+        dst[1024],           /* Destination filename */
+        linkname[1024];      /* Symlink name */
+    ssize_t linklen;         /* Length of symlink */
+    int num_files;           /* Number of files to install */
+    char *files[1000];       /* Files to install */
+    struct stat fileinfo;    /* File information */
+    dist_t *dist;            /* Distribution */
+    file_t *file;            /* File in distribution */
+    struct utsname platform; /* Platform information */
 
     /*
      * Parse the command-line arguments...
@@ -95,22 +91,19 @@ static void usage(void)
                 group = argv[i];
             else
                 usage();
-        }
-        else if (strcmp(argv[i], "-m") == 0) {
+        } else if (strcmp(argv[i], "-m") == 0) {
             i++;
             if (i < argc)
-                mode = (int) strtol(argv[i], NULL, 8);
+                mode = (int)strtol(argv[i], NULL, 8);
             else
                 usage();
-        }
-        else if (strcmp(argv[i], "-o") == 0) {
+        } else if (strcmp(argv[i], "-o") == 0) {
             i++;
             if (i < argc)
                 user = argv[i];
             else
                 usage();
-        }
-        else if (strcmp(argv[i], "-s") == 0)
+        } else if (strcmp(argv[i], "-s") == 0)
             continue;
         else if (strcmp(argv[i], "--list-file") == 0) {
             i++;
@@ -118,14 +111,12 @@ static void usage(void)
                 listname = argv[i];
             else
                 usage();
-        }
-        else if (argv[i][0] == '-')
+        } else if (argv[i][0] == '-')
             usage();
         else if (num_files < (sizeof(files) / sizeof(files[0]))) {
             files[num_files] = argv[i];
             num_files++;
-        }
-        else {
+        } else {
             fputs("epminstall: Too many filenames on command-line!\n", stderr);
             usage();
         }
@@ -136,8 +127,8 @@ static void usage(void)
     get_platform(&platform);
 
     if ((dist = read_dist(listname, &platform, "")) == NULL) {
-        fprintf(stderr, "epminstall: Unable to read list file \"%s\": %s\n",
-                listname, strerror(errno));
+        fprintf(stderr, "epminstall: Unable to read list file \"%s\": %s\n", listname,
+                strerror(errno));
         return (1);
     }
 
@@ -165,8 +156,7 @@ static void usage(void)
             strlcpy(file->dst, files[i], sizeof(file->dst));
             strlcpy(file->src, "-", sizeof(file->src));
         }
-    }
-    else {
+    } else {
         /*
          * Check to see if we have 1 or more files and a directory or
          * a source and destination file...
@@ -180,26 +170,24 @@ static void usage(void)
                     file = add_file(dist, NULL);
 
                 if (stat(files[0], &fileinfo)) {
-                    fprintf(stderr, "epminstall: Unable to stat \"%s\": %s\n",
-                            files[0], strerror(errno));
+                    fprintf(stderr, "epminstall: Unable to stat \"%s\": %s\n", files[0],
+                            strerror(errno));
                     fileinfo.st_mode = mode;
                 }
 
                 if (S_ISLNK(fileinfo.st_mode)) {
                     file->type = 'l';
 
-                    if ((linklen =
-                         readlink(files[0], linkname, sizeof(linkname) - 1)) < 0) {
+                    if ((linklen = readlink(files[0], linkname, sizeof(linkname) - 1)) <
+                        0) {
                         fprintf(stderr, "epminstall: Unable to read symlink \"%s\": %s\n",
                                 files[0], strerror(errno));
                         files[0] = "BROKEN-LINK";
-                    }
-                    else {
+                    } else {
                         linkname[linklen] = '\0';
                         files[0] = linkname;
                     }
-                }
-                else
+                } else
                     file->type = 'f';
 
                 if (mode)
@@ -213,8 +201,7 @@ static void usage(void)
                 strlcpy(file->group, group, sizeof(file->group));
                 strlcpy(file->dst, files[1], sizeof(file->dst));
                 strlcpy(file->src, files[0], sizeof(file->src));
-            }
-            else
+            } else
                 num_files--;
         }
 
@@ -235,8 +222,7 @@ static void usage(void)
                 strlcpy(file->group, group, sizeof(file->group));
                 strlcpy(file->dst, files[num_files], sizeof(file->dst));
                 strlcpy(file->src, "-", sizeof(file->src));
-            }
-            else if (file->type != 'd') {
+            } else if (file->type != 'd') {
                 fprintf(stderr,
                         "epminstall: Destination path \"%s\" is not a directory!\n",
                         files[num_files]);
@@ -259,26 +245,24 @@ static void usage(void)
                     file = add_file(dist, NULL);
 
                 if (stat(files[i], &fileinfo)) {
-                    fprintf(stderr, "epminstall: Unable to stat \"%s\": %s\n",
-                            files[i], strerror(errno));
+                    fprintf(stderr, "epminstall: Unable to stat \"%s\": %s\n", files[i],
+                            strerror(errno));
                     fileinfo.st_mode = mode;
                 }
 
                 if (S_ISLNK(fileinfo.st_mode)) {
                     file->type = 'l';
 
-                    if ((linklen =
-                         readlink(files[i], linkname, sizeof(linkname) - 1)) < 0) {
+                    if ((linklen = readlink(files[i], linkname, sizeof(linkname) - 1)) <
+                        0) {
                         fprintf(stderr, "epminstall: Unable to read symlink \"%s\": %s\n",
                                 files[i], strerror(errno));
                         files[i] = "BROKEN-LINK";
-                    }
-                    else {
+                    } else {
                         linkname[linklen] = '\0';
                         files[i] = linkname;
                     }
-                }
-                else
+                } else
                     file->type = 'f';
 
                 if (mode)
@@ -307,8 +291,8 @@ static void usage(void)
      */
 
     if (write_dist(listname, dist)) {
-        fprintf(stderr, "epminstall: Unable to read list file \"%s\": %s\n",
-                listname, strerror(errno));
+        fprintf(stderr, "epminstall: Unable to read list file \"%s\": %s\n", listname,
+                strerror(errno));
         return (1);
     }
 
@@ -319,18 +303,16 @@ static void usage(void)
     return (0);
 }
 
-
 /*
  * 'find_file()' - Find a file in the distribution...
  */
 
-static file_t *                 /* O - File entry or NULL */
-find_file(dist_t * dist,        /* I - Distribution to search */
-          const char *dst)      /* I - Destination filename */
+static file_t *            /* O - File entry or NULL */
+find_file(dist_t *dist,    /* I - Distribution to search */
+          const char *dst) /* I - Destination filename */
 {
-    int i;                      /* Looping var */
-    file_t *file;               /* Current file */
-
+    int i;        /* Looping var */
+    file_t *file; /* Current file */
 
     for (i = dist->num_files, file = dist->files; i > 0; i--, file++)
         if (strcmp(file->dst, dst) == 0)
@@ -339,13 +321,11 @@ find_file(dist_t * dist,        /* I - Distribution to search */
     return (NULL);
 }
 
-
 /*
  * 'info()' - Show the EPM copyright and license.
  */
 
-static void info(void)
-{
+static void info(void) {
     puts(EPM_VERSION);
     puts("Copyright 1999-2019 by Michael R Sweet.");
     puts("Copyright 2020 by Jim Jagielski.");
@@ -357,13 +337,11 @@ static void info(void)
     puts("");
 }
 
-
 /*
  * 'usage()' - Show command-line usage instructions.
  */
 
-static void usage(void)
-{
+static void usage(void) {
     info();
 
     puts("Usage: epminstall [options] file1 file2 ... fileN directory");

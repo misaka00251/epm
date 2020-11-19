@@ -22,7 +22,6 @@
 
 #include "epm.h"
 
-
 /*
  * Globals...
  */
@@ -36,58 +35,40 @@ const char *UninstProgram = EPM_LIBDIR "/uninst";
 int Verbosity = 0;
 int AooMode = 0;
 
-
 /*
  * Local functions...
  */
 
-static void depend(dist_t * dist);
+static void depend(dist_t *dist);
 static void info(void);
 static void usage(void);
-
 
 /*
  * 'main()' - Read a product list and produce a distribution.
  */
 
-int                             /* O - Exit status */
-main(int argc,                  /* I - Number of command-line args */
-     char *argv[])              /* I - Command-line arguments */
+int                /* O - Exit status */
+main(int argc,     /* I - Number of command-line args */
+     char *argv[]) /* I - Command-line arguments */
 {
-    int i;                      /* Looping var */
-    int strip;                  /* 1 if we should strip executables */
-    struct utsname platform;    /* UNIX name info */
-    char *namefmt,              /* Name format to use */
-        *custom_name,           /* User-supplied system name */
-         platname[255],         /* Base platform name */
-         prodname[256],         /* Product name */
-         listname[256],         /* List file name */
-         directory[255],        /* Name of install directory */
-        *temp,                  /* Temporary string pointer */
-        *setup,                 /* Setup GUI image */
-        *types;                 /* Setup GUI install types */
-    dist_t *dist;               /* Software distribution */
-    int format;                 /* Distribution format */
-    int show_depend;            /* Show dependencies */
-    static char *formats[] =    /* Distribution format strings */
-    {
-        "portable",
-        "aix",
-        "bsd",
-        "deb",
-        "inst",
-        "rpm",
-        "rpm",
-        "macos",
-        "macos",
-        "pkg",
-        "rpm",
-        "rpm",
-        "setld",
-        "slackware",
-        "swinstall"
-    };
-
+    int i;                   /* Looping var */
+    int strip;               /* 1 if we should strip executables */
+    struct utsname platform; /* UNIX name info */
+    char *namefmt,           /* Name format to use */
+        *custom_name,        /* User-supplied system name */
+        platname[255],       /* Base platform name */
+        prodname[256],       /* Product name */
+        listname[256],       /* List file name */
+        directory[255],      /* Name of install directory */
+        *temp,               /* Temporary string pointer */
+        *setup,              /* Setup GUI image */
+        *types;              /* Setup GUI install types */
+    dist_t *dist;            /* Software distribution */
+    int format;              /* Distribution format */
+    int show_depend;         /* Show dependencies */
+    static char *formats[] = /* Distribution format strings */
+        {"portable", "aix", "bsd", "deb", "inst",  "rpm",       "rpm",      "macos",
+         "macos",    "pkg", "rpm", "rpm", "setld", "slackware", "swinstall"};
 
     /*
      * Get platform information...
@@ -122,7 +103,7 @@ main(int argc,                  /* I - Number of command-line args */
              */
 
             switch (argv[i][1]) {
-            case 'a':          /* Architecture */
+            case 'a': /* Architecture */
                 if (argv[i][2])
                     temp = argv[i] + 2;
                 else {
@@ -138,7 +119,7 @@ main(int argc,                  /* I - Number of command-line args */
                 strlcpy(platform.machine, temp, sizeof(platform.machine));
                 break;
 
-            case 'f':          /* Format */
+            case 'f': /* Format */
                 if (argv[i][2])
                     temp = argv[i] + 2;
                 else {
@@ -167,8 +148,8 @@ main(int argc,                  /* I - Number of command-line args */
                     format = PACKAGE_LSB_SIGNED;
                 else if (!strcasecmp(temp, "macos") || !strcasecmp(temp, "osx"))
                     format = PACKAGE_MACOS;
-                else if (!strcasecmp(temp, "macos-signed")
-                         || !strcasecmp(temp, "osx-signed"))
+                else if (!strcasecmp(temp, "macos-signed") ||
+                         !strcasecmp(temp, "osx-signed"))
                     format = PACKAGE_MACOS_SIGNED;
                 else if (!strcasecmp(temp, "pkg"))
                     format = PACKAGE_PKG;
@@ -217,15 +198,15 @@ main(int argc,                  /* I - Number of command-line args */
                 }
                 break;
 
-            case 'g':          /* Don't strip */
+            case 'g': /* Don't strip */
                 strip = 0;
                 break;
 
-            case 'k':          /* Keep intermediate files */
+            case 'k': /* Keep intermediate files */
                 KeepFiles = 1;
                 break;
 
-            case 'm':          /* Custom sysname-release-machine string */
+            case 'm': /* Custom sysname-release-machine string */
                 if (argv[i][2])
                     custom_name = argv[i] + 2;
                 else {
@@ -239,11 +220,11 @@ main(int argc,                  /* I - Number of command-line args */
                 }
                 break;
 
-            case 'n':          /* Name with sysname, machine, and/or release */
+            case 'n': /* Name with sysname, machine, and/or release */
                 namefmt = argv[i] + 2;
                 break;
 
-            case 's':          /* Use setup GUI */
+            case 's': /* Use setup GUI */
                 if (argv[i][2])
                     setup = argv[i] + 2;
                 else {
@@ -257,24 +238,24 @@ main(int argc,                  /* I - Number of command-line args */
                 }
                 break;
 
-            case 't':          /* Test scripts */
+            case 't': /* Test scripts */
                 fputs("epm: Sorry, the \"test\" option is no longer available!\n",
                       stderr);
                 break;
 
-            case 'u':          /* Uncompressed output */
+            case 'u': /* Uncompressed output */
                 CompressFiles = 0;
                 break;
 
-            case 'v':          /* Be verbose */
+            case 'v': /* Be verbose */
                 Verbosity += strlen(argv[i]) - 1;
                 break;
 
-            case 'z':          /* Compress output */
+            case 'z': /* Compress output */
                 CompressFiles = 1;
                 break;
 
-            case '-':          /* --option */
+            case '-': /* --option */
                 if (!strcmp(argv[i], "--data-dir")) {
                     i++;
                     if (i < argc)
@@ -283,8 +264,7 @@ main(int argc,                  /* I - Number of command-line args */
                         puts("epm: Expected data directory.");
                         usage();
                     }
-                }
-                else if (!strcmp(argv[i], "--depend"))
+                } else if (!strcmp(argv[i], "--depend"))
                     show_depend = 1;
                 else if (!strcmp(argv[i], "--keep-files"))
                     KeepFiles = 1;
@@ -298,8 +278,7 @@ main(int argc,                  /* I - Number of command-line args */
                         puts("epm: Expected output directory.");
                         usage();
                     }
-                }
-                else if (!strcmp(argv[i], "--setup-image")) {
+                } else if (!strcmp(argv[i], "--setup-image")) {
                     i++;
                     if (i < argc)
                         setup = argv[i];
@@ -307,8 +286,7 @@ main(int argc,                  /* I - Number of command-line args */
                         puts("epm: Expected setup image.");
                         usage();
                     }
-                }
-                else if (!strcmp(argv[i], "--setup-program")) {
+                } else if (!strcmp(argv[i], "--setup-program")) {
                     i++;
                     if (i < argc)
                         SetupProgram = argv[i];
@@ -316,8 +294,7 @@ main(int argc,                  /* I - Number of command-line args */
                         puts("epm: Expected setup program.");
                         usage();
                     }
-                }
-                else if (!strcmp(argv[i], "--setup-types")) {
+                } else if (!strcmp(argv[i], "--setup-types")) {
                     i++;
                     if (i < argc)
                         types = argv[i];
@@ -325,8 +302,7 @@ main(int argc,                  /* I - Number of command-line args */
                         puts("epm: Expected setup.types file.");
                         usage();
                     }
-                }
-                else if (!strcmp(argv[i], "--software-dir")) {
+                } else if (!strcmp(argv[i], "--software-dir")) {
                     i++;
                     if (i < argc)
                         SoftwareDir = argv[i];
@@ -334,8 +310,7 @@ main(int argc,                  /* I - Number of command-line args */
                         puts("epm: Expected software directory.");
                         usage();
                     }
-                }
-                else if (!strcmp(argv[i], "--uninstall-program")) {
+                } else if (!strcmp(argv[i], "--uninstall-program")) {
                     i++;
                     if (i < argc)
                         UninstProgram = argv[i];
@@ -343,12 +318,10 @@ main(int argc,                  /* I - Number of command-line args */
                         puts("epm: Expected uninstall program.");
                         usage();
                     }
-                }
-                else if (!strcmp(argv[i], "--version")) {
+                } else if (!strcmp(argv[i], "--version")) {
                     info();
                     return (0);
-                }
-                else {
+                } else {
                     printf("epm: Unknown option \"%s\".\n", argv[i]);
                     usage();
                 }
@@ -359,8 +332,7 @@ main(int argc,                  /* I - Number of command-line args */
                 usage();
                 break;
             }
-        }
-        else if (strchr(argv[i], '=') != NULL)
+        } else if (strchr(argv[i], '=') != NULL)
             putenv(argv[i]);
         else if (prodname[0] == '\0')
             strlcpy(prodname, argv[i], sizeof(prodname));
@@ -446,9 +418,7 @@ main(int argc,                  /* I - Number of command-line args */
      * Check that all requires info is present!
      */
 
-    if (!dist->product[0] ||
-        !dist->copyright[0] ||
-        !dist->vendor[0] ||
+    if (!dist->product[0] || !dist->copyright[0] || !dist->vendor[0] ||
         (!dist->license[0] && !dist->readme[0]) || !dist->version[0]) {
         fputs("epm: Error - missing %product, %copyright, %vendor, %license,\n", stderr);
         fputs("     %readme, or %version attributes in list file!\n", stderr);
@@ -521,7 +491,8 @@ main(int argc,                  /* I - Number of command-line args */
         if (geteuid() && run_command(NULL, "fakeroot --version"))
             fputs("epm: Warning - file permissions and ownership may not be correct\n"
                   "     in Debian packages unless you run EPM as root or the 'fakeroot'\n"
-                  "     command is available!\n", stderr);
+                  "     command is available!\n",
+                  stderr);
 
         i = make_deb(prodname, directory, platname, dist, &platform);
         break;
@@ -539,13 +510,14 @@ main(int argc,                  /* I - Number of command-line args */
     case PACKAGE_LSB_SIGNED:
     case PACKAGE_RPM:
     case PACKAGE_RPM_SIGNED:
-        i = make_rpm(format, prodname, directory, platname, dist, &platform,
-                     setup, types);
+        i = make_rpm(format, prodname, directory, platname, dist, &platform, setup,
+                     types);
         break;
     case PACKAGE_SETLD:
         if (geteuid())
             fputs("epm: Warning - file permissions and ownership may not be correct\n"
-                  "     in Tru64 packages unless you run EPM as root!\n", stderr);
+                  "     in Tru64 packages unless you run EPM as root!\n",
+                  stderr);
 
         i = make_setld(prodname, directory, platname, dist, &platform);
         break;
@@ -553,8 +525,7 @@ main(int argc,                  /* I - Number of command-line args */
         if (geteuid()) {
             fputs("epm: Error - HP-UX packages must be built as root!\n", stderr);
             i = 1;
-        }
-        else
+        } else
             i = make_swinstall(prodname, directory, platname, dist, &platform);
         break;
     }
@@ -573,16 +544,14 @@ main(int argc,                  /* I - Number of command-line args */
     return (i);
 }
 
-
 /*
  * 'depend()' - Show dependencies.
  */
 
-static void depend(dist_t * dist)  /* I - Distribution */
+static void depend(dist_t *dist) /* I - Distribution */
 {
-    int i;                      /* Looping var */
-    file_t *file;               /* Current file */
-
+    int i;        /* Looping var */
+    file_t *file; /* Current file */
 
     for (i = dist->num_files, file = dist->files; i > 0; i--, file++)
         switch (file->type) {
@@ -597,13 +566,11 @@ static void depend(dist_t * dist)  /* I - Distribution */
         }
 }
 
-
 /*
  * 'info()' - Show the EPM copyright and license.
  */
 
-static void info(void)
-{
+static void info(void) {
     puts(EPM_VERSION);
     puts("Copyright (c) 1999-2020 by Michael R Sweet.");
     puts("Copyright (c) 2020 by Jim Jagielski.");
@@ -617,13 +584,11 @@ static void info(void)
     puts("");
 }
 
-
 /*
  * 'usage()' - Show command-line usage instructions.
  */
 
-static void usage(void)
-{
+static void usage(void) {
     info();
 
     puts("Usage: epm [options] [name=value ... name=value] product [list-file]");
@@ -632,7 +597,9 @@ static void usage(void)
     puts("    Use the named architecture instead of the local one.");
     puts("-g");
     puts("    Don't strip executables in distributions.");
-    puts("-f {aix,bsd,deb,depot,inst,macos,macos-signed,native,pkg,portable,rpm,rpm-signed,setld,slackware,swinstall,tardist}");
+    puts("-f "
+         "{aix,bsd,deb,depot,inst,macos,macos-signed,native,pkg,portable,rpm,rpm-signed,"
+         "setld,slackware,swinstall,tardist}");
     puts("    Set distribution format.");
     puts("-k");
     puts("    Keep intermediate files (spec files, etc.)");
@@ -665,7 +632,8 @@ static void usage(void)
     puts("--keep-files");
     puts("    Keep temporary distribution files in the output directory.");
     puts("--aoo-mode");
-    puts("    Modify rpm, deb, et.al. package names and format for Apache OpenOffice use.");
+    puts("    Modify rpm, deb, et.al. package names and format for Apache OpenOffice "
+         "use.");
     puts("--output-dir /foo/bar/directory");
     puts("    Enable the setup GUI and use \"setup.xpm\" for the setup image.");
     puts("--setup-image setup.xpm");

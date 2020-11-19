@@ -23,34 +23,32 @@
 
 #include "epm.h"
 
-
 /*
  * 'make_setld()' - Make a Tru64 setld package.
  */
 
-int                             /* O - 0 = success, 1 = fail */
-make_setld(const char *prodname,        /* I - Product short name */
-           const char *directory,       /* I - Directory for distribution files */
-           const char *platname,        /* I - Platform name */
-           dist_t * dist,       /* I - Distribution information */
-           struct utsname *platform)    /* I - Platform information */
+int                                  /* O - 0 = success, 1 = fail */
+make_setld(const char *prodname,     /* I - Product short name */
+           const char *directory,    /* I - Directory for distribution files */
+           const char *platname,     /* I - Platform name */
+           dist_t *dist,             /* I - Distribution information */
+           struct utsname *platform) /* I - Platform information */
 {
-    int i, j;                   /* Looping vars */
-    FILE *fp;                   /* Spec file */
-    tarf_t *tarfile;            /* .tardist file */
-    char name[1024];            /* Full product name */
-    char scpname[1024];         /* XXXVVV control program filename */
-    char miname[1024];          /* XXXVVV.mi filename */
-    char keyname[1024];         /* XXXVVV.key filename */
-    char filename[1024];        /* Destination filename */
-    char subset[1024];          /* Subset name */
-    file_t *file;               /* Current distribution file */
-    command_t *c;               /* Current command */
-    char current[1024];         /* Current directory */
-    struct passwd *pwd;         /* Pointer to user record */
-    struct group *grp;          /* Pointer to group record */
-    const char *runlevels;      /* Run levels */
-
+    int i, j;              /* Looping vars */
+    FILE *fp;              /* Spec file */
+    tarf_t *tarfile;       /* .tardist file */
+    char name[1024];       /* Full product name */
+    char scpname[1024];    /* XXXVVV control program filename */
+    char miname[1024];     /* XXXVVV.mi filename */
+    char keyname[1024];    /* XXXVVV.key filename */
+    char filename[1024];   /* Destination filename */
+    char subset[1024];     /* Subset name */
+    file_t *file;          /* Current distribution file */
+    command_t *c;          /* Current command */
+    char current[1024];    /* Current directory */
+    struct passwd *pwd;    /* Pointer to user record */
+    struct group *grp;     /* Pointer to group record */
+    const char *runlevels; /* Run levels */
 
     REF(platform);
 
@@ -60,15 +58,18 @@ make_setld(const char *prodname,        /* I - Product short name */
      */
 
     if (dist->vernumber < 100 || dist->vernumber > 999) {
-        fprintf(stderr, "epm: Need a version number between 100 and 999 inclusive.\n"
+        fprintf(stderr,
+                "epm: Need a version number between 100 and 999 inclusive.\n"
                 "     The current version number (%d) is out of range.\n",
                 dist->vernumber);
         return (1);
     }
 
     if (strlen(prodname) < 3) {
-        fprintf(stderr, "epm: Need a product name of at least 3 uppercase characters.\n"
-                "     The current product name (%s) is not acceptable.\n", prodname);
+        fprintf(stderr,
+                "epm: Need a product name of at least 3 uppercase characters.\n"
+                "     The current product name (%s) is not acceptable.\n",
+                prodname);
         return (1);
     }
 
@@ -76,7 +77,8 @@ make_setld(const char *prodname,        /* I - Product short name */
         if (!isupper(prodname[i] & 255)) {
             fprintf(stderr,
                     "epm: Need a product name of at least 3 uppercase characters.\n"
-                    "     The current product name (%s) is not acceptable.\n", prodname);
+                    "     The current product name (%s) is not acceptable.\n",
+                    prodname);
             return (1);
         }
 
@@ -110,8 +112,7 @@ make_setld(const char *prodname,        /* I - Product short name */
         else
             snprintf(name, sizeof(name), "%s-%s-%s", prodname, dist->version,
                      dist->release);
-    }
-    else if (platname[0])
+    } else if (platname[0])
         snprintf(name, sizeof(name), "%s-%s-%s", prodname, dist->version, platname);
     else
         snprintf(name, sizeof(name), "%s-%s", prodname, dist->version);
@@ -193,8 +194,8 @@ make_setld(const char *prodname,        /* I - Product short name */
     if (Verbosity)
         puts("Creating subset control program...");
 
-    snprintf(scpname, sizeof(scpname), "%s/src/scps/%sALL%03d.scp", directory,
-             prodname, dist->vernumber);
+    snprintf(scpname, sizeof(scpname), "%s/src/scps/%sALL%03d.scp", directory, prodname,
+             dist->vernumber);
 
     if ((fp = fopen(scpname, "w")) == NULL) {
         fprintf(stderr, "epm: Unable to create subset control program \"%s\": %s\n",
@@ -321,8 +322,8 @@ make_setld(const char *prodname,        /* I - Product short name */
     fprintf(fp, "MI=%s%03d.mi\n", prodname, dist->vernumber);
     fputs("COMPRESS=0\n", fp);
     fputs("%%\n", fp);
-    qprintf(fp, "%sALL%03d\t.\t0\t'%s, %s'\n", prodname, dist->vernumber,
-            dist->product, dist->version);
+    qprintf(fp, "%sALL%03d\t.\t0\t'%s, %s'\n", prodname, dist->vernumber, dist->product,
+            dist->version);
     for (i = 0; i < dist->num_subpackages; i++)
         qprintf(fp, "%s%s%03d\t.\t0\t'%s, %s'\n", prodname, dist->subpackages[i],
                 dist->vernumber, dist->product, dist->version);

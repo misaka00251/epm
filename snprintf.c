@@ -20,35 +20,33 @@
  * Include necessary headers...
  */
 
-#include <stdio.h>
-#include <ctype.h>
 #include "epmstring.h"
-
+#include <ctype.h>
+#include <stdio.h>
 
 #ifndef HAVE_VSNPRINTF
 /*
  * 'vsnprintf()' - Format a string into a fixed size buffer.
  */
 
-int                             /* O - Number of bytes formatted */
-epm_vsnprintf(char *buffer,     /* O - Output buffer */
-              size_t bufsize,   /* O - Size of output buffer */
-              const char *format,       /* I - printf-style format string */
-              va_list ap)       /* I - Pointer to additional arguments */
+int                               /* O - Number of bytes formatted */
+epm_vsnprintf(char *buffer,       /* O - Output buffer */
+              size_t bufsize,     /* O - Size of output buffer */
+              const char *format, /* I - printf-style format string */
+              va_list ap)         /* I - Pointer to additional arguments */
 {
-    char *bufptr,               /* Pointer to position in buffer */
-        *bufend,                /* Pointer to end of buffer */
-         sign,                  /* Sign of format width */
-         size,                  /* Size character (h, l, L) */
-         type;                  /* Format type character */
-    const char *bufformat;      /* Start of format */
-    int width,                  /* Width of field */
-        prec;                   /* Number of characters of precision */
-    char tformat[100],          /* Temporary format string for sprintf() */
-         temp[1024];            /* Buffer for formatted numbers */
-    char *s;                    /* Pointer to string */
-    int slen;                   /* Length of string */
-
+    char *bufptr,          /* Pointer to position in buffer */
+        *bufend,           /* Pointer to end of buffer */
+        sign,              /* Sign of format width */
+        size,              /* Size character (h, l, L) */
+        type;              /* Format type character */
+    const char *bufformat; /* Start of format */
+    int width,             /* Width of field */
+        prec;              /* Number of characters of precision */
+    char tformat[100],     /* Temporary format string for sprintf() */
+        temp[1024];        /* Buffer for formatted numbers */
+    char *s;               /* Pointer to string */
+    int slen;              /* Length of string */
 
     /*
      * Loop through the format string, formatting as needed...
@@ -65,8 +63,7 @@ epm_vsnprintf(char *buffer,     /* O - Output buffer */
             if (*format == '%') {
                 *bufptr++ = *format++;
                 continue;
-            }
-            else if (strchr(" -+#\'", *format))
+            } else if (strchr(" -+#\'", *format))
                 sign = *format++;
             else
                 sign = 0;
@@ -81,15 +78,13 @@ epm_vsnprintf(char *buffer,     /* O - Output buffer */
 
                 while (isdigit(*format))
                     prec = prec * 10 + *format++ - '0';
-            }
-            else
+            } else
                 prec = -1;
 
             if (*format == 'l' && format[1] == 'l') {
                 size = 'L';
                 format += 2;
-            }
-            else if (*format == 'h' || *format == 'l' || *format == 'L')
+            } else if (*format == 'h' || *format == 'l' || *format == 'L')
                 size = *format++;
 
             if (!*format)
@@ -98,7 +93,7 @@ epm_vsnprintf(char *buffer,     /* O - Output buffer */
             type = *format++;
 
             switch (type) {
-            case 'E':          /* Floating point formats */
+            case 'E': /* Floating point formats */
             case 'G':
             case 'e':
             case 'f':
@@ -115,14 +110,13 @@ epm_vsnprintf(char *buffer,     /* O - Output buffer */
                     strncpy(bufptr, temp, bufend - bufptr);
                     bufptr = bufend;
                     break;
-                }
-                else {
+                } else {
                     strcpy(bufptr, temp);
                     bufptr += strlen(temp);
                 }
                 break;
 
-            case 'B':          /* Integer formats */
+            case 'B': /* Integer formats */
             case 'X':
             case 'b':
             case 'd':
@@ -142,14 +136,13 @@ epm_vsnprintf(char *buffer,     /* O - Output buffer */
                     strncpy(bufptr, temp, bufend - bufptr);
                     bufptr = bufend;
                     break;
-                }
-                else {
+                } else {
                     strcpy(bufptr, temp);
                     bufptr += strlen(temp);
                 }
                 break;
 
-            case 'p':          /* Pointer value */
+            case 'p': /* Pointer value */
                 if ((format - bufformat + 1) > sizeof(tformat) ||
                     (width + 2) > sizeof(temp))
                     break;
@@ -162,7 +155,7 @@ epm_vsnprintf(char *buffer,     /* O - Output buffer */
                 bufptr += strlen(bufptr);
                 break;
 
-            case 'c':          /* Character or character array */
+            case 'c': /* Character or character array */
                 if (width <= 1)
                     *bufptr++ = va_arg(ap, int);
                 else {
@@ -174,7 +167,7 @@ epm_vsnprintf(char *buffer,     /* O - Output buffer */
                 }
                 break;
 
-            case 's':          /* String */
+            case 's': /* String */
                 if ((s = va_arg(ap, char *)) == NULL)
                     s = "(null)";
 
@@ -191,8 +184,7 @@ epm_vsnprintf(char *buffer,     /* O - Output buffer */
                 if (sign == '-') {
                     strncpy(bufptr, s, slen);
                     memset(bufptr + slen, ' ', width - slen);
-                }
-                else {
+                } else {
                     memset(bufptr, ' ', width - slen);
                     strncpy(bufptr + width - slen, s, slen);
                 }
@@ -200,7 +192,7 @@ epm_vsnprintf(char *buffer,     /* O - Output buffer */
                 bufptr += width;
                 break;
 
-            case 'n':          /* Output number of chars so far */
+            case 'n': /* Output number of chars so far */
                 if ((format - bufformat + 1) > sizeof(tformat) ||
                     (width + 2) > sizeof(temp))
                     break;
@@ -213,8 +205,7 @@ epm_vsnprintf(char *buffer,     /* O - Output buffer */
                 bufptr += strlen(bufptr);
                 break;
             }
-        }
-        else
+        } else
             *bufptr++ = *format++;
     }
 
@@ -227,21 +218,19 @@ epm_vsnprintf(char *buffer,     /* O - Output buffer */
 }
 #endif /* !HAVE_VSNPRINT */
 
-
 #ifndef HAVE_SNPRINTF
 /*
  * 'epm_snprintf()' - Format a string into a fixed size buffer.
  */
 
-int                             /* O - Number of bytes formatted */
-epm_snprintf(char *buffer,      /* O - Output buffer */
-             size_t bufsize,    /* O - Size of output buffer */
-             const char *format,        /* I - printf-style format string */
-             ...)               /* I - Additional arguments as needed */
+int                              /* O - Number of bytes formatted */
+epm_snprintf(char *buffer,       /* O - Output buffer */
+             size_t bufsize,     /* O - Size of output buffer */
+             const char *format, /* I - printf-style format string */
+             ...)                /* I - Additional arguments as needed */
 {
-    int bytes;                  /* Number of bytes formatted */
-    va_list ap;                 /* Pointer to additional arguments */
-
+    int bytes;  /* Number of bytes formatted */
+    va_list ap; /* Pointer to additional arguments */
 
     va_start(ap, format);
     bytes = vsnprintf(buffer, bufsize, format, ap);

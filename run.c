@@ -21,28 +21,26 @@
  */
 
 #include "epm.h"
-#include <stdarg.h>
 #include <fcntl.h>
+#include <stdarg.h>
 #include <sys/wait.h>
-
 
 /*
  * 'run_command()' - Run an external program.
  */
 
-int                             /* O - Exit status */
-run_command(const char *directory,      /* I - Directory for command or NULL */
-            const char *command,        /* I - Command string */
-            ...)                        /* I - Additional arguments as needed */
+int                                /* O - Exit status */
+run_command(const char *directory, /* I - Directory for command or NULL */
+            const char *command,   /* I - Command string */
+            ...)                   /* I - Additional arguments as needed */
 {
-    va_list ap;                 /* Argument pointer */
-    int pid,                    /* Child process ID */
-        status,                 /* Status of child */
-        argc;                   /* Number of arguments */
-    char argbuf[10240],         /* Argument buffer */
-        *argptr,                /* Argument string pointer */
-        *argv[100];             /* Argument strings */
-
+    va_list ap;         /* Argument pointer */
+    int pid,            /* Child process ID */
+        status,         /* Status of child */
+        argc;           /* Number of arguments */
+    char argbuf[10240], /* Argument buffer */
+        *argptr,        /* Argument string pointer */
+        *argv[100];     /* Argument strings */
 
     /*
      * Format the command string...
@@ -75,8 +73,7 @@ run_command(const char *directory,      /* I - Directory for command or NULL */
             }
 
             argptr--;
-        }
-        else if (*argptr == '\'') {
+        } else if (*argptr == '\'') {
             if (argptr == argv[argc - 1])
                 argv[argc - 1]++;
 
@@ -88,8 +85,7 @@ run_command(const char *directory,      /* I - Directory for command or NULL */
                 memmove(argptr, argptr + 1, strlen(argptr));
 
             argptr--;
-        }
-        else if (*argptr == '\"') {
+        } else if (*argptr == '\"') {
             if (argptr == argv[argc - 1])
                 argv[argc - 1]++;
 
@@ -140,8 +136,7 @@ run_command(const char *directory,      /* I - Directory for command or NULL */
         fprintf(stderr, "epm: Unable to execute \"%s\" program: %s\n", argv[0],
                 strerror(errno));
         exit(errno);
-    }
-    else if (pid < 0) {
+    } else if (pid < 0) {
         /*
          * Error - can't fork!
          */
@@ -157,8 +152,7 @@ run_command(const char *directory,      /* I - Directory for command or NULL */
     if (wait(&status) != pid) {
         fputs("epm: Got exit status from wrong program!\n", stderr);
         return (1);
-    }
-    else if (WIFSIGNALED(status))
+    } else if (WIFSIGNALED(status))
         return (-WTERMSIG(status));
     else
         return (WEXITSTATUS(status));

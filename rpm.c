@@ -26,53 +26,48 @@
  * Local functions...
  */
 
-static int move_rpms(const char *prodname, const char *directory,
-                     const char *platname, dist_t * dist,
-                     struct utsname *platform,
-                     const char *rpmdir, const char *subpackage, const char *release);
-static int write_spec(int format, const char *prodname, dist_t * dist,
-                      FILE *fp, const char *subpackage);
-
+static int move_rpms(const char *prodname, const char *directory, const char *platname,
+                     dist_t *dist, struct utsname *platform, const char *rpmdir,
+                     const char *subpackage, const char *release);
+static int write_spec(int format, const char *prodname, dist_t *dist, FILE *fp,
+                      const char *subpackage);
 
 /*
  * 'make_rpm()' - Make a Red Hat software distribution package.
  */
 
-int                             /* O - 0 = success, 1 = fail */
-make_rpm(int format,            /* I - Subformat */
-         const char *prodname,  /* I - Product short name */
-         const char *directory, /* I - Directory for distribution files */
-         const char *platname,  /* I - Platform name */
-         dist_t * dist,         /* I - Distribution information */
-         struct utsname *platform,      /* I - Platform information */
-         const char *setup,     /* I - Setup GUI image */
-         const char *types)     /* I - Setup GUI install types */
+int                                /* O - 0 = success, 1 = fail */
+make_rpm(int format,               /* I - Subformat */
+         const char *prodname,     /* I - Product short name */
+         const char *directory,    /* I - Directory for distribution files */
+         const char *platname,     /* I - Platform name */
+         dist_t *dist,             /* I - Distribution information */
+         struct utsname *platform, /* I - Platform information */
+         const char *setup,        /* I - Setup GUI image */
+         const char *types)        /* I - Setup GUI install types */
 {
-    int i;                      /* Looping var */
-    FILE *fp;                   /* Spec file */
-    tarf_t *tarfile;            /* Distribution tar file */
-    char specname[1024];        /* Spec filename */
-    char name[1024],            /* Product filename */
-         filename[1024];        /* Destination filename */
-    file_t *file;               /* Current distribution file */
-    char absdir[1024];          /* Absolute directory */
-    char rpmdir[1024];          /* RPMDIR env var */
-    char release[256];          /* Release: number */
-    const char *build_option;   /* Additional rpmbuild option */
-
+    int i;                    /* Looping var */
+    FILE *fp;                 /* Spec file */
+    tarf_t *tarfile;          /* Distribution tar file */
+    char specname[1024];      /* Spec filename */
+    char name[1024],          /* Product filename */
+        filename[1024];       /* Destination filename */
+    file_t *file;             /* Current distribution file */
+    char absdir[1024];        /* Absolute directory */
+    char rpmdir[1024];        /* RPMDIR env var */
+    char release[256];        /* Release: number */
+    const char *build_option; /* Additional rpmbuild option */
 
     if (Verbosity)
         puts("Creating RPM distribution...");
 
     if (directory[0] != '/') {
-        char current[1024];     /* Current directory */
-
+        char current[1024]; /* Current directory */
 
         getcwd(current, sizeof(current));
 
         snprintf(absdir, sizeof(absdir), "%s/%s", current, directory);
-    }
-    else
+    } else
         strlcpy(absdir, directory, sizeof(absdir));
 
     /*
@@ -107,9 +102,9 @@ make_rpm(int format,            /* I - Subformat */
     if (format == PACKAGE_LSB || format == PACKAGE_LSB_SIGNED)
         fputs("Requires: lsb >= 3.0\n", fp);
 
-    /*
-     * Tell RPM to put the distributions in the output directory...
-     */
+        /*
+         * Tell RPM to put the distributions in the output directory...
+         */
 
 #ifdef EPM_RPMTOPDIR
     fprintf(fp, "%%define _topdir %s\n", absdir);
@@ -230,18 +225,21 @@ make_rpm(int format,            /* I - Subformat */
         build_option = "";
 
     if (!strcmp(platform->machine, "intel")) {
-        if (run_command(NULL, EPM_RPMBUILD " -bb --buildroot \"%s/buildroot\" "
-                        EPM_RPMARCH "i386 %s%s", absdir, build_option, specname))
+        if (run_command(NULL,
+                        EPM_RPMBUILD " -bb --buildroot \"%s/buildroot\" " EPM_RPMARCH
+                                     "i386 %s%s",
+                        absdir, build_option, specname))
             return (1);
-    }
-    else if (!strcmp(platform->machine, "ppc")) {
-        if (run_command(NULL, EPM_RPMBUILD " -bb --buildroot \"%s/buildroot\" "
-                        EPM_RPMARCH "ppc %s%s", absdir, build_option, specname))
+    } else if (!strcmp(platform->machine, "ppc")) {
+        if (run_command(NULL,
+                        EPM_RPMBUILD " -bb --buildroot \"%s/buildroot\" " EPM_RPMARCH
+                                     "ppc %s%s",
+                        absdir, build_option, specname))
             return (1);
-    }
-    else if (run_command(NULL, EPM_RPMBUILD " -bb --buildroot \"%s/buildroot\" "
-                         EPM_RPMARCH "%s %s%s", absdir, platform->machine,
-                         build_option, specname))
+    } else if (run_command(NULL,
+                           EPM_RPMBUILD " -bb --buildroot \"%s/buildroot\" " EPM_RPMARCH
+                                        "%s %s%s",
+                           absdir, platform->machine, build_option, specname))
         return (1);
 
     /*
@@ -293,9 +291,8 @@ make_rpm(int format,            /* I - Subformat */
              * Include the ESP Software Installation Wizard (setup)...
              */
 
-            const char *setup_img;      /* Setup image name */
-            struct stat srcstat;        /* File information */
-
+            const char *setup_img; /* Setup image name */
+            struct stat srcstat;   /* File information */
 
             if (stat(SetupProgram, &srcstat)) {
                 fprintf(stderr, "epm: Unable to stat GUI setup program %s: %s\n",
@@ -304,8 +301,8 @@ make_rpm(int format,            /* I - Subformat */
                 return (-1);
             }
 
-            if (tar_header(tarfile, TAR_NORMAL, 0555, srcstat.st_size,
-                           srcstat.st_mtime, "root", "root", "setup", NULL) < 0) {
+            if (tar_header(tarfile, TAR_NORMAL, 0555, srcstat.st_size, srcstat.st_mtime,
+                           "root", "root", "setup", NULL) < 0) {
                 tar_close(tarfile);
                 return (-1);
             }
@@ -333,8 +330,8 @@ make_rpm(int format,            /* I - Subformat */
             else
                 setup_img = "setup.xpm";
 
-            if (tar_header(tarfile, TAR_NORMAL, 0444, srcstat.st_size,
-                           srcstat.st_mtime, "root", "root", setup_img, NULL) < 0) {
+            if (tar_header(tarfile, TAR_NORMAL, 0444, srcstat.st_size, srcstat.st_mtime,
+                           "root", "root", setup_img, NULL) < 0) {
                 tar_close(tarfile);
                 return (-1);
             }
@@ -355,8 +352,8 @@ make_rpm(int format,            /* I - Subformat */
                 stat(types, &srcstat);
 
                 if (tar_header(tarfile, TAR_NORMAL, 0444, srcstat.st_size,
-                               srcstat.st_mtime, "root", "root", "setup.types", NULL) < 0)
-                {
+                               srcstat.st_mtime, "root", "root", "setup.types",
+                               NULL) < 0) {
                     tar_close(tarfile);
                     return (-1);
                 }
@@ -381,8 +378,8 @@ make_rpm(int format,            /* I - Subformat */
                 return (-1);
             }
 
-            if (tar_header(tarfile, TAR_NORMAL, 0555, srcstat.st_size,
-                           srcstat.st_mtime, "root", "root", "uninst", NULL) < 0) {
+            if (tar_header(tarfile, TAR_NORMAL, 0555, srcstat.st_size, srcstat.st_mtime,
+                           "root", "root", "uninst", NULL) < 0) {
                 tar_close(tarfile);
                 return (-1);
             }
@@ -450,25 +447,23 @@ make_rpm(int format,            /* I - Subformat */
     return (0);
 }
 
-
 /*
  * 'move_rpms()' - Move RPM packages to the build directory...
  */
 
-static int                      /* O - 0 = success, 1 = fail */
-move_rpms(const char *prodname, /* I - Product short name */
-          const char *directory,        /* I - Directory for distribution files */
-          const char *platname, /* I - Platform name */
-          dist_t * dist,        /* I - Distribution information */
-          struct utsname *platform,     /* I - Platform information */
-          const char *rpmdir,   /* I - RPM directory */
-          const char *subpackage,       /* I - Subpackage name */
-          const char *release)          /* I - Release: value */
+static int                          /* O - 0 = success, 1 = fail */
+move_rpms(const char *prodname,     /* I - Product short name */
+          const char *directory,    /* I - Directory for distribution files */
+          const char *platname,     /* I - Platform name */
+          dist_t *dist,             /* I - Distribution information */
+          struct utsname *platform, /* I - Platform information */
+          const char *rpmdir,       /* I - RPM directory */
+          const char *subpackage,   /* I - Subpackage name */
+          const char *release)      /* I - Release: value */
 {
-    char rpmname[1024];         /* RPM name */
-    char prodfull[1024];        /* Full product name */
-    struct stat rpminfo;        /* RPM file info */
-
+    char rpmname[1024];  /* RPM name */
+    char prodfull[1024]; /* Full product name */
+    struct stat rpminfo; /* RPM file info */
 
     /*
      * Move the RPMs to the local directory and rename the RPMs using the
@@ -495,19 +490,19 @@ move_rpms(const char *prodname, /* I - Product short name */
     strlcat(rpmname, ".rpm", sizeof(rpmname));
 
     if (!strcmp(platform->machine, "intel"))
-        run_command(NULL, "/bin/mv %s/RPMS/i386/%s-%s-%s.i386.rpm %s",
-                    rpmdir, prodfull, dist->version, release, rpmname);
+        run_command(NULL, "/bin/mv %s/RPMS/i386/%s-%s-%s.i386.rpm %s", rpmdir, prodfull,
+                    dist->version, release, rpmname);
     else if (!strcmp(platform->sysname, "aix") && !strcmp(platform->machine, "ppc"))
-        run_command(NULL, "/bin/mv %s/RPMS/ppc/%s-%s-%s.%s%s.ppc.rpm %s",
-                    rpmdir, prodfull, dist->version, release, platform->sysname,
+        run_command(NULL, "/bin/mv %s/RPMS/ppc/%s-%s-%s.%s%s.ppc.rpm %s", rpmdir,
+                    prodfull, dist->version, release, platform->sysname,
                     platform->release, rpmname);
     else if (!strcmp(platform->machine, "ppc"))
-        run_command(NULL, "/bin/mv %s/RPMS/powerpc/%s-%s-%s.powerpc.rpm %s",
-                    rpmdir, prodfull, dist->version, release, rpmname);
+        run_command(NULL, "/bin/mv %s/RPMS/powerpc/%s-%s-%s.powerpc.rpm %s", rpmdir,
+                    prodfull, dist->version, release, rpmname);
     else
-        run_command(NULL, "/bin/mv %s/RPMS/%s/%s-%s-%s.%s.rpm %s",
-                    rpmdir, platform->machine, prodfull, dist->version,
-                    release, platform->machine, rpmname);
+        run_command(NULL, "/bin/mv %s/RPMS/%s/%s-%s-%s.%s.rpm %s", rpmdir,
+                    platform->machine, prodfull, dist->version, release,
+                    platform->machine, rpmname);
 
     if (Verbosity) {
         stat(rpmname, &rpminfo);
@@ -518,28 +513,26 @@ move_rpms(const char *prodname, /* I - Product short name */
     return (0);
 }
 
-
 /*
  * 'write_spec()' - Write the subpackage-specific parts of the RPM spec file.
  */
 
-static int                      /* O - 0 on success, -1 on error */
-write_spec(int format,          /* I - Subformat */
-           const char *prodname,        /* I - Product name */
-           dist_t * dist,       /* I - Distribution */
-           FILE *fp,            /* I - Spec file */
-           const char *subpackage)      /* I - Subpackage name */
+static int                         /* O - 0 on success, -1 on error */
+write_spec(int format,             /* I - Subformat */
+           const char *prodname,   /* I - Product name */
+           dist_t *dist,           /* I - Distribution */
+           FILE *fp,               /* I - Spec file */
+           const char *subpackage) /* I - Subpackage name */
 {
-    int i;                      /* Looping var */
-    char name[1024];            /* Full product name */
-    const char *product;        /* Product to depend on */
-    file_t *file;               /* Current distribution file */
-    command_t *c;               /* Current command */
-    depend_t *d;                /* Current dependency */
-    const char *runlevels;      /* Run levels */
-    int number;                 /* Start/stop number */
-    int have_commands;          /* Have commands in current section? */
-
+    int i;                 /* Looping var */
+    char name[1024];       /* Full product name */
+    const char *product;   /* Product to depend on */
+    file_t *file;          /* Current distribution file */
+    command_t *c;          /* Current command */
+    depend_t *d;           /* Current dependency */
+    const char *runlevels; /* Run levels */
+    int number;            /* Start/stop number */
+    int have_commands;     /* Have commands in current section? */
 
     /*
      * Get the name we'll use for the subpackage...
@@ -563,9 +556,8 @@ write_spec(int format,          /* I - Subformat */
                 break;
 
         if (i < dist->num_descriptions) {
-            char line[1024],    /* First line of description... */
-                *ptr;           /* Pointer into line */
-
+            char line[1024], /* First line of description... */
+                *ptr;        /* Pointer into line */
 
             strlcpy(line, dist->descriptions[i].description, sizeof(line));
             if ((ptr = strchr(line, '\n')) != NULL)
@@ -574,8 +566,7 @@ write_spec(int format,          /* I - Subformat */
             fprintf(fp, " - %s", line);
         }
         fputs("\n", fp);
-    }
-    else
+    } else
         fprintf(fp, "Summary: %s\n", dist->product);
 
     fputs("Group: Applications\n", fp);
@@ -607,12 +598,10 @@ write_spec(int format,          /* I - Subformat */
                 fprintf(fp, " <= %s\n", d->version[1]);
             else
                 putc('\n', fp);
-        }
-        else if (d->vernumber[0] && d->vernumber[1] < INT_MAX) {
+        } else if (d->vernumber[0] && d->vernumber[1] < INT_MAX) {
             if (d->vernumber[0] < INT_MAX && d->vernumber[1] < INT_MAX)
                 fprintf(fp, " >= %s, %s <= %s\n", d->version[0], product, d->version[1]);
-        }
-        else if (d->vernumber[0] != d->vernumber[1])
+        } else if (d->vernumber[0] != d->vernumber[1])
             fprintf(fp, " >= %s\n", d->version[0]);
         else
             fprintf(fp, " = %s\n", d->version[0]);
@@ -657,8 +646,7 @@ write_spec(int format,          /* I - Subformat */
             if (c->type == COMMAND_POST_INSTALL && c->subpackage == subpackage)
                 fprintf(fp, "%s\n", c->command);
 
-    }
-    else
+    } else
         have_commands = 0;
 
     for (i = dist->num_files, file = dist->files; i > 0; i--, file++)
@@ -683,8 +671,7 @@ write_spec(int format,          /* I - Subformat */
                             file->dst);
                     fprintf(fp, "	/etc/init.d/%s start\n", file->dst);
                 }
-        }
-        else {
+        } else {
             /*
              * Find where the frigging init scripts go...
              */
@@ -706,15 +693,16 @@ write_spec(int format,          /* I - Subformat */
                             file->dst);
                     qprintf(fp,
                             "			/bin/ln -s %s/init.d/%s "
-                            "$rcdir/init.d/%s\n", SoftwareDir, file->dst, file->dst);
+                            "$rcdir/init.d/%s\n",
+                            SoftwareDir, file->dst, file->dst);
                     fputs("		else\n", fp);
                     fputs("			if test -d /etc/init.d; then\n", fp);
-                    qprintf(fp,
-                            "				/bin/rm -f /etc/init.d/%s\n",
+                    qprintf(fp, "				/bin/rm -f /etc/init.d/%s\n",
                             file->dst);
                     qprintf(fp,
                             "				/bin/ln -s %s/init.d/%s "
-                            "/etc/init.d/%s\n", SoftwareDir, file->dst, file->dst);
+                            "/etc/init.d/%s\n",
+                            SoftwareDir, file->dst, file->dst);
                     fputs("			fi\n", fp);
                     fputs("		fi\n", fp);
 
@@ -725,19 +713,22 @@ write_spec(int format,          /* I - Subformat */
                         else
                             number = get_start(file, 99);
 
-                        qprintf(fp, "		/bin/rm -f $rcdir/rc%c.d/%c%02d%s\n",
-                                *runlevels, (*runlevels == '0'
-                                             || *runlevels == '1'
-                                             || *runlevels == '6') ? 'K' : 'S',
-                                number, file->dst);
-                        qprintf(fp,
-                                "		/bin/ln -s %s/init.d/%s "
-                                "$rcdir/rc%c.d/%c%02d%s\n", SoftwareDir,
-                                file->dst, *runlevels, (*runlevels == '0'
-                                                        || *runlevels == '1'
-                                                        || *runlevels ==
-                                                        '6') ? 'K' : 'S', number,
-                                file->dst);
+                        qprintf(
+                            fp, "		/bin/rm -f $rcdir/rc%c.d/%c%02d%s\n",
+                            *runlevels,
+                            (*runlevels == '0' || *runlevels == '1' || *runlevels == '6')
+                                ? 'K'
+                                : 'S',
+                            number, file->dst);
+                        qprintf(
+                            fp,
+                            "		/bin/ln -s %s/init.d/%s "
+                            "$rcdir/rc%c.d/%c%02d%s\n",
+                            SoftwareDir, file->dst, *runlevels,
+                            (*runlevels == '0' || *runlevels == '1' || *runlevels == '6')
+                                ? 'K'
+                                : 'S',
+                            number, file->dst);
                     }
 
                     qprintf(fp, "		%s/init.d/%s start\n", SoftwareDir,
@@ -773,8 +764,7 @@ write_spec(int format,          /* I - Subformat */
                     fprintf(fp, "	/usr/lib/lsb/remove_initd /etc/init.d/%s\n",
                             file->dst);
                 }
-        }
-        else {
+        } else {
             /*
              * Find where the frigging init scripts go...
              */
@@ -799,8 +789,7 @@ write_spec(int format,          /* I - Subformat */
                             file->dst);
                     fputs("		else\n", fp);
                     fputs("			if test -d /etc/init.d; then\n", fp);
-                    qprintf(fp,
-                            "				/bin/rm -f /etc/init.d/%s\n",
+                    qprintf(fp, "				/bin/rm -f /etc/init.d/%s\n",
                             file->dst);
                     fputs("			fi\n", fp);
                     fputs("		fi\n", fp);
@@ -812,11 +801,13 @@ write_spec(int format,          /* I - Subformat */
                         else
                             number = get_start(file, 99);
 
-                        qprintf(fp, "		/bin/rm -f $rcdir/rc%c.d/%c%02d%s\n",
-                                *runlevels, (*runlevels == '0'
-                                             || *runlevels == '1'
-                                             || *runlevels == '6') ? 'K' : 'S',
-                                number, file->dst);
+                        qprintf(
+                            fp, "		/bin/rm -f $rcdir/rc%c.d/%c%02d%s\n",
+                            *runlevels,
+                            (*runlevels == '0' || *runlevels == '1' || *runlevels == '6')
+                                ? 'K'
+                                : 'S',
+                            number, file->dst);
                     }
                 }
             }
@@ -825,8 +816,7 @@ write_spec(int format,          /* I - Subformat */
         }
 
         fputs("fi\n", fp);
-    }
-    else
+    } else
         have_commands = 0;
 
     for (i = dist->num_commands, c = dist->commands; i > 0; i--, c++)
@@ -878,12 +868,12 @@ write_spec(int format,          /* I - Subformat */
         if (file->subpackage == subpackage)
             switch (tolower(file->type)) {
             case 'c':
-                fprintf(fp, "%%attr(%04o,%s,%s) %%config(noreplace) \"%s\"\n",
-                        file->mode, file->user, file->group, file->dst);
+                fprintf(fp, "%%attr(%04o,%s,%s) %%config(noreplace) \"%s\"\n", file->mode,
+                        file->user, file->group, file->dst);
                 break;
             case 'd':
-                fprintf(fp, "%%attr(%04o,%s,%s) %%dir \"%s\"\n", file->mode,
-                        file->user, file->group, file->dst);
+                fprintf(fp, "%%attr(%04o,%s,%s) %%dir \"%s\"\n", file->mode, file->user,
+                        file->group, file->dst);
                 break;
             case 'f':
             case 'l':
@@ -894,8 +884,8 @@ write_spec(int format,          /* I - Subformat */
                 if (format == PACKAGE_LSB)
                     fprintf(fp, "%%attr(0555,root,root) \"/etc/init.d/%s\"\n", file->dst);
                 else
-                    fprintf(fp, "%%attr(0555,root,root) \"%s/init.d/%s\"\n",
-                            SoftwareDir, file->dst);
+                    fprintf(fp, "%%attr(0555,root,root) \"%s/init.d/%s\"\n", SoftwareDir,
+                            file->dst);
                 break;
             }
 

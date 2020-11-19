@@ -22,45 +22,42 @@
 
 #include "epm.h"
 
-
 /*
  * Local functions...
  */
 
-static void write_fileset(FILE *fp, dist_t * dist, const char *directory,
+static void write_fileset(FILE *fp, dist_t *dist, const char *directory,
                           const char *prodname, const char *subpackage);
-
 
 /*
  * 'make_swinstall()' - Make an HP-UX software distribution package.
  */
 
-int                             /* O - 0 = success, 1 = fail */
-make_swinstall(const char *prodname,    /* I - Product short name */
+int                                  /* O - 0 = success, 1 = fail */
+make_swinstall(const char *prodname, /* I - Product short name */
                const char *directory,
                /* I - Directory for distribution files */
-               const char *platname,    /* I - Platform name */
-               dist_t * dist,   /* I - Distribution information */
+               const char *platname,     /* I - Platform name */
+               dist_t *dist,             /* I - Distribution information */
                struct utsname *platform) /* I - Platform information */
 {
-    int i, j;                   /* Looping vars */
-    FILE *fp;                   /* Spec/script file */
-    tarf_t *tarfile;            /* .tardist file */
-    int linknum;                /* Symlink number */
-    const char *vendor;         /* Pointer into vendor name */
-    char vtag[65],              /* Vendor tag */
-        *vtagptr;               /* Pointer into vendor tag */
-    char name[1024];            /* Full product name */
-    char infoname[1024],        /* Info filename */
-         preinstall[1024],      /* preinstall script */
-         postinstall[1024],     /* postinstall script */
-         preremove[1024],       /* preremove script */
-         postremove[1024];      /* postremove script */
-    char filename[1024];        /* Destination filename */
-    file_t *file;               /* Current distribution file */
-    command_t *c;               /* Current command */
-    const char *runlevels;      /* Run levels */
-
+    int i, j;              /* Looping vars */
+    FILE *fp;              /* Spec/script file */
+    tarf_t *tarfile;       /* .tardist file */
+    int linknum;           /* Symlink number */
+    const char *vendor;    /* Pointer into vendor name */
+    char vtag[65],         /* Vendor tag */
+        *vtagptr;          /* Pointer into vendor tag */
+    char name[1024];       /* Full product name */
+    char infoname[1024],   /* Info filename */
+        preinstall[1024],  /* preinstall script */
+        postinstall[1024], /* postinstall script */
+        preremove[1024],   /* preremove script */
+        postremove[1024];  /* postremove script */
+    char filename[1024];   /* Destination filename */
+    file_t *file;          /* Current distribution file */
+    command_t *c;          /* Current command */
+    const char *runlevels; /* Run levels */
 
     REF(platform);
 
@@ -69,13 +66,12 @@ make_swinstall(const char *prodname,    /* I - Product short name */
 
     if (dist->release[0]) {
         if (platname[0])
-            snprintf(name, sizeof(name), "%s-%s-%s-%s", prodname,
-                     dist->version, dist->release, platname);
+            snprintf(name, sizeof(name), "%s-%s-%s-%s", prodname, dist->version,
+                     dist->release, platname);
         else
-            snprintf(name, sizeof(name), "%s-%s-%s", prodname,
-                     dist->version, dist->release);
-    }
-    else if (platname[0])
+            snprintf(name, sizeof(name), "%s-%s-%s", prodname, dist->version,
+                     dist->release);
+    } else if (platname[0])
         snprintf(name, sizeof(name), "%s-%s-%s", prodname, dist->version, platname);
     else
         snprintf(name, sizeof(name), "%s-%s", prodname, dist->version);
@@ -114,8 +110,7 @@ make_swinstall(const char *prodname,    /* I - Product short name */
                 fprintf(fp, "%s\n", c->command);
 
         fclose(fp);
-    }
-    else
+    } else
         preinstall[0] = '\0';
 
     /*
@@ -161,8 +156,7 @@ make_swinstall(const char *prodname,    /* I - Product short name */
                 qprintf(fp, "/sbin/init.d/%s start\n", file->dst);
 
         fclose(fp);
-    }
-    else
+    } else
         postinstall[0] = '\0';
 
     /*
@@ -208,8 +202,7 @@ make_swinstall(const char *prodname,    /* I - Product short name */
                 fprintf(fp, "%s\n", c->command);
 
         fclose(fp);
-    }
-    else
+    } else
         preremove[0] = '\0';
 
     /*
@@ -246,8 +239,7 @@ make_swinstall(const char *prodname,    /* I - Product short name */
                 fprintf(fp, "%s\n", c->command);
 
         fclose(fp);
-    }
-    else
+    } else
         postremove[0] = '\0';
 
     /*
@@ -298,8 +290,8 @@ make_swinstall(const char *prodname,    /* I - Product short name */
 
     for (i = dist->num_files, file = dist->files, linknum = 0; i > 0; i--, file++)
         if (tolower(file->type) == 'l') {
-            snprintf(filename, sizeof(filename), "%s/%s.link%04d", directory,
-                     prodname, linknum);
+            snprintf(filename, sizeof(filename), "%s/%s.link%04d", directory, prodname,
+                     linknum);
             symlink(file->src, filename);
             linknum++;
         }
@@ -338,8 +330,8 @@ make_swinstall(const char *prodname,    /* I - Product short name */
                     break;
 
             if (j < dist->num_descriptions) {
-                snprintf(filename, sizeof(filename), "%s/%s-%s.desc", directory,
-                         prodname, dist->subpackages[i]);
+                snprintf(filename, sizeof(filename), "%s/%s-%s.desc", directory, prodname,
+                         dist->subpackages[i]);
 
                 if ((fp = fopen(filename, "w")) == NULL) {
                     fprintf(stderr, "epm: Unable to create description file \"%s\": %s\n",
@@ -448,8 +440,8 @@ make_swinstall(const char *prodname,    /* I - Product short name */
                     break;
                 }
 
-            snprintf(filename, sizeof(filename), "%s/%s-%s.desc", directory,
-                     prodname, dist->subpackages[i]);
+            snprintf(filename, sizeof(filename), "%s/%s-%s.desc", directory, prodname,
+                     dist->subpackages[i]);
             if (!access(filename, 0))
                 fprintf(fp, "    description < %s\n", filename);
             fputs("  end\n", fp);
@@ -478,7 +470,8 @@ make_swinstall(const char *prodname,    /* I - Product short name */
     snprintf(filename, sizeof(filename), "%s/%s", directory, prodname);
     mkdir(filename, 0777);
 
-    if (run_command(NULL, "/usr/sbin/swpackage %s-s %s "
+    if (run_command(NULL,
+                    "/usr/sbin/swpackage %s-s %s "
                     "-x target_type=tape "
                     "-d '|" EPM_GZIP " -9 >%s/%s.depot.gz' %s",
                     Verbosity == 0 ? "" : "-v ", infoname, directory, name, prodname))
@@ -490,7 +483,8 @@ make_swinstall(const char *prodname,    /* I - Product short name */
     snprintf(filename, sizeof(filename), "%s/%s", directory, prodname);
     mkdir(filename, 0777);
 
-    if (run_command(NULL, "/usr/sbin/swpackage %s-s %s -d %s/%s "
+    if (run_command(NULL,
+                    "/usr/sbin/swpackage %s-s %s -d %s/%s "
                     "-x write_remote_files=true %s",
                     Verbosity == 0 ? "" : "-v ", infoname, directory, prodname, prodname))
         return (1);
@@ -537,8 +531,8 @@ make_swinstall(const char *prodname,    /* I - Product short name */
 
         while (linknum > 0) {
             linknum--;
-            snprintf(filename, sizeof(filename), "%s/%s.link%04d", directory,
-                     prodname, linknum);
+            snprintf(filename, sizeof(filename), "%s/%s.link%04d", directory, prodname,
+                     linknum);
             unlink(filename);
         }
 
@@ -546,8 +540,8 @@ make_swinstall(const char *prodname,    /* I - Product short name */
         unlink(filename);
 
         for (i = 0; i < dist->num_subpackages; i++) {
-            snprintf(filename, sizeof(filename), "%s/%s-%s.desc", directory,
-                     prodname, dist->subpackages[i]);
+            snprintf(filename, sizeof(filename), "%s/%s-%s.desc", directory, prodname,
+                     dist->subpackages[i]);
             unlink(filename);
         }
     }
@@ -555,23 +549,21 @@ make_swinstall(const char *prodname,    /* I - Product short name */
     return (0);
 }
 
-
 /*
  * 'write_fileset()' - Write a fileset specification for a subpackage.
  */
 
-static void write_fileset(FILE *fp,     /* I - File to write to */
-                          dist_t * dist,        /* I - Distribution */
-                          const char *directory,        /* I - Output directory */
-                          const char *prodname, /* I - Product name */
-                          const char *subpackage)       /* I - Subpackage to write */
+static void write_fileset(FILE *fp,               /* I - File to write to */
+                          dist_t *dist,           /* I - Distribution */
+                          const char *directory,  /* I - Output directory */
+                          const char *prodname,   /* I - Product name */
+                          const char *subpackage) /* I - Subpackage to write */
 {
-    int i;                      /* Looping var */
-    char filename[1024];        /* Temporary filename */
-    depend_t *d;                /* Current dependency */
-    file_t *file;               /* Current distribution file */
-    int linknum;                /* Symlink number */
-
+    int i;               /* Looping var */
+    char filename[1024]; /* Temporary filename */
+    depend_t *d;         /* Current dependency */
+    file_t *file;        /* Current distribution file */
+    int linknum;         /* Symlink number */
 
     fputs("  fileset\n", fp);
     fprintf(fp, "    tag fs_%s\n", subpackage ? subpackage : "base");
@@ -603,8 +595,7 @@ static void write_fileset(FILE *fp,     /* I - File to write to */
                         fprintf(fp, ",r<=%s\n", d->version[1]);
                     else
                         putc('\n', fp);
-                }
-                else
+                } else
                     fprintf(fp, ",r>=%s,r<=%s\n", d->version[0], d->version[1]);
             }
         }
@@ -625,8 +616,7 @@ static void write_fileset(FILE *fp,     /* I - File to write to */
                         fprintf(fp, ",r<=%s\n", d->version[1]);
                     else
                         putc('\n', fp);
-                }
-                else
+                } else
                     fprintf(fp, ",r>=%s,r<=%s\n", d->version[0], d->version[1]);
             }
         }
@@ -664,24 +654,24 @@ static void write_fileset(FILE *fp,     /* I - File to write to */
 
         switch (tolower(file->type)) {
         case 'd':
-            qprintf(fp, "    file -m %04o -o %s -g %s . %s\n", file->mode,
-                    file->user, file->group, file->dst);
+            qprintf(fp, "    file -m %04o -o %s -g %s . %s\n", file->mode, file->user,
+                    file->group, file->dst);
             break;
         case 'c':
-            qprintf(fp, "    file -m %04o -o %s -g %s -v %s %s\n", file->mode,
-                    file->user, file->group, file->src, file->dst);
+            qprintf(fp, "    file -m %04o -o %s -g %s -v %s %s\n", file->mode, file->user,
+                    file->group, file->src, file->dst);
             break;
         case 'f':
         case 'i':
-            qprintf(fp, "    file -m %04o -o %s -g %s %s %s\n", file->mode,
-                    file->user, file->group, file->src, file->dst);
+            qprintf(fp, "    file -m %04o -o %s -g %s %s %s\n", file->mode, file->user,
+                    file->group, file->src, file->dst);
             break;
         case 'l':
-            snprintf(filename, sizeof(filename), "%s/%s.link%04d", directory,
-                     prodname, linknum);
+            snprintf(filename, sizeof(filename), "%s/%s.link%04d", directory, prodname,
+                     linknum);
             linknum++;
-            qprintf(fp, "    file -o %s -g %s %s %s\n", file->user, file->group,
-                    filename, file->dst);
+            qprintf(fp, "    file -o %s -g %s %s %s\n", file->user, file->group, filename,
+                    file->dst);
             break;
         }
     }
