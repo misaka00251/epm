@@ -50,8 +50,7 @@
  * What command is used to build RPMs?
  */
 
-#define EPM_RPMBUILD	"rpm"
-#define EPM_RPMBUILD_NEW "rpmbuild"
+#define EPM_RPMBUILD	"rpmbuild"
 
 
 /*

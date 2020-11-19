@@ -410,6 +410,7 @@ fi
 if test "x$RPMBUILD" != x; then
 	AC_DEFINE_UNQUOTED(EPM_RPMBUILD, "$RPMBUILD")
 	AC_DEFINE(EPM_RPMTOPDIR)
+	AC_DEFINE_UNQUOTED(EPM_RPMARCH, "--buildarch ")
 else
 	if test "x$RPM" != x; then
 		AC_DEFINE_UNQUOTED(EPM_RPMBUILD, "$RPM")
