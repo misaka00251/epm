@@ -73,6 +73,9 @@ make_deb(const char     *prodname,	/* I - Product short name */
 		filename[1024];		/* File to archive */
   char      *sep;
 
+  /*
+   * OpenOffice builds have traditionally used '_' instead of '-' for versioning
+   */
   sep = (AooMode ? "_" : "-");
 
   if (AooMode) {
@@ -223,6 +226,9 @@ make_subpackage(const char     *prodname,
 			};
   char      *sep;
 
+ /*
+  * OpenOffice builds have traditionally used '_' instead of '-' for versioning
+  */
   sep = (AooMode ? "_" : "-");
  /*
   * Figure out the full name of the distribution...
