@@ -4,6 +4,8 @@ Changes in EPM
 Changes in EPM 4.5.2
 --------------------
 
+- Use `fakeroot` if available when building DEB packages to ensure
+  correct permissions
 - Support `rpmbuild` for RHEL7 and similar platforms
 
 Changes in EPM 4.5.1
