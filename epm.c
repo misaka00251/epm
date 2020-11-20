@@ -5,15 +5,17 @@
  * Copyright © 1999-2020 by Michael R Sweet
  * Copyright © 1999-2008 by Easy Software Products.
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
- * any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 /*
@@ -578,8 +580,8 @@ static void info(void) {
     puts("  url: https://github.com/jimjag/epm/");
     puts("");
     puts("EPM is free software and comes with ABSOLUTELY NO WARRANTY; for details");
-    puts("see the GNU General Public License in the file COPYING or at");
-    puts("\"http://www.fsf.org/gpl.html\".  Report all problems to");
+    puts("see the Apache License version 2.0 in the file LICENSE or at");
+    puts("\"https://www.apache.org/licenses/LICENSE-2.0\".  Report all problems to");
     puts("\"https://github.com/jimjag/epm/issues\".");
     puts("");
 }
