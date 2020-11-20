@@ -196,20 +196,22 @@ make_subpackage(const char *prodname,   /* I - Product short name */
             continue;
 
         if (d->type == DEPEND_REQUIRES) {
-            if (AooMode) {
 #ifdef __FreeBSD__
+            if (AooMode) {
                 if (dist->relnumber) {
                     fprintf(fp, "@pkgdep %s-%s-%d-%s", d->product, dist->version,
                             dist->relnumber, platname);
                 } else {
                     fprintf(fp, "@pkgdep %s-%s-%s", d->product, dist->version, platname);
                 }
+             } else
+                 fprintf(fp, "@pkgdep %s", d->product);
 #elif defined(__OpenBSD__)
                 fprintf(fp, "@depend %s", d->product);
 #else
                 fprintf(fp, "@pkgdep %s", d->product);
 #endif /* __FreeBSD__ */
-            } else {
+        } else {
 #ifdef __FreeBSD__
                 /*
                  * FreeBSD uses @conflicts...
@@ -220,7 +222,6 @@ make_subpackage(const char *prodname,   /* I - Product short name */
 #else
                 fprintf(fp, "@pkgcfl %s", d->product);
 #endif /* __FreeBSD__ */
-            }
         }
         if (d->vernumber[0] > 0)
             fprintf(fp, "-%s\n", d->version[0]);
@@ -238,15 +239,13 @@ make_subpackage(const char *prodname,   /* I - Product short name */
                       stderr);
                 break;
             case COMMAND_POST_INSTALL:
-                if (AooMode) {
+                if (AooMode)
                     cr2semicolon(c->command);
-                }
                 fprintf(fp, "@exec %s\n", c->command);
                 break;
             case COMMAND_PRE_REMOVE:
-                if (AooMode) {
+                if (AooMode)
                     cr2semicolon(c->command);
-                }
                 fprintf(fp, "@unexec %s\n", c->command);
                 break;
             case COMMAND_POST_REMOVE:

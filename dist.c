@@ -237,7 +237,7 @@ void add_depend(dist_t *dist,       /* I - Distribution */
     switch (i) {
     case 0:
         strlcpy(temp->version[0], "0.0", sizeof(temp->version[0]));
-        /* fall through to set max version number */
+        /* no break */
     case 1:
         strlcpy(temp->version[1], "999.99.99p99", sizeof(temp->version[1]));
         temp->vernumber[1] = INT_MAX;
