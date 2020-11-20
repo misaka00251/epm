@@ -29,23 +29,17 @@ How Do I Compile EPM?
 
 EPM uses GNU autoconf to configure itself for your system.  To build it, use:
 
-    ./configure ENTER
-    make ENTER
+    ./configure <ENTER>
+    make <ENTER>
 
 The default installation prefix is `/usr/local`; if you want to put EPM in a
 different location, use the `--prefix` option to the configure script:
 
-    ./configure --prefix=/path/to/use ENTER
-    make ENTER
-
-If using to build Apache OpenOffice, you will need to also include the `--enable-aoo`
-option, to activate those AOO specific changes:
-
-    ./configure --enable-aoo ENTER
-    make ENTER
+    ./configure --prefix=/path/to/use <ENTER>
+    make <ENTER>
 
 Once EPM is compiled you can type:
 
-    sudo make install ENTER
+    sudo make install <ENTER>
 
 to install the software.
