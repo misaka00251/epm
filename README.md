@@ -53,7 +53,7 @@ Do I Have to Pay to Distribute Software Using EPM?
 --------------------------------------------------
 
 No!  EPM is free software and any installations you create are unencumbered by
-licensing of any kind, not even the GPL.
+licensing of any kind, not even the GPL or the ALv2.
 
 
 What's New in EPM?

@@ -38,7 +38,11 @@ different location, use the `--prefix` option to the configure script:
     ./configure --prefix=/path/to/use <ENTER>
     make <ENTER>
 
-Once EPM is compiled you can type:
+To test that the build was OK, you can use the following:
+
+    make test <ENTER>
+
+Once EPM is compiled and you are sure it is working, you can type:
 
     sudo make install <ENTER>
 

@@ -4,10 +4,10 @@ Changes in EPM
 Changes in EPM 5.0.0
 --------------------
 
-- Relicensed to the ALv2 (via copyright holder)
 - Enabling the GUI correctly checks for FLTK
 - The Apache OpenOffice specific changes are no longer configure-time
   (buildtime) enabled, but run time, via the --aoo-mode CLI option.
+- Relicensed to the ALv2 (via copyright holder)
 
 Changes in EPM 4.5.2
 --------------------
