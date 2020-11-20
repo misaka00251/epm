@@ -277,8 +277,8 @@ $(EPM_OBJS):	epm.h epmstring.h
 epm:	epm.o libepm.a
 	echo Linking epm...
 	$(CC) $(LDFLAGS) -o epm epm.o libepm.a $(LIBS)
-	echo Code signing $@...
-	$(CODE_SIGN) $(CSFLAGS) -i com.jimjag.epm.$@ $@
+	#echo Code signing $@...
+	#$(CODE_SIGN) $(CSFLAGS) -i com.jimjag.epm.$@ $@
 
 epm.o:	epm.h epmstring.h
 
@@ -287,8 +287,8 @@ epm.o:	epm.h epmstring.h
 epminstall:	epminstall.o libepm.a
 	echo Linking epminstall...
 	$(CC) $(LDFLAGS) -o epminstall epminstall.o libepm.a $(LIBS)
-	echo Code signing $@...
-	$(CODE_SIGN) $(CSFLAGS) -i com.jimjag.epm.$@ $@
+	#echo Code signing $@...
+	#$(CODE_SIGN) $(CSFLAGS) -i com.jimjag.epm.$@ $@
 
 epminstall.o:	epm.h epmstring.h
 
@@ -297,8 +297,8 @@ epminstall.o:	epm.h epmstring.h
 mkepmlist:	mkepmlist.o libepm.a
 	echo Linking mkepmlist...
 	$(CC) $(LDFLAGS) -o mkepmlist mkepmlist.o libepm.a $(LIBS)
-	echo Code signing $@...
-	$(CODE_SIGN) $(CSFLAGS) -i com.jimjag.epm.$@ $@
+	#echo Code signing $@...
+	#$(CODE_SIGN) $(CSFLAGS) -i com.jimjag.epm.$@ $@
 
 mkepmlist.o:	epm.h epmstring.h
 

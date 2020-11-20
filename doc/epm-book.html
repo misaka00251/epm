@@ -35,9 +35,11 @@ A { text-decoration: none; }
 <br> with
 <br> ESP Package Manager</h1>
 <p ALIGN="CENTER">MICHAEL R. SWEET</p>
+<p ALIGN="CENTER">JIM JAGIELSKI</p>
 
 <!-- NEW PAGE -->
 <h2>Software Distribution with ESP Package Manager</h2>
+<h3>Copyright &copy; 2020 by Jim Jagielski</h3>
 <h3>Copyright &copy; 2006-2020 by Michael R Sweet</h3>
 <h3>Copyright &copy; 2006-2010 by Easy Software Products</h3>
 <p><small>This book may be redistributed and/or modified under the terms
@@ -184,7 +186,8 @@ A { text-decoration: none; }
 <!-- NEED 4in -->
 <h2><a NAME="1_3">Other References</a></h2>
 <dl>
-<dt><a HREF="https://www.msweet.org/epm">https://www.msweet.org/epm</a></dt>
+<dt><a HREF="https://jimjag.github.io/epm/">
+https://jimjag.github.io/epm/</a></dt>
 <dd>The official home page of the ESP Package Manager software.
 <br> &nbsp;</dd>
 <dt><a HREF="http://www.debian.org/devel/">http://www.debian.org/devel/</a>
@@ -206,7 +209,7 @@ A { text-decoration: none; }
  clear. If you find errors or have a suggestion for improving the book,
  please file a bug at:</p>
 <pre>
-<a href="https://github.com/michaelrsweet/epm/issues">https://github.com/michaelrsweet/epm/issues</a>
+<a href="https://github.com/jimjag/epm/issues">https://github.com/jimjag/epm/issues</a>
 </pre>
 <h2><a NAME="1_5">Acknowledgments</a></h2>
 <p>I'd like to thank the following people for their contributions to
@@ -435,7 +438,7 @@ fakeroot</code> software, introducing potential security risks and
 <p>The EPM project page provides access to the current software,
  documentation, and issue tracker for EPM:</p>
 <pre>
-<a HREF="https://www.msweet.org/epm">https://www.msweet.org/epm</a>
+<a HREF="https://jimjag.github.io/epm/">https://jimjag.github.io/epm/</a>
 </pre>
 <p>The EPM source code can be downloaded in compressed tar files or via
  the popular Subversion software. Please see the EPM project page for
@@ -1335,11 +1338,13 @@ $srcdir=.
 <pre>
 %product ESP Package Manager
 %copyright 1999-2020 by Michael R Sweet, All Rights Reserved.
+%copyright 2020 by Jim Jagielski, All Rights Reserved.
 %vendor Michael R Sweet
+%vendor Jim Jagielski
 %license ${srcdir}/COPYING
 %readme ${srcdir}/README.md
 %description Universal software packaging tool for UNIX.
-%version 4.5 450
+%version 4.6 460
 </pre>
 <p>After the product information, we include all of the non-GUI files
  that are part of EPM:</p>
