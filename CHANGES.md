@@ -1,7 +1,7 @@
 Changes in EPM
 ==============
 
-Changes in EPM 4.6.0
+Changes in EPM 5.0.0
 --------------------
 
 - Enabling the GUI correctly checks for FLTK
