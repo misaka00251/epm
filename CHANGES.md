@@ -4,6 +4,7 @@ Changes in EPM
 Changes in EPM 4.6.0
 --------------------
 
+- Enabling the GUI correctly checks for FLTK
 - The Apache OpenOffice specific changes are no longer configure-time
   (buildtime) enabled, but run time, via the --aoo-mode CLI option.
 
@@ -11,8 +12,9 @@ Changes in EPM 4.5.2
 --------------------
 
 - Use `fakeroot` if available when building DEB packages to ensure
-  correct permissions
+  correct file permissions
 - Support `rpmbuild` for RHEL7 and similar platforms
+- Brought back support for platforms deprecated in 4.5.0
 
 Changes in EPM 4.5.1
 --------------------
