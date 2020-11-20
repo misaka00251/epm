@@ -1355,7 +1355,7 @@ Optional Features:
   --enable-debug          turn on debugging, default=no
   --enable-sanitizer      build with AddressSanitizer, default=no
   --enable-gui            turn on GUI utilities, default=auto
-  --enable-fltk          enable fltk [default=auto]
+  --enable-fltk           enable fltk, default=auto
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -2208,7 +2208,7 @@ VERNUMBER=460
 
 
 cat >>confdefs.h <<_ACEOF
-#define EPM_VERSION "ESP Package Manager v$VERSION"
+#define EPM_VERSION "ESP Package Manager (EPM) v$VERSION"
 _ACEOF
 
 
@@ -4886,7 +4886,7 @@ if test "$ac_res" != no; then :
 fi
 
 
-if test "x$enable_gui" != xno && test "x$enable_fltk" = xyes; then
+if test "x$enable_gui" != xno && test "x$enable_fltk" != xno; then
 	# Extract the first word of "fltk-config", so it can be a program name with args.
 set dummy fltk-config; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5

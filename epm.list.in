@@ -28,7 +28,7 @@ $mandir=@mandir@
 $srcdir=@srcdir@
 
 # Product information
-%product ESP Package Manager
+%product ESP Package Manager (EPM)
 %copyright 1999-2020 by Michael R Sweet, All Rights Reserved.
 %vendor Michael R Sweet
 %license ${srcdir}/COPYING
