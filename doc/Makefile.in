@@ -21,7 +21,7 @@
 CC	=	@CC@
 HTMLDOC	=	@HTMLDOC@
 RM	=	@RM@ -f
-
+INSTALL		=	@INSTALL@
 
 # Program options...
 ARFLAGS		=	@ARFLAGS@
