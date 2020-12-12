@@ -32,7 +32,7 @@ static int make_package(int format, const char *prodname, const char *directory,
                         dist_t *dist, const char *setup);
 
 /*
- * 'make_macos()' - Make a Red Hat software distribution package.
+ * 'make_macos()' - Make a macOS disk image containing a macOS package.
  */
 
 int                                  /* O - 0 = success, 1 = fail */
