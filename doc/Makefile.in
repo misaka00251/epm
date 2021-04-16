@@ -37,6 +37,7 @@ OPTIM		=	@OPTIM@
 bindir		=	@bindir@
 datadir		=	@datadir@
 datarootdir	=	@datarootdir@
+docdir		=	@docdir@
 exec_prefix	=	@exec_prefix@
 includedir	=	@includedir@
 infodir		=	@infodir@
@@ -84,7 +85,7 @@ clean:
 install:
 	echo Installing EPM manpages in $(BUILDROOT)$(mandir)/man1
 	$(INSTALL) -d -m 755 $(BUILDROOT)$(mandir)/man1
-	for file in epm.1 epminstall.1 mkepmlist. setup.1; do \
+	for file in epm.1 epminstall.1 mkepmlist.1 setup.1; do \
 		$(INSTALL) -c -m 644 $$file $(BUILDROOT)$(mandir)/man1; \
 	done
 	echo Installing EPM manpages in $(BUILDROOT)$(mandir)/man5
